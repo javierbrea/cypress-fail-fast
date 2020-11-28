@@ -2,7 +2,7 @@ name: check-package-version
 on:
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   check-package-version:
     runs-on: ubuntu-latest
