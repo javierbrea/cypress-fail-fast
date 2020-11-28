@@ -4,6 +4,7 @@
     "afterEach": true,
     "beforeEach": true,
     "before": true,
+    "after": true,
     "cy": true
   }
 }

@@ -1,7 +1,13 @@
-const { shouldFailFast } = require("./helpers");
+const { PLUGIN_ENVIRONMENT_VAR } = require("./helpers");
 
 function isHeaded() {
   return Cypress.browser && Cypress.browser.isHeaded;
+}
+
+function shouldFailFast() {
+  return (
+    Cypress.env(PLUGIN_ENVIRONMENT_VAR) === true || Cypress.env(PLUGIN_ENVIRONMENT_VAR) === "true"
+  );
 }
 
 function testState(test) {
