@@ -54,7 +54,7 @@ or Set the "env" key in your cypress.json configuration file:
 
 The plugin uses tests' internal properties such as the `state`, `currentRetrys`, etc, so it may stop working on each new Cypress release. To avoid this it has been tested with Cypress versions from 5.0.0, and new releases will be published for each new Cypress minor or major releases, updating the Cypress version used in the package E2E tests.
 
-If you find some issue please check the latest tested version in the `package.json` file of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/tests-e2e/cypress-5/plugin.js
+If you find some issue please check the latest tested version in the `package.json` file of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/tests-e2e/cypress-5/package.json
 
 Tests for checking that the solution also works on Cypress 6 will be added soon, as well as the correspondent E2E tests.
 
@@ -73,12 +73,12 @@ MIT, see [LICENSE](./LICENSE) for details.
 
 [coveralls-image]: https://coveralls.io/repos/github/javierbrea/cypress-fail-fast/badge.svg
 [coveralls-url]: https://coveralls.io/github/javierbrea/cypress-fail-fast
-[travisci-image]: https://travis-ci.com/javierbrea/cypress-fail-fast.svg?branch=master
+[travisci-image]: https://travis-ci.com/javierbrea/cypress-fail-fast.svg?branch=main
 [travisci-url]: https://travis-ci.com/javierbrea/cypress-fail-fast
 [last-commit-image]: https://img.shields.io/github/last-commit/javierbrea/cypress-fail-fast.svg
 [last-commit-url]: https://github.com/javierbrea/cypress-fail-fast/commits
 [license-image]: https://img.shields.io/npm/l/cypress-fail-fast.svg
-[license-url]: https://github.com/javierbrea/cypress-fail-fast/blob/master/LICENSE
+[license-url]: https://github.com/javierbrea/cypress-fail-fast/blob/main/LICENSE
 [npm-downloads-image]: https://img.shields.io/npm/dm/cypress-fail-fast.svg
 [npm-downloads-url]: https://www.npmjs.com/package/cypress-fail-fast
 [npm-dependencies-image]: https://img.shields.io/david/javierbrea/cypress-fail-fast.svg
