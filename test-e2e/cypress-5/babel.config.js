@@ -5,7 +5,7 @@ module.exports = {
       {
         root: ["."],
         alias: {
-          "cypress-fast-fail": `../../`,
+          "cypress-fail-fast": `../../`,
         },
       },
     ],

@@ -1,4 +1,7 @@
 {
   "baseUrl": "http://localhost:3000",
-  "video": false
+  "video": false,
+  "env": {
+    "FAIL_FAST": true
+  }
 }

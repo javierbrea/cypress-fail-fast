@@ -32,7 +32,7 @@
     "test:mutation": "stryker run"
   },
   "peerDependencies": {
-    "cypress": "^5.0.0"
+    "cypress": "5.x"
   },
   "devDependencies": {
     "@stryker-mutator/core": "4.0.0",
