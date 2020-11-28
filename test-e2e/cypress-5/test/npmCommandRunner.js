@@ -1,5 +1,6 @@
 const path = require("path");
 const childProcess = require("child_process");
+const stripAnsi = require("strip-ansi");
 
 const ENCODING_TYPE = "utf8";
 const ROOT_FOLDER = path.resolve(__dirname, "..");
@@ -8,7 +9,7 @@ const npmRun = (commands, envVars) => {
   let npmProcess;
   const logs = [];
   const logData = (log) => {
-    const cleanLog = log.trim();
+    const cleanLog = stripAnsi(log.trim());
     if (cleanLog.length) {
       console.log(cleanLog);
       logs.push(cleanLog);

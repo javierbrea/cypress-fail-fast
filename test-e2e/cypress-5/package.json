@@ -16,6 +16,7 @@
     "cypress": "5.0.0",
     "jest": "26.6.1",
     "serve": "11.3.2",
-    "start-server-and-test": "1.11.5"
+    "start-server-and-test": "1.11.5",
+    "strip-ansi": "6.0.0"
   }
 }
