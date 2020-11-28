@@ -2,8 +2,9 @@ name: publish-to-github-registry
 on:
   #release:
     #types: [created]
-  branches:
-    - main
+  push:
+    branches:
+      - main
 jobs:
   publish:
     runs-on: ubuntu-latest
