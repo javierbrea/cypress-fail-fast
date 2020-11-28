@@ -22,17 +22,18 @@
   "main": "index.js",
   "scripts": {
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "eslint src test *.js test-e2e/cypress-5/*.js test-e2e/cypress-5/cypress/**/*.js",
+    "lint": "eslint src test *.js test-e2e/cypress-5/*.js test-e2e/cypress-5/cypress/**/*.js test-e2e/cypress-6/*.js test-e2e/cypress-6/cypress/**/*.js",
     "lint:local": "npm run lint:all",
     "lint-staged": "lint-staged",
     "test": "jest",
-    "test:e2e:ci": "cd test-e2e/cypress-5 && npm i && npm run test:ci",
+    "test:e2e:v5:ci": "cd test-e2e/cypress-5 && npm i && npm run test:ci",
+    "test:e2e:v6:ci": "cd test-e2e/cypress-6 && npm i && npm run test:ci",
     "test:coverage": "npm run test",
-    "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
+    "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:v5:ci && npm run test:e2e:v6:ci",
     "test:mutation": "stryker run"
   },
   "peerDependencies": {
-    "cypress": "5.x"
+    "cypress": "5.x || 6.x"
   },
   "devDependencies": {
     "@stryker-mutator/core": "4.0.0",
@@ -54,7 +55,9 @@
     "src/**/*.js": "eslint",
     "test/**/*.js": "eslint",
     "test-e2e/cypress-5/*.js": "eslint",
-    "test-e2e/cypress-5/cypress/**/*.js": "eslint"
+    "test-e2e/cypress-5/cypress/**/*.js": "eslint",
+    "test-e2e/cypress-6/*.js": "eslint",
+    "test-e2e/cypress-6/cypress/**/*.js": "eslint"
   },
   "husky": {
     "hooks": {
