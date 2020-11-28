@@ -1,9 +1,14 @@
-const { shouldFailFast } = require("./helpers");
+const { PLUGIN_ENVIRONMENT_VAR } = require("./helpers");
 
-let shouldSkip = false;
+function shouldFailFast(config) {
+  return (
+    config.env[PLUGIN_ENVIRONMENT_VAR] === true || config.env[PLUGIN_ENVIRONMENT_VAR] === "true"
+  );
+}
 
 module.exports = (on, config) => {
   // Expose fail fast tasks
+  let shouldSkip = false;
 
   on("task", {
     resetShouldSkipDueToFailFast() {

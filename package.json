@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",
@@ -22,17 +22,17 @@
   "main": "index.js",
   "scripts": {
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "eslint src test *.js",
+    "lint": "eslint src test *.js test-e2e/cypress-5/*.js test-e2e/cypress-5/cypress/**/*.js",
     "lint:local": "npm run lint:all",
     "lint-staged": "lint-staged",
     "test": "jest",
+    "test:e2e:ci": "cd test-e2e/cypress-5 && npm i && npm run test:ci",
     "test:coverage": "npm run test",
-    "test:ci": "npm run test && npm run stryker",
-    "stryker:dev": "stryker run stryker.conf.local.js",
-    "stryker": "stryker run"
+    "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
+    "test:mutation": "stryker run"
   },
   "peerDependencies": {
-    "cypress": "^5.0.0"
+    "cypress": "5.x"
   },
   "devDependencies": {
     "@stryker-mutator/core": "4.0.0",
@@ -52,7 +52,9 @@
   "lint-staged": {
     "*.js": "eslint",
     "src/**/*.js": "eslint",
-    "test/**/*.js": "eslint"
+    "test/**/*.js": "eslint",
+    "test-e2e/cypress-5/*.js": "eslint",
+    "test-e2e/cypress-5/cypress/**/*.js": "eslint"
   },
   "husky": {
     "hooks": {
@@ -60,6 +62,6 @@
     }
   },
   "engines": {
-    "node": "12.x || 13.x || 14.x || 15.x"
+    "node": "12.x || 14.x || 15.x"
   }
 }
