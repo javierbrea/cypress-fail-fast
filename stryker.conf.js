@@ -4,11 +4,11 @@ const STRYKER_DASHBOARD_API_KEY = process.env.STRYKER_DASHBOARD_API_KEY;
 const BASE_CONFIG = {
   files: ["*.js", "src/**/*.js", "test/**/*.js"],
   packageManager: "npm",
-  /* thresholds: {
+  thresholds: {
     high: 80,
     low: 60,
     break: 80,
-  }, */
+  },
   reporters: ["html", "clear-text", "progress", "dashboard"],
   testRunner: "jest",
   coverageAnalysis: "off",
