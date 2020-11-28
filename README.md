@@ -20,7 +20,7 @@ Inside `cypress/plugins/index.js`:
 
 ```javascript
 module.exports = (on, config) => {
-  require("cypress-fail-fast")(on, config);
+  require("cypress-fail-fast/plugin")(on, config);
   return config;
 };
 ```
@@ -28,7 +28,7 @@ module.exports = (on, config) => {
 At the top of `cypress/support/index.js`:
 
 ```javascript
-require "cypress-fail-fast";
+import "cypress-fail-fast";
 ```
 
 ## Usage
