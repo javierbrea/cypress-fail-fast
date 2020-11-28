@@ -6,7 +6,7 @@
 
 # Cypress Fail Fast
 
-Enables fail fast on Cypress, skipping the rest of tests on first failure.
+Enables fail fast in Cypress, skipping the rest of tests on first failure.
 
 ## Installation
 
