@@ -1,0 +1,65 @@
+{
+  "name": "cypress-fail-fast",
+  "version": "0.1.0",
+  "description": "Skip the rest of Cypress tests on first failure",
+  "keywords": [
+    "cypress",
+    "cypress-plugin",
+    "fail-fast",
+    "failure",
+    "skip",
+    "tests",
+    "testing-tools",
+    "testing"
+  ],
+  "author": "Javier Brea",
+  "license": "MIT",
+  "repository": "https://github.com/javierbrea/cypress-fail-fast",
+  "files": [
+    "src",
+    "plugin.js"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "lint": "eslint src test *.js",
+    "lint:local": "npm run lint:all",
+    "lint-staged": "lint-staged",
+    "test": "jest",
+    "test:coverage": "npm run test",
+    "test:ci": "npm run test && npm run stryker",
+    "stryker:dev": "stryker run stryker.conf.local.js",
+    "stryker": "stryker run"
+  },
+  "peerDependencies": {
+    "cypress": "^5.0.0"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "4.0.0",
+    "@stryker-mutator/jest-runner": "4.0.0",
+    "babel-eslint": "10.1.0",
+    "coveralls": "3.0.9",
+    "eslint": "7.12.1",
+    "eslint-config-prettier": "6.15.0",
+    "eslint-plugin-prettier": "3.1.4",
+    "eslint-plugin-react": "7.21.5",
+    "husky": "4.3.0",
+    "jest": "26.6.1",
+    "lint-staged": "10.5.0",
+    "prettier": "2.1.2",
+    "sinon": "9.2.1"
+  },
+  "lint-staged": {
+    "*.js": "eslint",
+    "src/**/*.js": "eslint",
+    "test/**/*.js": "eslint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-staged"
+    }
+  },
+  "engines": {
+    "node": "12.x || 13.x || 14.x || 15.x"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "globals": {
+    "Cypress": true,
+    "afterEach": true,
+    "beforeEach": true,
+    "before": true,
+    "cy": true
+  }
+}
