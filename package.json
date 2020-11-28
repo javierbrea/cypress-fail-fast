@@ -28,7 +28,6 @@
     "test": "jest",
     "test:coverage": "npm run test",
     "test:ci": "npm run test && npm run stryker",
-    "stryker:dev": "stryker run stryker.conf.local.js",
     "stryker": "stryker run"
   },
   "peerDependencies": {
