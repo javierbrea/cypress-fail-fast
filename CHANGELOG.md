@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
-## [0.1.0] - 2019-11-28
+## [1.0.0] - 2019-11-28
 ### Added
-- Add package structure and first beta version.
-- Add dependencies and configure build and quality tools.
+- First release
