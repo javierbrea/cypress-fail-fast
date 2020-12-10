@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
-# [1.2.0] - 2020-12-10
+## [1.2.0] - 2020-12-10
 ### Added
 - chore(deps): Add node 10.x support
 
