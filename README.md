@@ -1,4 +1,4 @@
-[![Build status][travisci-image]][travisci-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Quality Gate][quality-gate-image]][quality-gate-url] [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fjavierbrea%2Fcypress-fail-fast%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/javierbrea/cypress-fail-fast/main)
+[![Build status][build-image]][build-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Quality Gate][quality-gate-image]][quality-gate-url] [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fjavierbrea%2Fcypress-fail-fast%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/javierbrea/cypress-fail-fast/main)
 
 [![NPM dependencies][npm-dependencies-image]][npm-dependencies-url] [![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com) [![Last commit][last-commit-image]][last-commit-url] [![Last release][release-image]][release-url]
 
@@ -50,11 +50,17 @@ or Set the "env" key in your cypress.json configuration file:
 }
 ```
 
-## Caveats
+From now, if one test fail after its last retry, the rest of tests will be skipped:
 
-The plugin uses tests' internal properties such as the `state`, `currentRetrys`, etc, so it may stop working on each new Cypress release. To avoid this it has been tested with Cypress versions from 5.0.0, and new releases will be published for each new Cypress minor or major releases, updating the Cypress version used in the package E2E tests.
+![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
 
-If you find some issue please check the latest tested version in the `devDependencies` of the `package.json` files of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-5/package.json and https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-6/package.json.
+## Tests
+
+To ensure the plugin stability, it is being tested with Cypress major versions 5.x and 6.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
+
+Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-5/package.json and https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-6/package.json
+
+Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 
 ## Acknowledgements
 
@@ -71,8 +77,8 @@ MIT, see [LICENSE](./LICENSE) for details.
 
 [coveralls-image]: https://coveralls.io/repos/github/javierbrea/cypress-fail-fast/badge.svg
 [coveralls-url]: https://coveralls.io/github/javierbrea/cypress-fail-fast
-[travisci-image]: https://travis-ci.com/javierbrea/cypress-fail-fast.svg?branch=main
-[travisci-url]: https://travis-ci.com/javierbrea/cypress-fail-fast
+[build-image]: https://github.com/javierbrea/cypress-fail-fast/workflows/build/badge.svg?branch=chore-deps-cypress-6
+[build-url]: https://github.com/javierbrea/cypress-fail-fast/actions?query=workflow%3Abuild+branch%3Amain
 [last-commit-image]: https://img.shields.io/github/last-commit/javierbrea/cypress-fail-fast.svg
 [last-commit-url]: https://github.com/javierbrea/cypress-fail-fast/commits
 [license-image]: https://img.shields.io/npm/l/cypress-fail-fast.svg
@@ -85,5 +91,3 @@ MIT, see [LICENSE](./LICENSE) for details.
 [quality-gate-url]: https://sonarcloud.io/dashboard?id=cypress-fail-fast
 [release-image]: https://img.shields.io/github/release-date/javierbrea/cypress-fail-fast.svg
 [release-url]: https://github.com/javierbrea/cypress-fail-fast/releases
-
-[cypress-typescript]: https://docs.cypress.io/guides/tooling/typescript-support.html
