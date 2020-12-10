@@ -77,7 +77,7 @@ MIT, see [LICENSE](./LICENSE) for details.
 
 [coveralls-image]: https://coveralls.io/repos/github/javierbrea/cypress-fail-fast/badge.svg
 [coveralls-url]: https://coveralls.io/github/javierbrea/cypress-fail-fast
-[build-image]: https://github.com/javierbrea/cypress-fail-fast/workflows/build/badge.svg?branch=chore-deps-cypress-6
+[build-image]: https://github.com/javierbrea/cypress-fail-fast/workflows/build/badge.svg?branch=main
 [build-url]: https://github.com/javierbrea/cypress-fail-fast/actions?query=workflow%3Abuild+branch%3Amain
 [last-commit-image]: https://img.shields.io/github/last-commit/javierbrea/cypress-fail-fast.svg
 [last-commit-url]: https://github.com/javierbrea/cypress-fail-fast/commits
