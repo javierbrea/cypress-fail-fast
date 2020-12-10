@@ -21,14 +21,14 @@
   ],
   "main": "index.js",
   "scripts": {
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "eslint src test *.js test-e2e/cypress-5/*.js test-e2e/cypress-5/cypress/**/*.js test-e2e/cypress-6/*.js test-e2e/cypress-6/cypress/**/*.js",
     "lint:local": "npm run lint:all",
     "lint-staged": "lint-staged",
     "test": "jest",
     "test:e2e:v5:ci": "cd test-e2e/cypress-5 && npm i && npm run test:ci",
     "test:e2e:v6:ci": "cd test-e2e/cypress-6 && npm i && npm run test:ci",
-    "test:coverage": "npm run test",
+    "test:unit": "npm run test",
+    "test:e2e": "npm run test:e2e:v5:ci && npm run test:e2e:v6:ci",
     "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:v5:ci && npm run test:e2e:v6:ci",
     "test:mutation": "stryker run"
   },
@@ -39,7 +39,6 @@
     "@stryker-mutator/core": "4.1.2",
     "@stryker-mutator/jest-runner": "4.1.2",
     "babel-eslint": "10.1.0",
-    "coveralls": "3.0.9",
     "eslint": "7.14.0",
     "eslint-config-prettier": "6.15.0",
     "eslint-plugin-prettier": "3.1.4",
@@ -65,6 +64,6 @@
     }
   },
   "engines": {
-    "node": "12.x || 14.x || 15.x"
+    "node": "10.x || 12.x || 14.x || 15.x"
   }
 }
