@@ -1,4 +1,4 @@
-[![Build status][travisci-image]][travisci-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Quality Gate][quality-gate-image]][quality-gate-url] [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fjavierbrea%2Fcypress-fail-fast%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/javierbrea/cypress-fail-fast/main)
+[![Build status][build-image]][build-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Quality Gate][quality-gate-image]][quality-gate-url] [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fjavierbrea%2Fcypress-fail-fast%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/javierbrea/cypress-fail-fast/main)
 
 [![NPM dependencies][npm-dependencies-image]][npm-dependencies-url] [![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com) [![Last commit][last-commit-image]][last-commit-url] [![Last release][release-image]][release-url]
 
@@ -77,8 +77,8 @@ MIT, see [LICENSE](./LICENSE) for details.
 
 [coveralls-image]: https://coveralls.io/repos/github/javierbrea/cypress-fail-fast/badge.svg
 [coveralls-url]: https://coveralls.io/github/javierbrea/cypress-fail-fast
-[travisci-image]: https://travis-ci.com/javierbrea/cypress-fail-fast.svg?branch=main
-[travisci-url]: https://travis-ci.com/javierbrea/cypress-fail-fast
+[build-image]: https://github.com/javierbrea/cypress-fail-fast/workflows/build/badge.svg?branch=chore-deps-cypress-6
+[build-url]: https://github.com/javierbrea/cypress-fail-fast/actions?query=workflow%3Abuild+branch%3Amain
 [last-commit-image]: https://img.shields.io/github/last-commit/javierbrea/cypress-fail-fast.svg
 [last-commit-url]: https://github.com/javierbrea/cypress-fail-fast/commits
 [license-image]: https://img.shields.io/npm/l/cypress-fail-fast.svg
@@ -91,5 +91,3 @@ MIT, see [LICENSE](./LICENSE) for details.
 [quality-gate-url]: https://sonarcloud.io/dashboard?id=cypress-fail-fast
 [release-image]: https://img.shields.io/github/release-date/javierbrea/cypress-fail-fast.svg
 [release-url]: https://github.com/javierbrea/cypress-fail-fast/releases
-
-[cypress-typescript]: https://docs.cypress.io/guides/tooling/typescript-support.html

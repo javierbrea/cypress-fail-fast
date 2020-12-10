@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- chore(deps): Add node 10.x support
 ### Changed
+- docs(readme): Improve docs
+- chore(deps): Update Cypress 6.x version used in E2E
+- chore(pipeline): Migrate pipelines to Github actions
+
 ### Fixed
 ### Removed
 ### BREAKING CHANGES
