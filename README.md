@@ -50,11 +50,13 @@ or Set the "env" key in your cypress.json configuration file:
 }
 ```
 
-## Caveats
+## Tests
 
-The plugin uses tests' internal properties such as the `state`, `currentRetrys`, etc, so it may stop working on each new Cypress release. To avoid this it has been tested with Cypress versions from 5.0.0, and new releases will be published for each new Cypress minor or major releases, updating the Cypress version used in the package E2E tests.
+To ensure the plugin stability, it is being tested with Cypress major versions 5.x and 6.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
 
-If you find some issue please check the latest tested version in the `devDependencies` of the `package.json` files of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-5/package.json and https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-6/package.json.
+Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-5/package.json and https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-6/package.json
+
+Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 
 ## Acknowledgements
 
