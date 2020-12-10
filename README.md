@@ -50,6 +50,10 @@ or Set the "env" key in your cypress.json configuration file:
 }
 ```
 
+From now, if one test fail after its last retry, the rest of tests will be skipped:
+
+![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
+
 ## Tests
 
 To ensure the plugin stability, it is being tested with Cypress major versions 5.x and 6.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
