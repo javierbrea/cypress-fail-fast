@@ -12,7 +12,7 @@
     "test:ci": "jest"
   },
   "devDependencies": {
-    "babel-plugin-module-resolver": "4.0.0",
+    "babel-plugin-module-resolver": "4.1.0",
     "cypress": "5.6.0",
     "jest": "26.6.3",
     "serve": "11.3.2",
