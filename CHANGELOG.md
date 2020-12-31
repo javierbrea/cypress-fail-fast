@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [1.3.1] - 2020-12-31
+### Fixed
+- docs: Fix E2E tests versions links
+
 ## [1.3.0] - 2020-12-31
 ### Added
 - feat: Add TypeScript declarations (#37)

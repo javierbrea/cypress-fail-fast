@@ -71,7 +71,9 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): 
 
 To ensure the plugin stability, it is being tested with Cypress major versions 5.x and 6.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
 
-Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests at https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-5/package.json and https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-6/package.json
+Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
+* [Cypress v5](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-5/package.json)
+* [Cypress v6](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-6/package.json)
 
 Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 
