@@ -46,7 +46,7 @@ jobs:
           BRANCH_NAME: ${{ steps.extract-branch.outputs.branch }}
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_TOKEN }}
       - name: Test E2E
-        run: npm run test:e2e
+        run: npm run test:e2e:ci
         id: test-e2e
       - name: Upload test results
         uses: actions/upload-artifact@v2

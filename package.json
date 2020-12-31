@@ -17,19 +17,24 @@
   "repository": "https://github.com/javierbrea/cypress-fail-fast",
   "files": [
     "src",
-    "plugin.js"
+    "index.d.ts",
+    "plugin.js",
+    "plugin.d.ts"
   ],
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "lint": "eslint src test *.js test-e2e/cypress-5/*.js test-e2e/cypress-5/cypress/**/*.js test-e2e/cypress-6/*.js test-e2e/cypress-6/cypress/**/*.js",
-    "lint:local": "npm run lint:all",
+    "lint": "eslint src test *.js test-e2e/*.js test-e2e/commands/**/*.js test-e2e/cypress-src/**/*.js test-e2e/test/**/*.js",
     "lint-staged": "lint-staged",
     "test": "jest",
-    "test:e2e:v5:ci": "cd test-e2e/cypress-5 && npm i && npm run test:ci",
-    "test:e2e:v6:ci": "cd test-e2e/cypress-6 && npm i && npm run test:ci",
+    "test:e2e:v5": "cd test-e2e/cypress-5 && npm i && npm run test:ci",
+    "test:e2e:v6": "cd test-e2e/cypress-6 && npm i && npm run test:ci",
+    "test:e2e:typescript": "cd test-e2e/typescript && npm i && npm run test:ci",
     "test:unit": "npm run test",
-    "test:e2e": "npm run test:e2e:v5:ci && npm run test:e2e:v6:ci",
-    "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:v5:ci && npm run test:e2e:v6:ci",
+    "test:e2e:install": "cd test-e2e && npm i",
+    "test:e2e:run": "cd test-e2e && npm run test:ci",
+    "test:e2e:ci": "npm run test:e2e:install && npm run test:e2e:run",
+    "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
     "test:mutation": "stryker run"
   },
   "peerDependencies": {
@@ -39,6 +44,7 @@
     "@stryker-mutator/core": "4.3.1",
     "@stryker-mutator/jest-runner": "4.3.1",
     "babel-eslint": "10.1.0",
+    "cypress": "6.2.0",
     "eslint": "7.16.0",
     "eslint-config-prettier": "7.1.0",
     "eslint-plugin-prettier": "3.3.0",
@@ -53,10 +59,10 @@
     "*.js": "eslint",
     "src/**/*.js": "eslint",
     "test/**/*.js": "eslint",
-    "test-e2e/cypress-5/*.js": "eslint",
-    "test-e2e/cypress-5/cypress/**/*.js": "eslint",
-    "test-e2e/cypress-6/*.js": "eslint",
-    "test-e2e/cypress-6/cypress/**/*.js": "eslint"
+    "test-e2e/*.js": "eslint",
+    "test-e2e/commands/**/*.js": "eslint",
+    "test-e2e/cypress-src/**/*.js": "eslint",
+    "test-e2e/test/**/*.js": "eslint"
   },
   "husky": {
     "hooks": {

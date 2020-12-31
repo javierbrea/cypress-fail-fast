@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- feat: Add TypeScript declarations (#37)
+- test(e2e): Add E2E tests using TypeScript in Cypress
 ### Changed
+- test(e2e): Refactor E2E tests to avoid code duplications. Now there is a common tests runner and code is generated for each different Cypress variant (except package.json files in order to allow renovate continue updating dependencies)
+- docs: Update contributing guidelines
+- chore(deps): Update dependencies
 ### Fixed
 ### Removed
 ### BREAKING CHANGES
