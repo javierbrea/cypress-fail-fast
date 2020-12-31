@@ -54,6 +54,19 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 
 ![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
 
+## Usage with TypeScript
+
+If you are using [TypeScript in the Cypress plugins file][cypress-typescript], this plugin includes TypeScript declarations and can be imported like the following:
+
+```ts
+import cypressFailFast = require("cypress-fail-fast/plugin");
+
+export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.ResolvedConfigOptions => {
+  cypressFailFast(on, config);
+  return config;
+};
+```
+
 ## Tests
 
 To ensure the plugin stability, it is being tested with Cypress major versions 5.x and 6.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
@@ -91,3 +104,5 @@ MIT, see [LICENSE](./LICENSE) for details.
 [quality-gate-url]: https://sonarcloud.io/dashboard?id=cypress-fail-fast
 [release-image]: https://img.shields.io/github/release-date/javierbrea/cypress-fail-fast.svg
 [release-url]: https://github.com/javierbrea/cypress-fail-fast/releases
+
+[cypress-typescript]: https://docs.cypress.io/guides/tooling/typescript-support.html

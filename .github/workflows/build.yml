@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ["12.19.0", "14.15.0", "15.2.0"]
+        node: ["10.23.0", "12.19.0", "14.15.0", "15.2.0"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
           BRANCH_NAME: ${{ steps.extract-branch.outputs.branch }}
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_TOKEN }}
       - name: Test E2E
-        run: npm run test:e2e
+        run: npm run test:e2e:ci
         id: test-e2e
       - name: Upload test results
         uses: actions/upload-artifact@v2

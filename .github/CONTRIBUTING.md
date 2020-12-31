@@ -31,8 +31,8 @@ Individuals making significant and valuable contributions are given commit-acces
 There are a few basic ground-rules for contributors:
 
 1. **No `--force` pushes** or modifying the Git history in any way.
-2. **All modifications** should be subject to a **pull request** to solicit feedback from other contributors. The base branch of the pull request should correspond with the assigned "release milestone" of the related issue. When an issue is created, it will be prioritized and a "release milestone" will be assigned to it, at the criteria of contributors. A branch will be created from master for that release milestone, and all related issues should be merged into it, until is ready to declare a formal release.
-3. **All changes** to this project will be documented in the GHANGELOG.md file.
+2. **All modifications** should be subject to a **pull request** to solicit feedback from other contributors. The base branch of the pull request should be the `release` branch.
+3. **All changes** to this project should be documented in the GHANGELOG.md file in the `unreleased` chapter until a formal release is declared.
 
 ### Releases
 
@@ -50,7 +50,7 @@ This document may also be subject to pull-requests or changes by contributors wh
 * Follow the [Tests styleguide](#tests-styleguide).
 * All enhancements and bug fixes must be accompanied with all needed new related regression test.
 * Coverage of unit tests must remain 100%.
-* Run tests often. Tests are ran automatically with Travis when you push, but you still need to run them locally before pushing.
+* Run tests often. Tests are ran automatically when a PR is opened, but you still need to run them locally before creating it.
 * Document new features, or update documentation if changes affect to it.
 * End all files with a newline.
 * Place requires in the following order:
@@ -69,7 +69,7 @@ This document may also be subject to pull-requests or changes by contributors wh
 
 ### JavaScript Styleguide
 
-All JavaScript must adhere to the style defined in the `.eslintrc.js` file.
+All JavaScript must adhere to the style defined in the `.eslintrc.json` file.
 
 ### Tests Styleguide
 
@@ -77,7 +77,6 @@ All JavaScript must adhere to the style defined in the `.eslintrc.js` file.
 - Treat `describe` as a noun or situation (Situations usually start with "when").
 - Treat `it` as a statement about state or how an operation changes state. Usually, all `it` should start with "should".
 - Prefer fewer asserts per `it`.
-- Prefer one file for all specs of a javascript file, but, if it grows too much, split it into many files adding a sufix describing the behavior being tested in it (`file.behavior.js`)
 
 #### Example
 
