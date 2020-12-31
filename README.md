@@ -59,7 +59,7 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 If you are using [TypeScript in the Cypress plugins file][cypress-typescript], this plugin includes TypeScript declarations and can be imported like the following:
 
 ```ts
-import cypressFailFast = require("../support/cypress-fail-fast/plugin");
+import cypressFailFast = require("cypress-fail-fast/plugin");
 
 export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.ResolvedConfigOptions => {
   cypressFailFast(on, config);
