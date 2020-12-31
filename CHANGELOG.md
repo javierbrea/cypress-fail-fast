@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- feat: Add TypeScript declarations (#37)
+- test(e2e): Add E2E tests using TypeScript in Cypress
 ### Changed
 ### Fixed
 ### Removed
