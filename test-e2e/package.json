@@ -1,0 +1,19 @@
+{
+  "name": "cypress-fail-fast-e2e-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "serve -l 3000",
+    "test:build": "cross-env node commands/build.js",
+    "test:install": "cd cypress-variants/cypress-5 && npm i && cd .. && cd cypress-6 && npm i && cd .. && cd typescript && npm i",
+    "serve-and-test": "start-server-and-test serve http-get://localhost:3000 jest",
+    "test:ci": "npm run test:build && npm run test:install && npm run serve-and-test"
+  },
+  "devDependencies": {
+    "cross-env": "7.0.3",
+    "jest": "26.6.3",
+    "serve": "11.3.2",
+    "start-server-and-test": "1.11.7",
+    "strip-ansi": "6.0.0"
+  }
+}

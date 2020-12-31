@@ -1,0 +1,12 @@
+{
+  "name": "cypress-fail-fast-v6-e2e-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "cypress:run": "cypress run"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "4.1.0",
+    "cypress": "6.1.0"
+  }
+}

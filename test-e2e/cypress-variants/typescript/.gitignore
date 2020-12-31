@@ -1,0 +1,8 @@
+# exclude everything
+/*
+
+# exception to the rule
+!/.gitignore
+!/package.json
+!/package-lock.json
+!/tsconfig.json
