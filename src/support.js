@@ -48,7 +48,12 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
   afterEach(function () {
     // Mark skip flag as true if test failed
     const currentTest = this.currentTest;
-    if (currentTest && testHasFailed(currentTest) && shouldSkipRestOfTests(currentTest)) {
+    if (
+      currentTest &&
+      pluginIsEnabled() &&
+      testHasFailed(currentTest) &&
+      shouldSkipRestOfTests(currentTest)
+    ) {
       cy.task("shouldSkipDueToFailFast", true);
       Cypress.runner.stop();
     }

@@ -1,11 +1,3 @@
-const { PLUGIN_ENVIRONMENT_VAR } = require("./helpers");
-
-function shouldFailFast(config) {
-  return (
-    config.env[PLUGIN_ENVIRONMENT_VAR] === true || config.env[PLUGIN_ENVIRONMENT_VAR] === "true"
-  );
-}
-
 module.exports = (on, config) => {
   // Expose fail fast tasks
   let shouldSkip = false;
@@ -16,7 +8,7 @@ module.exports = (on, config) => {
       return null;
     },
     shouldSkipDueToFailFast(value) {
-      if (value === true && shouldFailFast(config)) {
+      if (value === true) {
         shouldSkip = value;
       }
       return shouldSkip;
