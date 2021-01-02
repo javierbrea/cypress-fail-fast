@@ -139,6 +139,16 @@ describe("support", () => {
         expect(Cypress.runner.stop.callCount).toEqual(1);
       });
 
+      it("should not log the task when setting flag to true", async () => {
+        getSupportCallbacks({
+          pluginEnabled: true,
+          shouldSkip: true,
+        });
+        beforeEachCallback();
+        await wait(200);
+        expect(cy.task.calledWith("failFastShouldSkip", null, { log: false })).toEqual(true);
+      });
+
       it("should not call stop runner if failFastShouldSkip returns false", async () => {
         getSupportCallbacks({
           pluginEnabled: true,
@@ -249,6 +259,17 @@ describe("support", () => {
         beforeCallback();
         await wait(200);
         expect(cy.task.calledWith("failFastResetSkip")).toEqual(true);
+      });
+
+      it("should not log the task when resetting the plugin flag", async () => {
+        getSupportCallbacks({
+          pluginEnabled: true,
+          browserIsHeaded: true,
+        });
+        beforeCallback();
+        await wait(200);
+        expect(cy.task.getCall(0).args[1]).toEqual(null);
+        expect(cy.task.getCall(0).args[2]).toEqual({ log: false });
       });
 
       it("should call to reset plugin if browser is headed when enabled with string", async () => {
