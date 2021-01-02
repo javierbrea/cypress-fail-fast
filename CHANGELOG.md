@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [unreleased]
 ### Added
 - feat: Read failFast.enabled property from current test and parents configuration
+- test(e2e): Add helper to run E2E tests with different specs files and configurations
 ### Changed
 ### Fixed
 ### Removed
