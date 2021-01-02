@@ -38,7 +38,7 @@ const getSpecsStatusesTests = (specsExpectedStatuses) => {
   };
 };
 
-const runVariantTests = (cypressVariant, options = {}, tests) => {
+const runVariantTests = (cypressVariant, tests, options = {}) => {
   describe(`Executed in ${cypressVariant.name}`, () => {
     let logs;
     const getLogs = (specIndex) => logs[specIndex];
@@ -55,7 +55,7 @@ const runVariantTests = (cypressVariant, options = {}, tests) => {
 const runSpecsTests = (description, options = {}) => {
   describe(description, () => {
     cypressVariants.forEach((cypressVariant) => {
-      runVariantTests(cypressVariant, options, getSpecsStatusesTests(options.specsResults));
+      runVariantTests(cypressVariant, getSpecsStatusesTests(options.specsResults), options);
     });
   });
 };
