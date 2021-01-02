@@ -54,6 +54,45 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 
 ![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
 
+## Custom Configurations
+
+If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test's configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
+
+* __`failFast`__: Configuration for the plugin, containing any of next properties:
+  * __`enabled`__ : Indicates wheter a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. (Note that setting this property as `true` will not have effect if the plugin is disabled globally using the `FAIL_FAST` environment variable)
+
+
+### Example
+
+In the next example, tests are configured to `fail-fast` only in case the test with the "sanity test" description fails. If any of the other tests fails, `fail-fast` will not be applied.
+
+```js
+describe("All tests", {
+  failFast: {
+    enabled: false, // Children tests and describes will inherit this configuration
+  },
+}, () => {
+  it("sanity test", {
+    failFast: {
+      enabled: true, // Overwrite configuration defined in parents
+    },
+  }, () => {
+    // Will skip the rest of tests if this one fails
+    expect(true).to.be.true;
+  });
+
+  it("second test",() => {
+    // Will continue if this one fails
+    expect(true).to.be.true;
+  });
+
+  it("third test",() => {
+    // Will continue if this one fails
+    expect(true).to.be.true;
+  });
+});
+```
+
 ## Usage with TypeScript
 
 If you are using [TypeScript in the Cypress plugins file][cypress-typescript], this plugin includes TypeScript declarations and can be imported like the following:
