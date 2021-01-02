@@ -82,12 +82,12 @@ describe("All tests", {
   });
 
   it("second test",() => {
-    // Will continue if this one fails
+    // Will continue executing tests if this one fails
     expect(true).to.be.true;
   });
 
   it("third test",() => {
-    // Will continue if this one fails
+    // Will continue executing tests if this one fails
     expect(true).to.be.true;
   });
 });
