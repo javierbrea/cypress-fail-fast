@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - refactor: Rename plugin tasks. Start all with same namespace
 ### Fixed
 ### Removed
+- chore: Remove unused eslint settings from src folder
 ### BREAKING CHANGES
 
 ## [1.3.1] - 2020-12-31
