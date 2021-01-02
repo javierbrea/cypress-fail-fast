@@ -23,8 +23,10 @@ describe("support", () => {
       browser: {
         isHeaded: options.browserIsHeaded,
       },
-      env: () => {
-        return options.pluginEnabled;
+      env: (envKey) => {
+        if (envKey === "FAIL_FAST") {
+          return options.pluginEnabled;
+        }
       },
       runner: {
         stop: sandbox.spy(),
@@ -45,6 +47,8 @@ describe("support", () => {
             state: options.testState,
             currentRetry: () => options.testCurrentRetry,
             retries: () => options.testRetries,
+            cfg: options.customConfig,
+            parent: options.testParent,
           },
         };
     const beforeEachMethod = (callback) => {
@@ -78,8 +82,28 @@ describe("support", () => {
 
     describe("afterEach callback", () => {
       it("should not call to any plugin task", () => {
-        getSupportCallbacks();
+        getSupportCallbacks({
+          testState: "failed",
+          testCurrentRetry: 3,
+          testRetries: 3,
+        });
         afterEachCallback();
+        expect(cy.task.callCount).toEqual(0);
+      });
+
+      it("should not call to stop runner nor set plugin flag if current test config is enabled", () => {
+        getSupportCallbacks({
+          testState: "failed",
+          testCurrentRetry: 3,
+          testRetries: 3,
+          customConfig: {
+            failFast: {
+              enabled: true,
+            },
+          },
+        });
+        afterEachCallback();
+        expect(Cypress.runner.stop.callCount).toEqual(0);
         expect(cy.task.callCount).toEqual(0);
       });
     });
@@ -95,7 +119,7 @@ describe("support", () => {
 
   describe("when plugin is enabled", () => {
     describe("beforeEach callback", () => {
-      it("should call stop runner if shouldSkipDueToFailFast returns true when enabled with string", async () => {
+      it("should call stop runner if failFastShouldSkip returns true when enabled with string", async () => {
         getSupportCallbacks({
           pluginEnabled: "true",
           shouldSkip: true,
@@ -105,7 +129,7 @@ describe("support", () => {
         expect(Cypress.runner.stop.callCount).toEqual(1);
       });
 
-      it("should call stop runner if shouldSkipDueToFailFast returns true", async () => {
+      it("should call stop runner if failFastShouldSkip returns true", async () => {
         getSupportCallbacks({
           pluginEnabled: true,
           shouldSkip: true,
@@ -115,7 +139,17 @@ describe("support", () => {
         expect(Cypress.runner.stop.callCount).toEqual(1);
       });
 
-      it("should not call stop runner if shouldSkipDueToFailFast returns false", async () => {
+      it("should not log the task when setting flag to true", async () => {
+        getSupportCallbacks({
+          pluginEnabled: true,
+          shouldSkip: true,
+        });
+        beforeEachCallback();
+        await wait(200);
+        expect(cy.task.calledWith("failFastShouldSkip", null, { log: false })).toEqual(true);
+      });
+
+      it("should not call stop runner if failFastShouldSkip returns false", async () => {
         getSupportCallbacks({
           pluginEnabled: true,
           shouldSkip: false,
@@ -138,7 +172,7 @@ describe("support", () => {
         afterEachCallback();
         await wait(200);
         expect(Cypress.runner.stop.callCount).toEqual(1);
-        expect(cy.task.calledWith("shouldSkipDueToFailFast", true)).toEqual(true);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
       });
 
       it("should call stop runner and set plugin flag if current test state is failed and it is last retry when enabled with string", async () => {
@@ -152,7 +186,7 @@ describe("support", () => {
         afterEachCallback();
         await wait(200);
         expect(Cypress.runner.stop.callCount).toEqual(1);
-        expect(cy.task.calledWith("shouldSkipDueToFailFast", true)).toEqual(true);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
       });
 
       it("should not call to stop runner nor set plugin flag if current test state is not failed", async () => {
@@ -224,7 +258,18 @@ describe("support", () => {
         });
         beforeCallback();
         await wait(200);
-        expect(cy.task.calledWith("resetShouldSkipDueToFailFast")).toEqual(true);
+        expect(cy.task.calledWith("failFastResetSkip")).toEqual(true);
+      });
+
+      it("should not log the task when resetting the plugin flag", async () => {
+        getSupportCallbacks({
+          pluginEnabled: true,
+          browserIsHeaded: true,
+        });
+        beforeCallback();
+        await wait(200);
+        expect(cy.task.getCall(0).args[1]).toEqual(null);
+        expect(cy.task.getCall(0).args[2]).toEqual({ log: false });
       });
 
       it("should call to reset plugin if browser is headed when enabled with string", async () => {
@@ -234,7 +279,94 @@ describe("support", () => {
         });
         beforeCallback();
         await wait(200);
-        expect(cy.task.calledWith("resetShouldSkipDueToFailFast")).toEqual(true);
+        expect(cy.task.calledWith("failFastResetSkip")).toEqual(true);
+      });
+    });
+  });
+
+  describe("when plugin is enabled and custom configuration is defined", () => {
+    describe("afterEach callback", () => {
+      it("should not call to stop runner nor set plugin flag if current test config is disabled", () => {
+        getSupportCallbacks({
+          pluginEnabled: "true",
+          testState: "failed",
+          testCurrentRetry: 3,
+          testRetries: 3,
+          customConfig: {
+            failFast: {
+              enabled: false,
+            },
+          },
+        });
+        afterEachCallback();
+        expect(Cypress.runner.stop.callCount).toEqual(0);
+        expect(cy.task.callCount).toEqual(0);
+      });
+
+      it("should not call to stop runner nor set plugin flag if current test config is disabled in parent", () => {
+        getSupportCallbacks({
+          pluginEnabled: "true",
+          testState: "failed",
+          testCurrentRetry: 3,
+          testRetries: 3,
+          testParent: {
+            cfg: {
+              failFast: {
+                enabled: false,
+              },
+            },
+          },
+        });
+        afterEachCallback();
+        expect(Cypress.runner.stop.callCount).toEqual(0);
+        expect(cy.task.callCount).toEqual(0);
+      });
+
+      it("should not call to stop runner nor set plugin flag if current test config is disabled in grandparent", () => {
+        getSupportCallbacks({
+          pluginEnabled: "true",
+          testState: "failed",
+          testCurrentRetry: 3,
+          testRetries: 3,
+          testParent: {
+            parent: {
+              parent: {
+                cfg: {
+                  failFast: {
+                    enabled: false,
+                  },
+                },
+              },
+            },
+          },
+        });
+        afterEachCallback();
+        expect(Cypress.runner.stop.callCount).toEqual(0);
+        expect(cy.task.callCount).toEqual(0);
+      });
+
+      it("should call to stop runner if current test config is disabled in grandparent but enabled in test", () => {
+        getSupportCallbacks({
+          pluginEnabled: "true",
+          testState: "failed",
+          testCurrentRetry: 3,
+          testRetries: 3,
+          customConfig: {
+            failFast: {
+              enabled: true,
+            },
+          },
+          testParent: {
+            cfg: {
+              failFast: {
+                enabled: false,
+              },
+            },
+          },
+        });
+        afterEachCallback();
+        expect(Cypress.runner.stop.callCount).toEqual(1);
+        expect(cy.task.callCount).toEqual(1);
       });
     });
   });

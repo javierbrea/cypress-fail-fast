@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [1.4.0] - 2021-01-02
+
+### Added
+- feat: Add suite and tests plugin custom configuration. Enable or disable plugin for suites or tests using the enabled property from custom config
+- test(e2e): Add helper to run E2E tests with different specs files and configurations
+
+### Changed
+- feat: Do not log plugin tasks, except when setting shouldSkip flag to true
+- docs: Change TypeScript example
+- refactor: Do not check plugin configuration inside Node.js plugin
+- refactor: Rename plugin tasks. Start all with same namespace
+
+### Removed
+- chore: Remove unused eslint settings from src folder
+
 ## [1.3.1] - 2020-12-31
 ### Fixed
 - docs: Fix E2E tests versions links
