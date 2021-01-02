@@ -8,12 +8,8 @@ describe("plugin", () => {
   let shouldSkipDueToFailFast;
   let resetShouldSkipDueToFailFast;
 
-  const getPluginMethods = (pluginEnvironmentVarValue) => {
-    plugin(onEventSpy, {
-      env: {
-        FAIL_FAST: pluginEnvironmentVarValue,
-      },
-    });
+  const getPluginMethods = () => {
+    plugin(onEventSpy);
     eventName = onEventSpy.getCall(0).args[0];
     shouldSkipDueToFailFast = onEventSpy.getCall(0).args[1].shouldSkipDueToFailFast;
     resetShouldSkipDueToFailFast = onEventSpy.getCall(0).args[1].resetShouldSkipDueToFailFast;
@@ -41,27 +37,27 @@ describe("plugin", () => {
       expect(shouldSkipDueToFailFast()).toEqual(false);
     });
 
-    it("should return shouldSkip flag as false even after setting it as true", () => {
+    it("should return shouldSkip flag as true after setting it as true", () => {
       getPluginMethods();
       shouldSkipDueToFailFast(true);
-      expect(shouldSkipDueToFailFast()).toEqual(false);
+      expect(shouldSkipDueToFailFast()).toEqual(true);
     });
   });
 
   describe("when it is enabled using boolean", () => {
     it("should return shouldSkip flag as false by default when plugin ", () => {
-      getPluginMethods(true);
+      getPluginMethods();
       expect(shouldSkipDueToFailFast()).toEqual(false);
     });
 
     it("should return shouldSkip flag as true after setting it as true", () => {
-      getPluginMethods(true);
+      getPluginMethods();
       shouldSkipDueToFailFast(true);
       expect(shouldSkipDueToFailFast()).toEqual(true);
     });
 
     it("should reset shouldSkip flag after calling to reset method", () => {
-      getPluginMethods(true);
+      getPluginMethods();
       shouldSkipDueToFailFast(true);
       expect(shouldSkipDueToFailFast()).toEqual(true);
       resetShouldSkipDueToFailFast();
@@ -71,18 +67,18 @@ describe("plugin", () => {
 
   describe("when it is enabled using string", () => {
     it("should return shouldSkip flag as false by default when plugin ", () => {
-      getPluginMethods("true");
+      getPluginMethods();
       expect(shouldSkipDueToFailFast()).toEqual(false);
     });
 
     it("should return shouldSkip flag as true after setting it as true", () => {
-      getPluginMethods("true");
+      getPluginMethods();
       shouldSkipDueToFailFast(true);
       expect(shouldSkipDueToFailFast()).toEqual(true);
     });
 
     it("should reset shouldSkip flag after calling to reset method", () => {
-      getPluginMethods("true");
+      getPluginMethods();
       shouldSkipDueToFailFast(true);
       expect(shouldSkipDueToFailFast()).toEqual(true);
       resetShouldSkipDueToFailFast();

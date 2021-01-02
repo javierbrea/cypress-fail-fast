@@ -6,9 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- feat: Read failFast.enabled property from current test and parents configuration
+- feat: Add suite and tests plugin custom configuration. Enable or disable plugin for suites or tests using the enabled property from custom config
 - test(e2e): Add helper to run E2E tests with different specs files and configurations
 ### Changed
+- docs: Change TypeScript example
+- refactor: Do not check plugin configuration inside Node.js plugin
 ### Fixed
 ### Removed
 ### BREAKING CHANGES
