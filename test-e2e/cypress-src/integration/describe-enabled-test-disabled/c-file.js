@@ -8,10 +8,10 @@ describe("List items", () => {
   });
 
   it("should display first item", () => {
-    cy.get("ul li:eq(0)").should("have.text", "Foo text");
+    cy.get("ul li:eq(0)").should("have.text", "First item");
   });
 
   it("should display second item", () => {
-    cy.get("ul li:eq(1)").should("have.text", "Second item");
+    cy.get("ul li:eq(1)").should("have.text", "Foo text");
   });
 });
