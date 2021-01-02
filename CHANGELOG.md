@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- feat: Read failFast.enabled property from current test and parents configuration
 ### Changed
 ### Fixed
 ### Removed
