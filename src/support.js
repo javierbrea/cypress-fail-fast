@@ -37,7 +37,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   beforeEach(function () {
     if (pluginIsEnabled()) {
-      cy.task(SHOULD_SKIP_TASK).then((value) => {
+      cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
         if (value === true) {
           Cypress.runner.stop();
         }
@@ -67,7 +67,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
         Do this only for headed runs because in headless runs,
         the `before` hook is executed for each spec file.
       */
-      cy.task(RESET_SKIP_TASK);
+      cy.task(RESET_SKIP_TASK, null, { log: false });
     }
   });
 }
