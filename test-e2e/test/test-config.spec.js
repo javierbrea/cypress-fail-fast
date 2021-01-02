@@ -74,3 +74,27 @@ runSpecsTests("When it is disabled in describe, enabled in test but disabled in 
     CYPRESS_FAIL_FAST: "false",
   },
 });
+
+runSpecsTests("When it has configuration in grandparent suites", {
+  specs: "grandparent-describe-enabled",
+  specsResults: [
+    {
+      executed: 4,
+      passed: 3,
+      failed: 1,
+      skipped: 0,
+    },
+    {
+      executed: 4,
+      passed: 1,
+      failed: 2,
+      skipped: 1,
+    },
+    {
+      executed: 3,
+      passed: 0,
+      failed: 0,
+      skipped: 3,
+    },
+  ],
+});
