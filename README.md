@@ -100,7 +100,7 @@ If you are using [TypeScript in the Cypress plugins file][cypress-typescript], t
 ```ts
 import cypressFailFast = require("cypress-fail-fast/plugin");
 
-export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.ResolvedConfigOptions => {
+export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.PluginConfigOptions => {
   cypressFailFast(on, config);
   return config;
 };
