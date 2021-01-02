@@ -1,13 +1,16 @@
+const { SHOULD_SKIP_TASK, RESET_SKIP_TASK } = require("./helpers");
+
 module.exports = (on, config) => {
-  // Expose fail fast tasks
+  // store skip flag
   let shouldSkip = false;
 
+  // Expose fail fast tasks
   on("task", {
-    resetShouldSkipDueToFailFast() {
+    [RESET_SKIP_TASK]: function () {
       shouldSkip = false;
       return null;
     },
-    shouldSkipDueToFailFast(value) {
+    [SHOULD_SKIP_TASK]: function (value) {
       if (value === true) {
         shouldSkip = value;
       }

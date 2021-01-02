@@ -119,7 +119,7 @@ describe("support", () => {
 
   describe("when plugin is enabled", () => {
     describe("beforeEach callback", () => {
-      it("should call stop runner if shouldSkipDueToFailFast returns true when enabled with string", async () => {
+      it("should call stop runner if failFastShouldSkip returns true when enabled with string", async () => {
         getSupportCallbacks({
           pluginEnabled: "true",
           shouldSkip: true,
@@ -129,7 +129,7 @@ describe("support", () => {
         expect(Cypress.runner.stop.callCount).toEqual(1);
       });
 
-      it("should call stop runner if shouldSkipDueToFailFast returns true", async () => {
+      it("should call stop runner if failFastShouldSkip returns true", async () => {
         getSupportCallbacks({
           pluginEnabled: true,
           shouldSkip: true,
@@ -139,7 +139,7 @@ describe("support", () => {
         expect(Cypress.runner.stop.callCount).toEqual(1);
       });
 
-      it("should not call stop runner if shouldSkipDueToFailFast returns false", async () => {
+      it("should not call stop runner if failFastShouldSkip returns false", async () => {
         getSupportCallbacks({
           pluginEnabled: true,
           shouldSkip: false,
@@ -162,7 +162,7 @@ describe("support", () => {
         afterEachCallback();
         await wait(200);
         expect(Cypress.runner.stop.callCount).toEqual(1);
-        expect(cy.task.calledWith("shouldSkipDueToFailFast", true)).toEqual(true);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
       });
 
       it("should call stop runner and set plugin flag if current test state is failed and it is last retry when enabled with string", async () => {
@@ -176,7 +176,7 @@ describe("support", () => {
         afterEachCallback();
         await wait(200);
         expect(Cypress.runner.stop.callCount).toEqual(1);
-        expect(cy.task.calledWith("shouldSkipDueToFailFast", true)).toEqual(true);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
       });
 
       it("should not call to stop runner nor set plugin flag if current test state is not failed", async () => {
@@ -248,7 +248,7 @@ describe("support", () => {
         });
         beforeCallback();
         await wait(200);
-        expect(cy.task.calledWith("resetShouldSkipDueToFailFast")).toEqual(true);
+        expect(cy.task.calledWith("failFastResetSkip")).toEqual(true);
       });
 
       it("should call to reset plugin if browser is headed when enabled with string", async () => {
@@ -258,7 +258,7 @@ describe("support", () => {
         });
         beforeCallback();
         await wait(200);
-        expect(cy.task.calledWith("resetShouldSkipDueToFailFast")).toEqual(true);
+        expect(cy.task.calledWith("failFastResetSkip")).toEqual(true);
       });
     });
   });

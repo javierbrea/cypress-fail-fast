@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - docs: Change TypeScript example
 - refactor: Do not check plugin configuration inside Node.js plugin
+- refactor: Rename plugin tasks. Start all with same namespace
 ### Fixed
 ### Removed
 ### BREAKING CHANGES

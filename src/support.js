@@ -1,4 +1,4 @@
-const { PLUGIN_ENVIRONMENT_VAR } = require("./helpers");
+const { PLUGIN_ENVIRONMENT_VAR, SHOULD_SKIP_TASK, RESET_SKIP_TASK } = require("./helpers");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
   function isHeaded() {
@@ -37,7 +37,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   beforeEach(function () {
     if (pluginIsEnabled()) {
-      cy.task("shouldSkipDueToFailFast").then((value) => {
+      cy.task(SHOULD_SKIP_TASK).then((value) => {
         if (value === true) {
           Cypress.runner.stop();
         }
@@ -54,18 +54,20 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
-      cy.task("shouldSkipDueToFailFast", true);
+      cy.task(SHOULD_SKIP_TASK, true);
       Cypress.runner.stop();
     }
   });
 
   before(function () {
     if (isHeaded() && pluginIsEnabled()) {
-      // Reset the shouldSkip flag at the start of a run, so that it
-      //  doesn't carry over into subsequent runs.
-      // Do this only for headed runs because in headless runs,
-      //  the `before` hook is executed for each spec file.
-      cy.task("resetShouldSkipDueToFailFast");
+      /*
+        Reset the shouldSkip flag at the start of a run, so that it
+        doesn't carry over into subsequent runs.
+        Do this only for headed runs because in headless runs,
+        the `before` hook is executed for each spec file.
+      */
+      cy.task(RESET_SKIP_TASK);
     }
   });
 }
