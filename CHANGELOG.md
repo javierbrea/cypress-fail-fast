@@ -6,13 +6,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+### Changed
+### Fixed
+### Removed
+### BREAKING CHANGES
+
+## [2.0.0] - 2021-01-17
+
+### Added
 - feat: Add FAIL_FAST_ENABLED environment variable (#53)
 - feat: Allow environment variables to be enabled with 1, and disabled with 0
+
 ### Changed
 - feat: Rename FAIL_FAST environment variable to FAIL_FAST_PLUGIN (#53)
 - test(e2e): Allow some tests to be executed only in last Cypress version in order to reduce timings
-### Fixed
-### Removed
+- chore(deps): Update devDependencies
+
 ### BREAKING CHANGES
 - feat: Plugin is now enabled by default (#44). To disable it, FAIL_FAST_PLUGIN environment variable has to be explicitly set as "false". Removed FAIL_FAST environment variable, which now has not any effect.
 
