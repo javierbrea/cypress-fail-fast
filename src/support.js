@@ -1,15 +1,32 @@
-const { PLUGIN_ENVIRONMENT_VAR, SHOULD_SKIP_TASK, RESET_SKIP_TASK } = require("./helpers");
+const {
+  ENVIRONMENT_DEFAULT_VALUES,
+  PLUGIN_ENVIRONMENT_VAR,
+  ENABLED_ENVIRONMENT_VAR,
+  SHOULD_SKIP_TASK,
+  RESET_SKIP_TASK,
+  isFalsy,
+  isTruthy,
+} = require("./helpers");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
   function isHeaded() {
     return Cypress.browser && Cypress.browser.isHeaded;
   }
 
+  function booleanEnvironmentVarValue(environmentVarName) {
+    const defaultValue = ENVIRONMENT_DEFAULT_VALUES[environmentVarName];
+    const value = Cypress.env(environmentVarName);
+    const isTruthyValue = isTruthy(value);
+    if (!isTruthyValue && !isFalsy(value)) {
+      return defaultValue;
+    }
+    return isTruthyValue;
+  }
+
   function getFailFastEnvironmentConfig() {
     return {
-      enabled:
-        Cypress.env(PLUGIN_ENVIRONMENT_VAR) === true ||
-        Cypress.env(PLUGIN_ENVIRONMENT_VAR) === "true",
+      plugin: booleanEnvironmentVarValue(PLUGIN_ENVIRONMENT_VAR),
+      enabled: booleanEnvironmentVarValue(ENABLED_ENVIRONMENT_VAR),
     };
   }
 
@@ -24,7 +41,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
   }
 
   function pluginIsEnabled() {
-    return getFailFastEnvironmentConfig().enabled;
+    return getFailFastEnvironmentConfig().plugin;
   }
 
   function shouldSkipRestOfTests(currentTest) {

@@ -31,40 +31,46 @@ At the top of `cypress/support/index.js`:
 import "cypress-fail-fast";
 ```
 
-## Usage
+From now, if one test fail after its last retry, the rest of tests will be skipped:
 
-Use the environment variable CYPRESS_FAIL_FAST to enable fail fast:
+![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
+
+## Configuration
+
+### Environment variables
+
+* __`FAIL_FAST_ENABLED`__: `boolean = true` Allows disabling the "fail-fast" feature globally, but it could be still enabled for specific tests or describes using [configuration by test](#configuration-by-test).
+* __`FAIL_FAST_PLUGIN`__: `boolean = true` If `false`, it disables the "fail-fast" feature totally, ignoring even plugin [configurations by test](#configuration-by-test).
+
+#### Examples
 
 ```bash
-CYPRESS_FAIL_FAST=true npm run cypress
+CYPRESS_FAIL_FAST_PLUGIN=false npm run cypress
 ```
 
-or Set the "env" key in your cypress.json configuration file:
+or set the "env" key in the `cypress.json` configuration file:
 
 ```json
 {
   "env":
   {
-    "FAIL_FAST": true
+    "FAIL_FAST_ENABLED": false
   }
 }
 ```
 
-From now, if one test fail after its last retry, the rest of tests will be skipped:
 
-![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
-
-## Custom Configurations
+### Configuration by test
 
 If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test's configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
 
 * __`failFast`__: Configuration for the plugin, containing any of next properties:
-  * __`enabled`__ : Indicates wheter a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. (Note that setting this property as `true` will not have effect if the plugin is disabled globally using the `FAIL_FAST` environment variable)
+  * __`enabled`__ : Indicates wheter a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. Note that the value defined in this property has priority over the value of the environment variable `CYPRESS_FAIL_FAST_ENABLED` _(but not over `CYPRESS_FAIL_FAST_PLUGIN`, which disables the plugin totally)_.
 
 
-### Example
+#### Example
 
-In the next example, tests are configured to `fail-fast` only in case the test with the "sanity test" description fails. If any of the other tests fails, `fail-fast` will not be applied.
+In the next example, tests are configured to "fail-fast" only in case the test with the "sanity test" description fails. If any of the other tests fails, "fail-fast" will not be applied.
 
 ```js
 describe("All tests", {
@@ -85,13 +91,45 @@ describe("All tests", {
     // Will continue executing tests if this one fails
     expect(true).to.be.true;
   });
-
-  it("third test",() => {
-    // Will continue executing tests if this one fails
-    expect(true).to.be.true;
-  });
 });
 ```
+
+### Configuration examples for usual scenarios
+
+##### You want to disable "fail-fast" in all specs except one:
+
+Set the `FAIL_FAST_ENABLED` key in the `cypress.json` configuration file:
+
+```json
+{
+  "env":
+  {
+    "FAIL_FAST_ENABLED": false
+  }
+}
+```
+
+Enable "fail-fast" in those specs you want using [configurations by test](#configuration-by-test):
+
+```js
+describe("All tests", { failFast: { enabled: true } }, () => {
+  // If any test in this describe fails, the rest of tests and specs will be skipped
+});
+```
+
+##### You want to totally disable "fail-fast" in your local environment:
+
+Set the `FAIL_FAST_PLUGIN` key in your local `cypress.env.json` configuration file:
+
+```json
+{
+  "env":
+  {
+    "FAIL_FAST_PLUGIN": false
+  }
+}
+```
+
 
 ## Usage with TypeScript
 

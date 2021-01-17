@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "serve -l 3000",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --verbose",
     "test:build": "cross-env node commands/build.js",
     "test:install": "cd cypress-variants/cypress-5 && npm i && cd .. && cd cypress-6 && npm i && cd .. && cd typescript && npm i",
     "serve-and-test": "start-server-and-test serve http-get://localhost:3000 test",

@@ -55,6 +55,9 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
 const runSpecsTests = (description, options = {}) => {
   describe(description, () => {
     cypressVariants.forEach((cypressVariant) => {
+      if (options.skipVariants && cypressVariant.skippable) {
+        return;
+      }
       runVariantTests(cypressVariant, getSpecsStatusesTests(options.specsResults), options);
     });
   });
