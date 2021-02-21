@@ -219,7 +219,7 @@ describe("support", () => {
           });
           beforeCallback();
           await wait(200);
-          expect(cy.task.callCount).toEqual(0);
+          expect(cy.task.calledWith("failFastResetSkip")).toEqual(false);
         });
 
         it("should not call to reset plugin if Cypress browser does not exists", async () => {
@@ -229,7 +229,7 @@ describe("support", () => {
           });
           beforeCallback();
           await wait(200);
-          expect(cy.task.callCount).toEqual(0);
+          expect(cy.task.calledWith("failFastResetSkip")).toEqual(false);
         });
 
         it("should call to reset plugin if browser is headed", async () => {
@@ -251,6 +251,28 @@ describe("support", () => {
           await wait(200);
           expect(cy.task.getCall(0).args[1]).toEqual(null);
           expect(cy.task.getCall(0).args[2]).toEqual({ log: false });
+        });
+
+        it("should call to stop runner if browser is not headed and should skip", async () => {
+          getSupportCallbacks({
+            ...config,
+            browserIsHeaded: false,
+            shouldSkip: true,
+          });
+          beforeCallback();
+          await wait(200);
+          expect(Cypress.runner.stop.callCount).toEqual(1);
+        });
+
+        it("should not call to stop runner if browser is not headed and should not skip", async () => {
+          getSupportCallbacks({
+            ...config,
+            browserIsHeaded: false,
+            shouldSkip: false,
+          });
+          beforeCallback();
+          await wait(200);
+          expect(Cypress.runner.stop.callCount).toEqual(0);
         });
       });
     });

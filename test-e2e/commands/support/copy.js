@@ -26,7 +26,16 @@ const variantPaths = (variant) => {
   };
 };
 
-// TODO, use typescript paths alias to load directly library from parent folder instead of copying it
+const copyScripts = (variant) => {
+  const SCRIPTS_FOLDER = "scripts";
+  const destPaths = variantPaths(variant);
+  const scriptsDestFolder = path.resolve(destPaths.root, SCRIPTS_FOLDER);
+  const scriptsOriginFolder = path.resolve(CYPRESS_SRC_PATH, SCRIPTS_FOLDER);
+
+  fsExtra.removeSync(scriptsDestFolder);
+  fsExtra.copySync(scriptsOriginFolder, scriptsDestFolder);
+};
+
 const copyPluginToCypressSupport = (variant) => {
   const PLUGIN_DEST_FOLDER = "cypress-fail-fast";
   const SRC_FOLDER = "src";
@@ -126,4 +135,5 @@ module.exports = {
   copyPluginToCypressSupport,
   copyCypressSources,
   copyCypressSpecs,
+  copyScripts,
 };

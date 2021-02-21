@@ -3,11 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "report:clean": "cross-env node scripts/reports.js clean",
+    "report:create": "cross-env node scripts/reports.js merge && marge cypress/mochawesome.json",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "npm run report:clean && cypress run"
   },
   "devDependencies": {
     "babel-plugin-module-resolver": "4.1.0",
-    "cypress": "5.6.0"
+    "cypress": "5.6.0",
+    "cross-env": "7.0.3",
+    "fs-extra": "9.1.0",
+    "mochawesome": "6.2.2",
+    "mochawesome-merge": "4.2.0",
+    "mochawesome-report-generator": "5.2.0"
   }
 }
