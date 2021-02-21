@@ -73,7 +73,6 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       shouldSkipRestOfTests(currentTest)
     ) {
       cy.task(SHOULD_SKIP_TASK, true);
-      //Cypress.runner.stop();
     }
   });
 
