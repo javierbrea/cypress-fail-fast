@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- feat: Use local variable to skip tests faster. Retrieve flag in before hook in headless mode.
+- feat: Mark current test as pending when it has to be skipped
+- test(e2e): Check that `test:after:run` event is executed in failed tests using mochawesome reporter
 ### Changed
 ### Fixed
 ### Removed

@@ -9,7 +9,6 @@ const {
 } = require("./helpers");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
-  let shouldSkip;
   function isHeaded() {
     return Cypress.browser && Cypress.browser.isHeaded;
   }
@@ -55,16 +54,12 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   beforeEach(function () {
     if (pluginIsEnabled()) {
-      if (shouldSkip) {
-        Cypress.runner.stop();
-      } else {
-        cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
-          if (value === true) {
-            shouldSkip = true;
-            Cypress.runner.stop();
-          }
-        });
-      }
+      cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
+        if (value === true) {
+          this.currentTest.pending = true;
+          Cypress.runner.stop();
+        }
+      });
     }
   });
 
@@ -77,8 +72,8 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
-      shouldSkip = true;
       cy.task(SHOULD_SKIP_TASK, true);
+      //Cypress.runner.stop();
     }
   });
 
@@ -91,12 +86,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
           Do this only for headed runs because in headless runs,
           the `before` hook is executed for each spec file.
         */
-        shouldSkip = false;
         cy.task(RESET_SKIP_TASK, null, { log: false });
       } else {
         cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
           if (value === true) {
-            shouldSkip = true;
             Cypress.runner.stop();
           }
         });
