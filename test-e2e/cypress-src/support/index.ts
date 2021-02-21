@@ -1,4 +1,4 @@
-import addContext from "mochawesome/addContext";
+import addContext = require("mochawesome/addContext");
 import "./cypress-fail-fast";
 
 Cypress.on("test:after:run", (test, runnable) => {
