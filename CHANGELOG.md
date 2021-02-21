@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- feat: Mark current test as pending when it has to be skipped
-- test(e2e): Check that `test:after:run` event is executed in failed tests using mochawesome reporter
+- test(e2e): Check that `test:after:run` event is executed in failed tests using mochawesome reporter (#61)
+- feat: Stop Cypress runner in before hook in headless mode when tests should be skipped (#52)
 ### Changed
 ### Fixed
+- fix: Mark current test as pending when it has to be skipped (related to #61)
 ### Removed
 ### BREAKING CHANGES
 
