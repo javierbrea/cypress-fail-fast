@@ -1,5 +1,6 @@
 describe("List items", () => {
   before(() => {
+    cy.task("log", "Executing before hook in c-file");
     cy.visit("/");
   });
 

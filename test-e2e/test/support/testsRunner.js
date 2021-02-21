@@ -4,6 +4,7 @@ const { npmRun } = require("./npmCommandRunner");
 const { splitLogsBySpec } = require("./logs");
 
 const AFTER_RUN_FAILED_TEST_LOG = "Executing test:after:run event in failed test";
+const BEFORE_HOOK_LOG = "Executing before hook";
 
 const pluralize = (text, amount) => {
   return amount < 2 ? text : `${text}s`;
@@ -32,11 +33,16 @@ const expectLogNotPrinted = (log, getSpecLogs) => {
 };
 
 const getSpecTests = (
-  { spec = 1, executed = null, passed = null, failed = null, skipped = null },
+  { spec = 1, logBefore = true, executed = null, passed = null, failed = null, skipped = null },
   getLogs
 ) => {
   const getSpecLogs = () => getLogs(spec);
   describe(`Spec ${spec}`, () => {
+    if (logBefore) {
+      expectLogPrinted(BEFORE_HOOK_LOG, getSpecLogs);
+    } else {
+      expectLogNotPrinted(BEFORE_HOOK_LOG, getSpecLogs);
+    }
     expectTestsAmount("executed", "Tests", executed, getSpecLogs);
     expectTestsAmount("passed", "Passing", passed, getSpecLogs);
     expectTestsAmount("failed", "Failing", failed, getSpecLogs);
