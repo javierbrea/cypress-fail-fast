@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - test(e2e): Update Cypress 6 to latest version.
 - chore(deps): Update devDependencies
 
+### Removed
+- test(unit): Remove duplicated test
+
 ## [2.0.0] - 2021-01-17
 
 ### Added

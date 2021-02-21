@@ -127,16 +127,6 @@ describe("support", () => {
   const testPluginAndFailFastEnabled = (extraDescription, config) => {
     describe(`when plugin and failFast are enabled ${extraDescription}`, () => {
       describe("beforeEach callback", () => {
-        it("should call stop runner if failFastShouldSkip returns true when plugin is enabled with string", async () => {
-          getSupportCallbacks({
-            ...config,
-            shouldSkip: true,
-          });
-          beforeEachCallback();
-          await wait(200);
-          expect(Cypress.runner.stop.callCount).toEqual(1);
-        });
-
         it("should call stop runner if failFastShouldSkip returns true", async () => {
           getSupportCallbacks({
             ...config,
