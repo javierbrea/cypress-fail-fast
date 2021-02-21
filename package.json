@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",
@@ -41,7 +41,6 @@
     "@stryker-mutator/core": "4.4.1",
     "@stryker-mutator/jest-runner": "4.4.1",
     "babel-eslint": "10.1.0",
-    "cypress": "6.2.0",
     "eslint": "7.20.0",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "3.3.1",
