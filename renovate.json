@@ -1,5 +1,12 @@
 {
   "extends": [
     "github>javierbrea/nodejs-ci-cd-shared-config"
+  ],
+  "packageRules": [
+    {
+      "matchPaths": ["test-e2e/cypress-variants/cypress-5/package.json"],
+      "matchPackageNames": ["cypress"],
+      "allowedVersions": "<=6.0.0"
+    }
   ]
 }
