@@ -127,16 +127,6 @@ describe("support", () => {
   const testPluginAndFailFastEnabled = (extraDescription, config) => {
     describe(`when plugin and failFast are enabled ${extraDescription}`, () => {
       describe("beforeEach callback", () => {
-        it("should call stop runner if failFastShouldSkip returns true when plugin is enabled with string", async () => {
-          getSupportCallbacks({
-            ...config,
-            shouldSkip: true,
-          });
-          beforeEachCallback();
-          await wait(200);
-          expect(Cypress.runner.stop.callCount).toEqual(1);
-        });
-
         it("should call stop runner if failFastShouldSkip returns true", async () => {
           getSupportCallbacks({
             ...config,
@@ -169,7 +159,7 @@ describe("support", () => {
       });
 
       describe("afterEach callback", () => {
-        it("should call stop runner and set plugin flag if current test state is failed and it is last retry", async () => {
+        it("should set plugin flag and do not stop runner if current test state is failed and it is last retry", async () => {
           getSupportCallbacks({
             ...config,
             shouldSkip: true,
@@ -179,11 +169,11 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(Cypress.runner.stop.callCount).toEqual(1);
+          expect(Cypress.runner.stop.callCount).toEqual(0);
           expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
         });
 
-        it("should not call to stop runner nor set plugin flag if current test state is not failed", async () => {
+        it("should not set plugin flag if current test state is not failed", async () => {
           getSupportCallbacks({
             ...config,
             shouldSkip: true,
@@ -193,11 +183,10 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(Cypress.runner.stop.callCount).toEqual(0);
           expect(cy.task.callCount).toEqual(0);
         });
 
-        it("should not call to stop runner and set plugin flag if current test retry is not the last one", async () => {
+        it("should not set plugin flag if current test retry is not the last one", async () => {
           getSupportCallbacks({
             ...config,
             shouldSkip: true,
@@ -207,11 +196,10 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(Cypress.runner.stop.callCount).toEqual(0);
           expect(cy.task.callCount).toEqual(0);
         });
 
-        it("should not call to stop runner is test.currentTest is not found", async () => {
+        it("should not set plugin flag if test.currentTest is not found", async () => {
           getSupportCallbacks({
             ...config,
             shouldSkip: true,
@@ -219,7 +207,6 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(Cypress.runner.stop.callCount).toEqual(0);
           expect(cy.task.callCount).toEqual(0);
         });
       });
@@ -271,7 +258,7 @@ describe("support", () => {
 
   const testAfterEachWithPluginEnabledAndConfigEnabled = (extraDescription, config) => {
     describe(`afterEach callback when plugin is enabled and config is enabled ${extraDescription}`, () => {
-      it("should call to stop runner and set plugin flag", () => {
+      it("should set plugin flag", async () => {
         getSupportCallbacks({
           ...config,
           testState: "failed",
@@ -279,7 +266,7 @@ describe("support", () => {
           testRetries: 3,
         });
         afterEachCallback();
-        expect(Cypress.runner.stop.callCount).toEqual(1);
+        await wait(200);
         expect(cy.task.callCount).toEqual(1);
       });
     });
@@ -287,7 +274,7 @@ describe("support", () => {
 
   const testAfterEachWithPluginEnabledAndConfigDisabled = (extraDescription, config) => {
     describe(`afterEach callback when plugin is enabled and config is disabled ${extraDescription}`, () => {
-      it("should not call to stop runner nor set plugin flag", () => {
+      it("should not set plugin flag", async () => {
         getSupportCallbacks({
           ...config,
           testState: "failed",
@@ -295,7 +282,7 @@ describe("support", () => {
           testRetries: 3,
         });
         afterEachCallback();
-        expect(Cypress.runner.stop.callCount).toEqual(0);
+        await wait(200);
         expect(cy.task.callCount).toEqual(0);
       });
     });

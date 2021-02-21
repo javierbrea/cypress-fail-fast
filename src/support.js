@@ -71,8 +71,13 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
-      cy.task(SHOULD_SKIP_TASK, true);
-      Cypress.runner.stop();
+      /*
+      It seems like executing a task produces test:after:run event not being executed
+      This workaround executes the task "parallely", so event is executed
+      */
+      setTimeout(() => {
+        cy.task(SHOULD_SKIP_TASK, true);
+      }, 0);
     }
   });
 
