@@ -16,7 +16,7 @@ const npmRun = (commands, variant, env) => {
     }
   };
 
-  const promise = new Promise((resolve) => {
+  return new Promise((resolve) => {
     const commandsArray = Array.isArray(commands) ? commands : [commands];
     npmProcess = childProcess.spawn("npm", ["run"].concat(commandsArray), {
       cwd: path.resolve(VARIANTS_FOLDER, variant),
@@ -36,8 +36,6 @@ const npmRun = (commands, variant, env) => {
       resolve(logs.join("\n"));
     });
   });
-
-  return promise;
 };
 
 module.exports = {

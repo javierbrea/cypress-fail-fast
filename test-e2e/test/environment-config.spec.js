@@ -27,22 +27,25 @@ runSpecsTests("When it has default configuration", {
   ],
 });
 
-/* runSpecsTests("When it is disabled using plugin environment variable", {
+runSpecsTests("When it is disabled using plugin environment variable", {
   specs: "environment-config-only",
   specsResults: [
     {
+      logBefore: true,
       executed: 4,
       passed: 3,
       failed: 1,
       skipped: 0,
     },
     {
+      logBefore: true,
       executed: 4,
       passed: 4,
       failed: 0,
       skipped: 0,
     },
     {
+      logBefore: true,
       executed: 3,
       passed: 2,
       failed: 1,
@@ -60,18 +63,21 @@ runSpecsTests("When it is disabled using enabled environment variable", {
   specs: "environment-config-only",
   specsResults: [
     {
+      logBefore: true,
       executed: 4,
       passed: 3,
       failed: 1,
       skipped: 0,
     },
     {
+      logBefore: true,
       executed: 4,
       passed: 4,
       failed: 0,
       skipped: 0,
     },
     {
+      logBefore: true,
       executed: 3,
       passed: 2,
       failed: 1,
@@ -82,4 +88,3 @@ runSpecsTests("When it is disabled using enabled environment variable", {
     CYPRESS_FAIL_FAST_ENABLED: false,
   },
 });
-*/

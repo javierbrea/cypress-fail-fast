@@ -4,18 +4,21 @@ runSpecsTests("When it is enabled in describe but disabled in test", {
   specs: "describe-enabled-test-disabled",
   specsResults: [
     {
+      logBefore: true,
       executed: 4,
       passed: 3,
       failed: 1,
       skipped: 0,
     },
     {
+      logBefore: true,
       executed: 4,
       passed: 4,
       failed: 0,
       skipped: 0,
     },
     {
+      logBefore: true,
       executed: 3,
       passed: 1,
       failed: 1,
@@ -28,18 +31,21 @@ runSpecsTests("When it is disabled in describe but enabled in test", {
   specs: "describe-disabled-test-enabled",
   specsResults: [
     {
+      logBefore: true,
       executed: 4,
       passed: 1,
       failed: 1,
       skipped: 2,
     },
     {
+      logBefore: false,
       executed: 4,
       passed: 0,
       failed: 0,
       skipped: 4,
     },
     {
+      logBefore: false,
       executed: 3,
       passed: 0,
       failed: 0,
@@ -53,18 +59,21 @@ runSpecsTests("When it is disabled in environment, disabled in describe and enab
   specs: "describe-disabled-test-enabled",
   specsResults: [
     {
+      logBefore: true,
       executed: 4,
       passed: 1,
       failed: 1,
       skipped: 2,
     },
     {
+      logBefore: false,
       executed: 4,
       passed: 0,
       failed: 0,
       skipped: 4,
     },
     {
+      logBefore: false,
       executed: 3,
       passed: 0,
       failed: 0,
@@ -83,18 +92,21 @@ runSpecsTests(
     specs: "describe-disabled-test-enabled",
     specsResults: [
       {
+        logBefore: true,
         executed: 4,
         passed: 3,
         failed: 1,
         skipped: 0,
       },
       {
+        logBefore: true,
         executed: 4,
         passed: 4,
         failed: 0,
         skipped: 0,
       },
       {
+        logBefore: true,
         executed: 3,
         passed: 2,
         failed: 1,
@@ -114,18 +126,21 @@ runSpecsTests(
     specs: "grandparent-describe-enabled",
     specsResults: [
       {
+        logBefore: true,
         executed: 4,
         passed: 3,
         failed: 1,
         skipped: 0,
       },
       {
+        logBefore: true,
         executed: 4,
         passed: 1,
         failed: 2,
         skipped: 1,
       },
       {
+        logBefore: false,
         executed: 3,
         passed: 0,
         failed: 0,
