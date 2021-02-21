@@ -3,6 +3,8 @@ const { copyCypressSpecs } = require("../../commands/support/copy");
 const { npmRun } = require("./npmCommandRunner");
 const { splitLogsBySpec } = require("./logs");
 
+const AFTER_RUN_FAILED_TEST_LOG = "Executing test:after:run event in failed test";
+
 const pluralize = (text, amount) => {
   return amount < 2 ? text : `${text}s`;
 };
@@ -17,6 +19,18 @@ const expectTestsAmount = (status, statusKey, amount, getSpecLogs) => {
   }
 };
 
+const expectLogPrinted = (log, getSpecLogs) => {
+  it(`should have logged "${log}"`, () => {
+    expect(getSpecLogs()).toEqual(expect.stringContaining(log));
+  });
+};
+
+const expectLogNotPrinted = (log, getSpecLogs) => {
+  it(`should have not logged "${log}"`, () => {
+    expect(getSpecLogs()).toEqual(expect.not.stringContaining(log));
+  });
+};
+
 const getSpecTests = (
   { spec = 1, executed = null, passed = null, failed = null, skipped = null },
   getLogs
@@ -26,6 +40,11 @@ const getSpecTests = (
     expectTestsAmount("executed", "Tests", executed, getSpecLogs);
     expectTestsAmount("passed", "Passing", passed, getSpecLogs);
     expectTestsAmount("failed", "Failing", failed, getSpecLogs);
+    if (failed > 0) {
+      expectLogPrinted(AFTER_RUN_FAILED_TEST_LOG, getSpecLogs);
+    } else {
+      expectLogNotPrinted(AFTER_RUN_FAILED_TEST_LOG, getSpecLogs);
+    }
     expectTestsAmount("skipped", "Skipped", skipped, getSpecLogs);
   });
 };

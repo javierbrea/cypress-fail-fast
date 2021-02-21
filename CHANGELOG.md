@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- test(e2e): Check that `test:after:run` event is executed in failed tests.
 ### Changed
+- feat: Do not stop runner from failed test hook and execute flag task "parallely" in order to let execute test:after:run events.
+- test(e2e): Update Cypress 6 to latest version.
+- chore(deps): Update devDependencies
 ### Fixed
 ### Removed
 ### BREAKING CHANGES

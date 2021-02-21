@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "babel-plugin-module-resolver": "4.1.0",
-    "cypress": "6.2.0"
+    "cypress": "6.5.0"
   }
 }
