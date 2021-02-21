@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [2.1.1] - 2021-02-21
+
+### Changed
+- chore(deps): Configure renovate to no upgrade Cypress version in v5 e2e tests
+
+### Fixed
+- fix: Revert change producing unstability (#61).
+
+### Removed
+- chore(deps): Remove unused devDependency
+
 ## [2.1.0] - 2021-02-21
 
 ### Added
