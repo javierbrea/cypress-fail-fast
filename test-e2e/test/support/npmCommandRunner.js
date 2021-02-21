@@ -40,4 +40,5 @@ const npmRun = (commands, variant, env) => {
 
 module.exports = {
   npmRun,
+  VARIANTS_FOLDER,
 };

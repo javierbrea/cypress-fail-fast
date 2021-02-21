@@ -56,6 +56,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     if (pluginIsEnabled()) {
       cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
         if (value === true) {
+          this.currentTest.pending = true;
           Cypress.runner.stop();
         }
       });
@@ -71,23 +72,27 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
-      /*
-      It seems like executing a task produces test:after:run event not being executed
-      This workaround executes the task "parallely", so event is executed
-      */
       cy.task(SHOULD_SKIP_TASK, true);
     }
   });
 
   before(function () {
-    if (isHeaded() && pluginIsEnabled()) {
-      /*
-        Reset the shouldSkip flag at the start of a run, so that it
-        doesn't carry over into subsequent runs.
-        Do this only for headed runs because in headless runs,
-        the `before` hook is executed for each spec file.
-      */
-      cy.task(RESET_SKIP_TASK, null, { log: false });
+    if (pluginIsEnabled()) {
+      if (isHeaded()) {
+        /*
+          Reset the shouldSkip flag at the start of a run, so that it
+          doesn't carry over into subsequent runs.
+          Do this only for headed runs because in headless runs,
+          the `before` hook is executed for each spec file.
+        */
+        cy.task(RESET_SKIP_TASK, null, { log: false });
+      } else {
+        cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
+          if (value === true) {
+            Cypress.runner.stop();
+          }
+        });
+      }
     }
   });
 }
