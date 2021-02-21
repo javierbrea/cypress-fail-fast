@@ -75,9 +75,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       It seems like executing a task produces test:after:run event not being executed
       This workaround executes the task "parallely", so event is executed
       */
-      setTimeout(() => {
-        cy.task(SHOULD_SKIP_TASK, true);
-      }, 0);
+      cy.task(SHOULD_SKIP_TASK, true);
     }
   });
 
