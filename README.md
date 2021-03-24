@@ -62,7 +62,7 @@ or set the "env" key in the `cypress.json` configuration file:
 
 ### Configuration by test
 
-If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test's configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
+If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
 
 * __`failFast`__: Configuration for the plugin, containing any of next properties:
   * __`enabled`__ : Indicates wheter a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. Note that the value defined in this property has priority over the value of the environment variable `CYPRESS_FAIL_FAST_ENABLED` _(but not over `CYPRESS_FAIL_FAST_PLUGIN`, which disables the plugin totally)_.

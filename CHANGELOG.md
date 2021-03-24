@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 ### Changed
 ### Fixed
+- fix(ts): Make failFast property optional in test configuration (#69)
+- docs: Fix typo in readme
 ### Removed
 ### BREAKING CHANGES
 
