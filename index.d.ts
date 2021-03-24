@@ -6,13 +6,13 @@ declare namespace Cypress {
      * Disables fail-fast plugin
      * If the test fails, the rest of tests won't be skipped
     */
-    enabled: boolean
+    enabled?: boolean
   }
 
   interface TestConfigOverrides extends Partial<TestConfigOverrides> {
     /**
      * Configuration for fail-fast plugin
     */
-    failFast: Partial<FailFastConfigOptions>
+    failFast?: Partial<FailFastConfigOptions>
   }
 }
