@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [2.2.1] - 2021-03-24
+
+### Fixed
+- fix(ts): Make failFast property optional in test configuration (#69)
+- docs: Fix typo in readme
+
+### Changed
+- chore(deps): Update devDependencies
+
 ## [2.2.0] - 2021-02-21
 
 ### Added
