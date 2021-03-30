@@ -30,9 +30,22 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     };
   }
 
+  function getTestConfig(test) {
+    // Cypress <6.7
+    if (test.cfg) {
+      return test.cfg;
+    }
+    // Cypress >6.7
+    if (test.ctx && test.ctx.test && test.ctx.test._testConfig) {
+      return test.ctx.test._testConfig;
+    }
+    return {};
+  }
+
   function getTestFailFastConfig(currentTest) {
-    if (currentTest.cfg && currentTest.cfg.failFast) {
-      return currentTest.cfg.failFast;
+    const testConfig = getTestConfig(currentTest);
+    if (testConfig.failFast) {
+      return testConfig.failFast;
     }
     if (currentTest.parent) {
       return getTestFailFastConfig(currentTest.parent);
