@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - fix: Fix configuration by test in Cypress versions higher than 6.6 (#73)
 
+### Changed
+- chore(deps): Update devDependencies
+
 ## [2.2.1] - 2021-03-24
 
 ### Fixed
