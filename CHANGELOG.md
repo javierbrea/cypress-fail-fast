@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [2.2.2] - 2021-03-30
+
+### Fixed
+- fix: Fix configuration by test in Cypress versions higher than 6.6 (#73)
+
 ## [2.2.1] - 2021-03-24
 
 ### Fixed

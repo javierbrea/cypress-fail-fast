@@ -50,10 +50,21 @@ describe("support", () => {
             state: options.testState,
             currentRetry: () => options.testCurrentRetry,
             retries: () => options.testRetries,
+            // Private property storing test config in Cypress <6.6
             cfg: options.customConfig,
             parent: options.testParent,
           },
         };
+
+    // Private property storing test config in Cypress >6.6
+    if (currentTest.currentTest && options.customConfigCtx) {
+      currentTest.currentTest.ctx = {
+        test: {
+          _testConfig: options.customConfigCtx,
+        },
+      };
+    }
+
     const beforeEachMethod = (callback) => {
       beforeEachCallback = callback.bind(currentTest);
     };
@@ -407,6 +418,14 @@ describe("support", () => {
 
   testAfterEachWithPluginEnabledAndConfigDisabled("in current test", {
     customConfig: {
+      failFast: {
+        enabled: false,
+      },
+    },
+  });
+
+  testAfterEachWithPluginEnabledAndConfigDisabled("in current test in Cypress >6.6", {
+    customConfigCtx: {
       failFast: {
         enabled: false,
       },
