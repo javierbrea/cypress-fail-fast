@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const cypressVariants = require("../../commands/support/variants");
-const { copyCypressSpecs } = require("../../commands/support/copy");
+const { copyCypressSpecs, copyCypressPluginFile } = require("../../commands/support/copy");
 const { npmRun, VARIANTS_FOLDER } = require("./npmCommandRunner");
 const { splitLogsBySpec } = require("./logs");
 
@@ -86,6 +86,16 @@ const getSpecsStatusesTests = (specsExpectedStatuses) => {
   };
 };
 
+const getParallelSpecsStatusesTests = (runIndex, specsExpectedStatuses) => {
+  return (getLogs, getReport) => {
+    describe(`Run ${runIndex}`, () => {
+      specsExpectedStatuses.forEach((specExpectedStatuses, index) => {
+        getSpecTests({ ...specExpectedStatuses, spec: index + 1 }, getLogs, getReport);
+      });
+    });
+  };
+};
+
 const runVariantTests = (cypressVariant, tests, options = {}) => {
   describe(`Executed in ${cypressVariant.name}`, () => {
     let logs;
@@ -115,6 +125,87 @@ const runSpecsTests = (description, options = {}) => {
   });
 };
 
+const runParallelTests = (
+  cypressVariant1,
+  cypressVariant2,
+  tests1,
+  tests2,
+  options1 = {},
+  options2 = {},
+  commonOptions = {}
+) => {
+  describe(`Running in parallel ${cypressVariant1.name}:${options1.specs} and ${cypressVariant2.name}:${options2.specs}`, () => {
+    let logs1;
+    let logs2;
+    let report1;
+    let report2;
+    const getLogs1 = (specIndex) => logs1[specIndex];
+    const getReport1 = () => report1;
+    const getLogs2 = (specIndex) => logs2[specIndex];
+    const getReport2 = () => report2;
+
+    beforeAll(async () => {
+      copyCypressSpecs(options1.specs, cypressVariant1);
+      copyCypressSpecs(options2.specs, cypressVariant2);
+      if (options1.pluginFile) {
+        copyCypressPluginFile(
+          cypressVariant1.path,
+          cypressVariant1.typescript,
+          options1.pluginFile
+        );
+      }
+      if (options2.pluginFile) {
+        copyCypressPluginFile(
+          cypressVariant2.path,
+          cypressVariant2.typescript,
+          options2.pluginFile
+        );
+      }
+      const logs = await Promise.all([
+        npmRun(["cypress:run"], cypressVariant1.path, options1.env),
+        npmRun(["cypress:run"], cypressVariant2.path, options2.env),
+      ]);
+
+      logs1 = splitLogsBySpec(logs[0]);
+      logs2 = splitLogsBySpec(logs[1]);
+      await npmRun(["report:create"], cypressVariant1.path, options1.env);
+      await npmRun(["report:create"], cypressVariant2.path, options2.env);
+      report1 = await readReport(cypressVariant1.path);
+      report2 = await readReport(cypressVariant2.path);
+    }, 60000);
+
+    afterAll(() => {
+      if (options1.pluginFile) {
+        copyCypressPluginFile(cypressVariant1.path, cypressVariant1.typescript);
+      }
+      if (options2.pluginFile) {
+        copyCypressPluginFile(cypressVariant2.path, cypressVariant2.typescript);
+      }
+      if (commonOptions.afterAll) {
+        commonOptions.afterAll();
+      }
+    });
+
+    tests1(getLogs1, getReport1);
+    tests2(getLogs2, getReport2);
+  });
+};
+
+const runParallelSpecsTests = (description, runsOptions, options) => {
+  describe(description, () => {
+    runParallelTests(
+      runsOptions[0].cypress,
+      runsOptions[1].cypress,
+      getParallelSpecsStatusesTests(1, runsOptions[0].specsResults),
+      getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
+      runsOptions[0],
+      runsOptions[1],
+      options
+    );
+  });
+};
+
 module.exports = {
   runSpecsTests,
+  runParallelSpecsTests,
 };
