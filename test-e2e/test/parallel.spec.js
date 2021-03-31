@@ -42,7 +42,7 @@ runParallelSpecsTests(
     {
       cypress: cypressVariants[2],
       pluginFile: "parallel",
-      delay: 3000,
+      delay: 10000,
       specs: "all-tests-passing",
       specsResults: [
         {
