@@ -8,6 +8,14 @@ const { splitLogsBySpec } = require("./logs");
 const AFTER_EVENT_LOG = "Executed test:after:run event in failed test";
 const BEFORE_HOOK_LOG = "Executing before hook";
 
+const wait = (time = 1000) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+};
+
 const readReport = (variantPath) => {
   return new Promise((resolve, reject) => {
     fs.readFile(
@@ -125,6 +133,13 @@ const runSpecsTests = (description, options = {}) => {
   });
 };
 
+const waitAndRun = (time, run) => {
+  if (!time) {
+    return run();
+  }
+  return wait(time).then(() => run());
+};
+
 const runParallelTests = (
   cypressVariant1,
   cypressVariant2,
@@ -162,8 +177,12 @@ const runParallelTests = (
         );
       }
       const logs = await Promise.all([
-        npmRun(["cypress:run"], cypressVariant1.path, options1.env),
-        npmRun(["cypress:run"], cypressVariant2.path, options2.env),
+        waitAndRun(options1.delay, () =>
+          npmRun(["cypress:run"], cypressVariant1.path, options1.env)
+        ),
+        waitAndRun(options2.delay, () =>
+          npmRun(["cypress:run"], cypressVariant2.path, options2.env)
+        ),
       ]);
 
       logs1 = splitLogsBySpec(logs[0]);
