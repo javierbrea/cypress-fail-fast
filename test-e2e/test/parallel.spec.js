@@ -15,6 +15,7 @@ runParallelSpecsTests(
       cypress: cypressVariants[1],
       pluginFile: "parallel",
       specs: "environment-config-only",
+      delay: 3000,
       specsResults: [
         {
           logBefore: true,
@@ -42,14 +43,21 @@ runParallelSpecsTests(
     {
       cypress: cypressVariants[2],
       pluginFile: "parallel",
-      delay: 10000,
       specs: "all-tests-passing",
       specsResults: [
         {
-          logBefore: false,
+          logBefore: true,
+          executed: 4,
+          passed: 4,
+          failed: 0,
+          skipped: 0,
         },
         {
-          logBefore: false,
+          logBefore: true,
+          executed: 4,
+          passed: 0,
+          failed: 0,
+          skipped: 4,
         },
         {
           logBefore: false,
