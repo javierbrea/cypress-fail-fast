@@ -1,0 +1,40 @@
+name: test-mutation
+on:
+  push:
+    branches:
+      - main
+      - release
+      # TODO, remove before merging
+      - feat-parallel-strategy
+jobs:
+  test-mutation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+      id: extract-branch
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15.x'
+        registry-url: 'https://registry.npmjs.org/'
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ~/.npm
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: npm ci
+    - name: Test mutation
+      run: npm run test:mutation
+      env:
+        BRANCH_NAME: ${{ steps.extract-branch.outputs.branch }}
+        STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_TOKEN }}
