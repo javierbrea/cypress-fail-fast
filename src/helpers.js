@@ -4,7 +4,7 @@ const STRATEGY_ENVIRONMENT_VAR = "FAIL_FAST_STRATEGY";
 const SHOULD_SKIP_TASK = "failFastShouldSkip";
 const RESET_SKIP_TASK = "failFastResetSkip";
 
-const STRATEGY_ALLOWED_VALUES = ["run", "spec", "parallel"];
+const STRATEGIES = ["spec", "parallel"];
 
 const TRUTHY_VALUES = [true, "true", 1, "1"];
 const FALSY_VALUES = [false, "false", 0, "0"];
@@ -12,27 +12,18 @@ const FALSY_VALUES = [false, "false", 0, "0"];
 const ENVIRONMENT_DEFAULT_VALUES = {
   [PLUGIN_ENVIRONMENT_VAR]: true,
   [ENABLED_ENVIRONMENT_VAR]: true,
-  [STRATEGY_ENVIRONMENT_VAR]: STRATEGY_ALLOWED_VALUES[0],
 };
 
 function valueIsOneOf(value, arrayOfValues) {
   return arrayOfValues.includes(value);
 }
 
-function isValidStrategy(value) {
-  return !!value && valueIsOneOf(value, STRATEGY_ALLOWED_VALUES);
-}
-
-function currentStrategyOrDefault(value) {
-  return isValidStrategy(value) ? value : ENVIRONMENT_DEFAULT_VALUES[STRATEGY_ENVIRONMENT_VAR];
-}
-
 function strategyIsParallel(value) {
-  return currentStrategyOrDefault(value) === STRATEGY_ALLOWED_VALUES[2];
+  return value === STRATEGIES[1];
 }
 
 function strategyIsSpec(value) {
-  return currentStrategyOrDefault(value) === STRATEGY_ALLOWED_VALUES[1];
+  return value === STRATEGIES[0];
 }
 
 function isTruthy(value) {
@@ -52,8 +43,6 @@ module.exports = {
   RESET_SKIP_TASK,
   isTruthy,
   isFalsy,
-  isValidStrategy,
-  currentStrategyOrDefault,
   strategyIsParallel,
   strategyIsSpec,
 };

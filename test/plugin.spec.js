@@ -158,5 +158,37 @@ describe("plugin", () => {
         expect(spy.callCount).toEqual(0);
       });
     });
+
+    describe("when strategy is not parallel", () => {
+      const env = {
+        FAIL_FAST_STRATEGY: "run",
+      };
+
+      it("should return shouldSkip flag as false if flag is false but isCancelled callback returns true", () => {
+        getPluginMethods(
+          {
+            parallelCallbacks: {
+              isCancelled: () => true,
+            },
+          },
+          env
+        );
+        expect(failFastShouldSkip()).toEqual(false);
+      });
+
+      it("should not call to isCancelled callback", () => {
+        const spy = sandbox.spy();
+        getPluginMethods(
+          {
+            parallelCallbacks: {
+              isCancelled: spy,
+            },
+          },
+          env
+        );
+        failFastShouldSkip();
+        expect(spy.callCount).toEqual(0);
+      });
+    });
   });
 });

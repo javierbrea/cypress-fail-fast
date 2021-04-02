@@ -14,6 +14,7 @@ describe("support", () => {
   let beforeEachCallback;
   let afterEachCallback;
   let beforeCallback;
+  let getCurrentTest;
   let Cypress;
   let cy;
 
@@ -67,6 +68,8 @@ describe("support", () => {
         },
       };
     }
+
+    getCurrentTest = () => currentTest;
 
     const beforeEachMethod = (callback) => {
       beforeEachCallback = callback.bind(currentTest);
@@ -149,6 +152,16 @@ describe("support", () => {
           beforeEachCallback();
           await wait(200);
           expect(Cypress.runner.stop.callCount).toEqual(1);
+        });
+
+        it("should set currentTest as pending if failFastShouldSkip returns true", async () => {
+          getSupportCallbacks({
+            ...config,
+            shouldSkip: true,
+          });
+          beforeEachCallback();
+          await wait(200);
+          expect(getCurrentTest().currentTest.pending).toEqual(true);
         });
 
         it("should not log the task when setting flag to true", async () => {
@@ -286,6 +299,18 @@ describe("support", () => {
           beforeCallback();
           await wait(200);
           expect(Cypress.runner.stop.callCount).toEqual(1);
+        });
+
+        it("should not log the task when checking if has to skip", async () => {
+          getSupportCallbacks({
+            ...config,
+            browserIsHeaded: false,
+            shouldSkip: true,
+          });
+          beforeCallback();
+          await wait(200);
+          expect(cy.task.getCall(0).args[1]).toEqual(null);
+          expect(cy.task.getCall(0).args[2]).toEqual({ log: false });
         });
 
         it("should not call to stop runner if browser is not headed and should not skip", async () => {
