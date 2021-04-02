@@ -56,6 +56,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     return getFailFastEnvironmentConfig();
   }
 
+  function currentStrategyIsSpec() {
+    return getFailFastEnvironmentConfig().strategyIsSpec;
+  }
+
   function pluginIsEnabled() {
     return getFailFastEnvironmentConfig().plugin;
   }
@@ -94,7 +98,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   before(function () {
     if (pluginIsEnabled()) {
-      if (isHeaded()) {
+      if (isHeaded() || currentStrategyIsSpec()) {
         /*
           Reset the shouldSkip flag at the start of a run, so that it
           doesn't carry over into subsequent runs.

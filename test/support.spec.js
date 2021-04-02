@@ -30,6 +30,9 @@ describe("support", () => {
         if (envKey === "FAIL_FAST_ENABLED") {
           return options.enabled;
         }
+        if (envKey === "FAIL_FAST_STRATEGY") {
+          return options.strategy;
+        }
       },
       runner: {
         stop: sandbox.spy(),
@@ -247,6 +250,16 @@ describe("support", () => {
           getSupportCallbacks({
             ...config,
             browserIsHeaded: true,
+          });
+          beforeCallback();
+          await wait(200);
+          expect(cy.task.calledWith("failFastResetSkip")).toEqual(true);
+        });
+
+        it("should call to reset plugin if strategy is spec", async () => {
+          getSupportCallbacks({
+            ...config,
+            strategy: "spec",
           });
           beforeCallback();
           await wait(200);
