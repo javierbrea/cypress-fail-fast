@@ -31,6 +31,7 @@ runSpecsTests("When strategy is spec", {
 });
 
 runSpecsTests("When strategy is run", {
+  skipVariants: true,
   specs: "describe-disabled-test-enabled",
   specsResults: [
     {
@@ -61,6 +62,7 @@ runSpecsTests("When strategy is run", {
 });
 
 runSpecsTests("When strategy is parallel", {
+  skipVariants: true,
   specs: "describe-disabled-test-enabled",
   specsResults: [
     {
