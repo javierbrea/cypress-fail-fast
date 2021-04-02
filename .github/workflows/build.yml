@@ -41,9 +41,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
-      # TODO, uncomment before merging
-      # - name: Test unit
-        # run: npm run test:unit
+      - name: Test unit
+        run: npm run test:unit
       # TODO: move to another action
       # - name: Test mutation
         # run: npm run test:mutation
@@ -59,23 +58,23 @@ jobs:
           name: coverage-${{ matrix.node }}
           path: coverage
           retention-days: 1
-#  quality:
-#    runs-on: ubuntu-latest
-#    needs: test
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#      - name: Download test results
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: coverage-15.2.0
-#          path: coverage
-#      - name: Coveralls
-#        uses: coverallsapp/github-action@master
-#        with:
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#      - name: SonarCloud Scan
-#        uses: sonarsource/sonarcloud-github-action@master
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  quality:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download test results
+        uses: actions/download-artifact@v2
+        with:
+          name: coverage-15.2.0
+          path: coverage
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
