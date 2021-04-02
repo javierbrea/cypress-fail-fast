@@ -1,10 +1,18 @@
-const { SHOULD_SKIP_TASK, RESET_SKIP_TASK } = require("./helpers");
+const {
+  SHOULD_SKIP_TASK,
+  RESET_SKIP_TASK,
+  STRATEGY_ENVIRONMENT_VAR,
+  strategyIsParallel,
+} = require("./helpers");
 
 module.exports = (on, config, pluginConfig = {}) => {
   // store skip flag
   let shouldSkipFlag = false;
 
-  const parallelCallbacks = pluginConfig.parallelCallbacks || {};
+  const parallelCallbacks =
+    strategyIsParallel(config.env[STRATEGY_ENVIRONMENT_VAR]) && !!pluginConfig.parallelCallbacks
+      ? pluginConfig.parallelCallbacks
+      : {};
   const isCancelledCallback = parallelCallbacks.isCancelled;
   const onCancelCallback = parallelCallbacks.onCancel;
 

@@ -2,10 +2,12 @@ const {
   ENVIRONMENT_DEFAULT_VALUES,
   PLUGIN_ENVIRONMENT_VAR,
   ENABLED_ENVIRONMENT_VAR,
+  STRATEGY_ENVIRONMENT_VAR,
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
   isFalsy,
   isTruthy,
+  strategyIsSpec,
 } = require("./helpers");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
@@ -27,6 +29,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     return {
       plugin: booleanEnvironmentVarValue(PLUGIN_ENVIRONMENT_VAR),
       enabled: booleanEnvironmentVarValue(ENABLED_ENVIRONMENT_VAR),
+      strategyIsSpec: strategyIsSpec(Cypress.env(STRATEGY_ENVIRONMENT_VAR)),
     };
   }
 
