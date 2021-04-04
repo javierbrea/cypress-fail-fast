@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",
@@ -8,9 +8,11 @@
     "fail-fast",
     "failure",
     "skip",
+    "cancel",
     "tests",
     "testing-tools",
-    "testing"
+    "testing",
+    "parallel"
   ],
   "author": "Javier Brea",
   "license": "MIT",
