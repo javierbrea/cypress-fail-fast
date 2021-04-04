@@ -3,6 +3,7 @@ const fsExtra = require("fs-extra");
 
 const CYPRESS_PATH = "cypress";
 const CYPRESS_PLUGINS_PATH = "plugins";
+const CYPRESS_CUSTOM_PLUGINS_PATH = "plugins-custom";
 const CYPRESS_SUPPORT_PATH = "support";
 const CYPRESS_INTEGRATION_PATH = "integration";
 const TESTS_PATH = path.resolve(__dirname, "..", "..");
@@ -65,23 +66,35 @@ const copyPluginToCypressSupport = (variant) => {
   fsExtra.copySync(eslintFile, path.resolve(pluginDestFolder, ESLINT_FILE));
 };
 
+const copyCypressPluginFile = (variant, typescript = false, customPluginFolder = null) => {
+  const destPaths = variantPaths(variant);
+  const INDEX_FILE = toTypeScriptName("index.js", typescript);
+
+  const pluginsPath = path.resolve(CYPRESS_SRC_PATH, CYPRESS_PLUGINS_PATH);
+  const customPluginsPath = path.resolve(CYPRESS_SRC_PATH, CYPRESS_CUSTOM_PLUGINS_PATH);
+  const pluginFile = customPluginFolder
+    ? path.resolve(customPluginsPath, customPluginFolder, INDEX_FILE)
+    : path.resolve(pluginsPath, INDEX_FILE);
+
+  fsExtra.removeSync(destPaths.cypress.plugins);
+  fsExtra.ensureDirSync(destPaths.cypress.plugins);
+  fsExtra.copySync(pluginFile, path.resolve(destPaths.cypress.plugins, INDEX_FILE));
+};
+
 const copyCypressSources = (variant, typescript = false) => {
   const destPaths = variantPaths(variant);
   const BABEL_CONFIG_FILE = "babel.config.js";
   const CYPRESS_CONFIG_FILE = "cypress.json";
   const INDEX_FILE = toTypeScriptName("index.js", typescript);
 
-  const pluginsPath = path.resolve(CYPRESS_SRC_PATH, CYPRESS_PLUGINS_PATH);
   const supportPath = path.resolve(CYPRESS_SRC_PATH, CYPRESS_SUPPORT_PATH);
 
   const cypressConfigFile = path.resolve(CYPRESS_SRC_PATH, CYPRESS_CONFIG_FILE);
   const babelConfigFile = path.resolve(CYPRESS_SRC_PATH, BABEL_CONFIG_FILE);
-  const pluginFile = path.resolve(pluginsPath, INDEX_FILE);
   const supportFile = path.resolve(supportPath, INDEX_FILE);
 
   fsExtra.removeSync(destPaths.cypress.plugins);
   fsExtra.ensureDirSync(destPaths.cypress.plugins);
-  fsExtra.copySync(pluginFile, path.resolve(destPaths.cypress.plugins, INDEX_FILE));
 
   fsExtra.removeSync(destPaths.cypress.support);
   fsExtra.ensureDirSync(destPaths.cypress.support);
@@ -92,6 +105,8 @@ const copyCypressSources = (variant, typescript = false) => {
   if (!typescript) {
     fsExtra.copySync(babelConfigFile, path.resolve(destPaths.root, BABEL_CONFIG_FILE));
   }
+
+  copyCypressPluginFile(variant, typescript);
 };
 
 const copyCypressSpecs = (specsFolder, variant) => {
@@ -135,5 +150,6 @@ module.exports = {
   copyPluginToCypressSupport,
   copyCypressSources,
   copyCypressSpecs,
+  copyCypressPluginFile,
   copyScripts,
 };

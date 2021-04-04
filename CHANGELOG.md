@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- feat: Add FAIL_FAST_STRATEGY environment variable, allowing to skip tests only in current spec file, in current run or in parallel runs (#29)
+- feat: Add configuration allowing to implement fail-fast in parallel runs (#33).
 ### Changed
+- chore(ci): Separate test mutation job to a new workflow
 ### Fixed
 ### Removed
 ### BREAKING CHANGES
