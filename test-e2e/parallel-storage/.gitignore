@@ -1,0 +1,5 @@
+# exclude everything
+/*
+
+# exception to the rule
+!/.gitignore
