@@ -172,7 +172,7 @@ module.exports = (on, config) => {
   require("cypress-fail-fast/plugin")(on, config, {
     parallelCallbacks: {
       onCancel: () => {
-        // Create flag file when the plugin start skipping tests
+        // Create flag file when the plugin starts skipping tests
         fs.writeFileSync(isCancelledFlagPath);
       },
       isCancelled: () => {
