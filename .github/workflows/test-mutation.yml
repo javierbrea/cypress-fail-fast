@@ -4,8 +4,6 @@ on:
     branches:
       - main
       - release
-      # TODO, remove before merging
-      - feat-parallel-strategy
 jobs:
   test-mutation:
     runs-on: ubuntu-latest
