@@ -16,6 +16,7 @@ It can be configured to skip all remaining tests in current spec file, in curren
 - [Configuration](#configuration)
   * [Environment variables](#environment-variables)
   * [Configuration by test](#configuration-by-test)
+  * [Configuration examples for usual scenarios](#configuration-examples-for-usual-scenarios)
   * [Configuration for parallel runs](#configuration-for-parallel-runs)
 - [Usage with TypeScript](#usage-with-typescript)
 
@@ -69,7 +70,8 @@ or set the "env" key in the `cypress.json` configuration file:
 {
   "env":
   {
-    "FAIL_FAST_ENABLED": false
+    "FAIL_FAST_STRATEGY": "run",
+    "FAIL_FAST_ENABLED": true
   }
 }
 ```
