@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - chore(ci): Separate test mutation job to a new workflow
+- chore(deps): Update devDependencies
 
 ## [2.2.2] - 2021-03-30
 
