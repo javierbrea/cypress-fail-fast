@@ -149,7 +149,7 @@ Set the `FAIL_FAST_PLUGIN` key in your local `cypress.env.json` configuration fi
 
 ### Configuration for parallel runs
 
-The plugin configuration supports defining two callbacks that, used in combination, allow to skip tests in one run when other run starts skipping tests also. Where, or how do you store the "flag" that allows to communicate your runs is on your hand, the plugin does not care about it.
+The plugin configuration supports defining two callbacks that, used in combination, allow to skip tests in one run when other run starts skipping tests also. Where, or how do you store the "flag" that allows to communicate your runs is in your hands, the plugin does not care about it.
 
 To implement it, the plugin can receive an object with extra configuration as third argument when it is registered in the `cypress/plugins/index.js` file:
 
@@ -165,19 +165,19 @@ Here is an example of configuration that would skip tests on many parallel runs 
 const fs = require("fs");
 const path = require("path");
 
-// Flag file is stored in the cypress folder
-const isCancelledFlagPath = path.resolve(__dirname, "..", ".run-is-cancelled");
+// Flag file is stored in the /cypress folder
+const isCancelledFlagFile = path.resolve(__dirname, "..", ".run-is-cancelled");
 
 module.exports = (on, config) => {
   require("cypress-fail-fast/plugin")(on, config, {
     parallelCallbacks: {
       onCancel: () => {
         // Create flag file when the plugin starts skipping tests
-        fs.writeFileSync(isCancelledFlagPath);
+        fs.writeFileSync(isCancelledFlagFile);
       },
       isCancelled: () => {
         // If any other run has created the file, start skipping tests
-        return fs.existsSync(isCancelledFlagPath);
+        return fs.existsSync(isCancelledFlagFile);
       },
     },
   });
@@ -186,7 +186,7 @@ module.exports = (on, config) => {
 };
 ```
 
-Note that this example requires to remove the created file when all of the runs has finished, or tests will always be skipped whenever any run starts again. So, the `FAIL_FAST_STRATEGY` environment variable should be set to `parallel` only on CI pipelines where the workspace is cleaned on finish, for example. 
+Note that this example requires to remove the created file when all of the runs have finished, or tests will always be skipped whenever any run starts again. So, the `FAIL_FAST_STRATEGY` environment variable should be set to `parallel` only in CI pipelines where the workspace is cleaned on finish, for example. 
 
 ## Usage with TypeScript
 
