@@ -11,7 +11,9 @@ const npmRun = (commands, variant, env) => {
   const logData = (log) => {
     const cleanLog = stripAnsi(log.trim());
     if (cleanLog.length) {
-      console.log(cleanLog);
+      if (process.env.DEBUG === "true") {
+        console.log(cleanLog);
+      }
       logs.push(cleanLog);
     }
   };

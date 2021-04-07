@@ -12,7 +12,7 @@ runParallelSpecsTests(
   "When parallel strategy is enabled and first tests run fails",
   [
     {
-      cypress: cypressVariants[1],
+      cypress: cypressVariants[2],
       pluginFile: "parallel",
       specs: "environment-config-only",
       delay: 3000,
@@ -44,7 +44,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[2],
+      cypress: cypressVariants[3],
       pluginFile: "parallel",
       specs: "all-tests-passing",
       specsResults: [
@@ -84,7 +84,7 @@ runParallelSpecsTests(
   "When parallel strategy is disabled and first tests run fails",
   [
     {
-      cypress: cypressVariants[1],
+      cypress: cypressVariants[2],
       pluginFile: "parallel",
       specs: "environment-config-only",
       delay: 3000,
@@ -116,7 +116,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[2],
+      cypress: cypressVariants[3],
       pluginFile: "parallel",
       specs: "all-tests-passing",
       specsResults: [
