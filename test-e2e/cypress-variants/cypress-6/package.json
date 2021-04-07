@@ -16,9 +16,5 @@
     "mochawesome": "6.2.2",
     "mochawesome-merge": "4.2.0",
     "mochawesome-report-generator": "5.2.0"
-  },
-  "dependencies": {
-    "cd": "^0.3.3",
-    "cypress-fail-fast-v7-e2e-tests": "file:../cypress-7"
   }
 }
