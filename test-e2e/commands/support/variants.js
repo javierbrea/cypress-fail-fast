@@ -9,6 +9,12 @@ const VARIANTS = [
     name: "Cypress 6",
     path: "cypress-6",
     typescript: false,
+    skippable: true,
+  },
+  {
+    name: "Cypress 7",
+    path: "cypress-7",
+    typescript: false,
   },
   {
     name: "TypeScript",
