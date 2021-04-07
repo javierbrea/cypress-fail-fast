@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",
@@ -32,17 +32,19 @@
     "test:unit": "npm run test",
     "test:e2e:install": "cd test-e2e && npm i",
     "test:e2e:run": "cd test-e2e && npm run test:ci",
+    "test:e2e:debug": "cross-env npm run test:e2e:install && DEBUG=true npm run test:e2e:run",
     "test:e2e:ci": "npm run test:e2e:install && npm run test:e2e:run",
     "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
     "test:mutation": "stryker run"
   },
   "peerDependencies": {
-    "cypress": "5.x || 6.x"
+    "cypress": "5.x || 6.x || 7.x"
   },
   "devDependencies": {
     "@stryker-mutator/core": "4.5.1",
     "@stryker-mutator/jest-runner": "4.5.1",
     "babel-eslint": "10.1.0",
+    "cross-env": "7.0.3",
     "eslint": "7.23.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-prettier": "3.3.1",

@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [2.3.1] - 2021-04-07
+
+### Added
+- chore(deps): Support Cypress v7.x in peerDependencies
+- test(e2e): Run e2e tests also in Cypress v7.x
+
+### Changed
+- chore(pipelines): Update node versions
+- chore(pipelines): Do not run tests in Node 10, because it is not supported by Cypress v7.x
+- chore(deps): Update devDependencies
+- chore(renovate): Configure renovate to not update Cypress to a version higher than 6.x in Cypress 6.x e2e tests folder
+- test(e2e): Do not trace npm commands logs until DEBUG environment variable is set to true
+
 ## [2.3.0] - 2021-04-04
 
 ### Added
