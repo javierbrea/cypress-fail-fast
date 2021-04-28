@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+- chore(deps): Support Node v16.x in engines. Run tests also in node 16.0.0
 ### Changed
 ### Fixed
 ### Removed
