@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - chore(deps): Support Node v16.x in engines. Run tests also in node 16.0.0
 
+### Changed
+- chore(deps): Update devDependencies
+
 ## [2.3.1] - 2021-04-07
 
 ### Added
