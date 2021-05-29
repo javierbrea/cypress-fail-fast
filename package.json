@@ -35,7 +35,8 @@
     "test:e2e:debug": "cross-env npm run test:e2e:install && DEBUG=true npm run test:e2e:run",
     "test:e2e:ci": "npm run test:e2e:install && npm run test:e2e:run",
     "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
-    "test:mutation": "stryker run"
+    "test:mutation": "stryker run",
+    "prepare": "is-ci || husky install"
   },
   "peerDependencies": {
     "cypress": "5.x || 6.x || 7.x"
@@ -49,7 +50,8 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-react": "7.23.2",
-    "husky": "4.3.8",
+    "husky": "6.0.0",
+    "is-ci": "3.0.0",
     "jest": "26.6.3",
     "lint-staged": "10.5.4",
     "prettier": "2.2.1",
@@ -63,11 +65,6 @@
     "test-e2e/commands/**/*.js": "eslint",
     "test-e2e/cypress-src/**/*.js": "eslint",
     "test-e2e/test/**/*.js": "eslint"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint-staged"
-    }
   },
   "engines": {
     "node": "10.x || 12.x || 14.x || 15.x || 16.x"
