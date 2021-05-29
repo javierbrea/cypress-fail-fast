@@ -237,8 +237,8 @@ MIT, see [LICENSE](./LICENSE) for details.
 [npm-downloads-url]: https://www.npmjs.com/package/cypress-fail-fast
 [npm-dependencies-image]: https://img.shields.io/david/javierbrea/cypress-fail-fast.svg
 [npm-dependencies-url]: https://david-dm.org/javierbrea/cypress-fail-fast
-[quality-gate-image]: https://sonarcloud.io/api/project_badges/measure?project=cypress-fail-fast&metric=alert_status
-[quality-gate-url]: https://sonarcloud.io/dashboard?id=cypress-fail-fast
+[quality-gate-image]: https://sonarcloud.io/api/project_badges/measure?project=javierbrea_cypress-fail-fast&metric=alert_status
+[quality-gate-url]: https://sonarcloud.io/dashboard?id=javierbrea_cypress-fail-fast
 [release-image]: https://img.shields.io/github/release-date/javierbrea/cypress-fail-fast.svg
 [release-url]: https://github.com/javierbrea/cypress-fail-fast/releases
 
