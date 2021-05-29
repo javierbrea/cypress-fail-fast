@@ -12,7 +12,7 @@
     "babel-plugin-module-resolver": "4.1.0",
     "cypress": "7.4.0",
     "cross-env": "7.0.3",
-    "fs-extra": "9.1.0",
+    "fs-extra": "10.0.0",
     "mochawesome": "6.2.2",
     "mochawesome-merge": "4.2.0",
     "mochawesome-report-generator": "5.2.0"
