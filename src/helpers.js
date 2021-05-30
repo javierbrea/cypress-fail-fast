@@ -3,6 +3,7 @@ const ENABLED_ENVIRONMENT_VAR = "FAIL_FAST_ENABLED";
 const STRATEGY_ENVIRONMENT_VAR = "FAIL_FAST_STRATEGY";
 const SHOULD_SKIP_TASK = "failFastShouldSkip";
 const RESET_SKIP_TASK = "failFastResetSkip";
+const LOG_TASK = "failFastLog";
 
 const STRATEGIES = ["spec", "parallel"];
 
@@ -41,6 +42,7 @@ module.exports = {
   STRATEGY_ENVIRONMENT_VAR,
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
+  LOG_TASK,
   isTruthy,
   isFalsy,
   strategyIsParallel,

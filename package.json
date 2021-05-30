@@ -32,7 +32,8 @@
     "test:unit": "npm run test",
     "test:e2e:install": "cd test-e2e && npm i",
     "test:e2e:run": "cd test-e2e && npm run test:ci",
-    "test:e2e:debug": "cross-env npm run test:e2e:install && DEBUG=true npm run test:e2e:run",
+    "test:e2e:run:debug": "cross-env DEBUG=true npm run test:e2e:run",
+    "test:e2e:debug": "npm run test:e2e:install && npm run test:e2e:run:debug",
     "test:e2e:ci": "npm run test:e2e:install && npm run test:e2e:run",
     "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
     "test:mutation": "stryker run",
@@ -40,6 +41,9 @@
   },
   "peerDependencies": {
     "cypress": "5.x || 6.x || 7.x"
+  },
+  "dependencies": {
+    "chalk": "4.1.1"
   },
   "devDependencies": {
     "@stryker-mutator/core": "5.0.1",

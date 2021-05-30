@@ -1,6 +1,8 @@
+const chalk = require("chalk");
 const {
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
+  LOG_TASK,
   STRATEGY_ENVIRONMENT_VAR,
   strategyIsParallel,
 } = require("./helpers");
@@ -40,6 +42,10 @@ module.exports = (on, config, pluginConfig = {}) => {
         shouldSkipFlag = value;
       }
       return shouldSkip();
+    },
+    [LOG_TASK]: function (message) {
+      console.log(`${chalk.yellow("[fail-fast]")} ${message}`);
+      return null;
     },
   });
 
