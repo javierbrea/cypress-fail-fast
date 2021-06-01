@@ -13,7 +13,7 @@
   "devDependencies": {
     "cross-env": "7.0.3",
     "fs-extra": "10.0.0",
-    "jest": "27.0.1",
+    "jest": "27.0.3",
     "serve": "11.3.2",
     "start-server-and-test": "1.12.3",
     "strip-ansi": "6.0.0"
