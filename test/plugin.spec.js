@@ -1,4 +1,5 @@
 const sinon = require("sinon");
+const chalk = require("chalk");
 const plugin = require("../src/plugin");
 
 describe("plugin", () => {
@@ -7,12 +8,14 @@ describe("plugin", () => {
   let eventName;
   let failFastShouldSkip;
   let failFastResetSkip;
+  let failFastLog;
 
   const getPluginMethods = (config, env) => {
     plugin(onEventSpy, { env: env || {} }, config);
     eventName = onEventSpy.getCall(0).args[0];
     failFastShouldSkip = onEventSpy.getCall(0).args[1].failFastShouldSkip;
     failFastResetSkip = onEventSpy.getCall(0).args[1].failFastResetSkip;
+    failFastLog = onEventSpy.getCall(0).args[1].failFastLog;
   };
 
   beforeEach(() => {
@@ -189,6 +192,21 @@ describe("plugin", () => {
         failFastShouldSkip();
         expect(spy.callCount).toEqual(0);
       });
+    });
+  });
+
+  describe("log task", () => {
+    it("should call to console.log adding the plugin name", () => {
+      const MESSAGE = "Foo message";
+      getPluginMethods();
+      sandbox.spy(console, "log");
+      failFastLog(MESSAGE);
+      expect(console.log.getCall(0).args[0]).toEqual(`${chalk.yellow("[fail-fast]")} ${MESSAGE}`);
+    });
+
+    it("should return null", () => {
+      getPluginMethods();
+      expect(failFastLog("foo")).toEqual(null);
     });
   });
 });

@@ -129,28 +129,30 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   const _onRunnableRun = Cypress.runner.onRunnableRun;
 
-  Cypress.runner.onRunnableRun = function (runnableRun, runnable, args) {
-    const isHook = runnable.type === "hook";
+  if (pluginIsEnabled()) {
+    Cypress.runner.onRunnableRun = function (runnableRun, runnable, args) {
+      const isHook = runnable.type === "hook";
 
-    const next = args[0];
-    const wrappedNext = function (error) {
-      if (error) {
-        hookFailedName = runnable.hookName;
-        hookFailed = true;
+      const next = args[0];
+      const wrappedNext = function (error) {
+        if (error) {
+          hookFailedName = runnable.hookName;
+          hookFailed = true;
+        }
+        /* 
+          Do not pass the error, because Cypress stops if there is an error on before hooks,
+          so this plugin can't set the skip flag
+        */
+        return next.call(this);
+      };
+
+      if (isHook) {
+        args[0] = wrappedNext;
       }
-      /* 
-        Do not pass the error, because Cypress stops if there is an error on before hooks,
-        so this plugin can't set the skip flag
-      */
-      return next.call(this);
+
+      return _onRunnableRun.apply(this, [runnableRun, runnable, args]);
     };
-
-    if (isHook) {
-      args[0] = wrappedNext;
-    }
-
-    return _onRunnableRun.apply(this, [runnableRun, runnable, args]);
-  };
+  }
 }
 
 module.exports = support;
