@@ -78,6 +78,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
   beforeEach(function () {
     if (pluginIsEnabled()) {
       if (hookFailed) {
+        // Mark skip flag as true if hook failed, and stop runner
         cy.task(LOG_TASK, `"${hookFailedName}" hook failed, entering skip mode`);
         cy.task(SHOULD_SKIP_TASK, true).then(() => {
           this.currentTest.pending = true;

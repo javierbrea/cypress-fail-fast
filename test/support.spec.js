@@ -386,6 +386,7 @@ describe("support", () => {
           CypressOnRunnableRun.getCall(0).args[2][0](new Error());
           beforeEachCallback();
           await wait(200);
+          expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
           expect(Cypress.runner.stop.callCount).toEqual(1);
         });
       });
