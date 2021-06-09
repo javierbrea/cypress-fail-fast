@@ -15,7 +15,7 @@
     "fs-extra": "10.0.0",
     "jest": "27.0.4",
     "serve": "11.3.2",
-    "start-server-and-test": "1.12.3",
+    "start-server-and-test": "1.12.5",
     "strip-ansi": "6.0.0"
   }
 }
