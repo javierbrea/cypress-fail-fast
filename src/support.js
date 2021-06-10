@@ -5,12 +5,15 @@ const {
   STRATEGY_ENVIRONMENT_VAR,
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
+  LOG_TASK,
   isFalsy,
   isTruthy,
   strategyIsSpec,
 } = require("./helpers");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
+  let hookFailed, hookFailedName;
+
   function isHeaded() {
     return Cypress.browser && Cypress.browser.isHeaded;
   }
@@ -74,12 +77,21 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   beforeEach(function () {
     if (pluginIsEnabled()) {
-      cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
-        if (value === true) {
+      if (hookFailed) {
+        // Mark skip flag as true if hook failed, and stop runner
+        cy.task(LOG_TASK, `"${hookFailedName}" hook failed, entering skip mode`);
+        cy.task(SHOULD_SKIP_TASK, true).then(() => {
           this.currentTest.pending = true;
           Cypress.runner.stop();
-        }
-      });
+        });
+      } else {
+        cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
+          if (value === true) {
+            this.currentTest.pending = true;
+            Cypress.runner.stop();
+          }
+        });
+      }
     }
   });
 
@@ -115,6 +127,33 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       }
     }
   });
+
+  const _onRunnableRun = Cypress.runner.onRunnableRun;
+
+  if (pluginIsEnabled()) {
+    Cypress.runner.onRunnableRun = function (runnableRun, runnable, args) {
+      const isHook = runnable.type === "hook";
+
+      const next = args[0];
+      const wrappedNext = function (error) {
+        if (error) {
+          hookFailedName = runnable.hookName;
+          hookFailed = true;
+        }
+        /* 
+          Do not pass the error, because Cypress stops if there is an error on before hooks,
+          so this plugin can't set the skip flag
+        */
+        return next.call(this);
+      };
+
+      if (isHook) {
+        args[0] = wrappedNext;
+      }
+
+      return _onRunnableRun.apply(this, [runnableRun, runnable, args]);
+    };
+  }
 }
 
 module.exports = support;
