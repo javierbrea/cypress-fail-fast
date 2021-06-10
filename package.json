@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",
@@ -32,7 +32,8 @@
     "test:unit": "npm run test",
     "test:e2e:install": "cd test-e2e && npm i",
     "test:e2e:run": "cd test-e2e && npm run test:ci",
-    "test:e2e:debug": "cross-env npm run test:e2e:install && DEBUG=true npm run test:e2e:run",
+    "test:e2e:run:debug": "cross-env DEBUG=true npm run test:e2e:run",
+    "test:e2e:debug": "npm run test:e2e:install && npm run test:e2e:run:debug",
     "test:e2e:ci": "npm run test:e2e:install && npm run test:e2e:run",
     "test:ci": "npm run test && npm run test:mutation && npm run test:e2e:ci",
     "test:mutation": "stryker run",
@@ -41,20 +42,23 @@
   "peerDependencies": {
     "cypress": "5.x || 6.x || 7.x"
   },
+  "dependencies": {
+    "chalk": "4.1.1"
+  },
   "devDependencies": {
     "@stryker-mutator/core": "5.0.1",
     "@stryker-mutator/jest-runner": "5.0.1",
     "babel-eslint": "10.1.0",
     "cross-env": "7.0.3",
-    "eslint": "7.27.0",
+    "eslint": "7.28.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
-    "eslint-plugin-react": "7.23.2",
+    "eslint-plugin-react": "7.24.0",
     "husky": "6.0.0",
     "is-ci": "3.0.0",
-    "jest": "27.0.1",
+    "jest": "27.0.4",
     "lint-staged": "11.0.0",
-    "prettier": "2.3.0",
+    "prettier": "2.3.1",
     "sinon": "11.1.1"
   },
   "lint-staged": {

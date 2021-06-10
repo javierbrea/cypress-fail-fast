@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [2.4.0] - 2021-06-10
+
+### Added
+- feat(#91): Enter skip mode if any hook fails
+
+### Changed
+- chore(deps): Update devDependencies
+
 ## [2.3.3] - 2021-05-29
 
 ### Changed

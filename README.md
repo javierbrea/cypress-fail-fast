@@ -13,6 +13,7 @@ It can be configured to skip all remaining tests in current spec file, in curren
 ## Table of Contents
 
 - [Installation](#installation)
+- [Limitations and notes](#limitations-and-notes)
 - [Configuration](#configuration)
   * [Environment variables](#environment-variables)
   * [Configuration by test](#configuration-by-test)
@@ -46,6 +47,11 @@ import "cypress-fail-fast";
 From now, if one test fail after its last retry, the rest of tests will be skipped:
 
 ![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
+
+## Limitations and notes
+
+* All spec files will be loaded, even after entering "skip mode", but every tests and hooks inside them will be skipped.
+* The `spec` strategy does not work in headed mode, because for Cypress events it is like running a single spec.
 
 ## Configuration
 

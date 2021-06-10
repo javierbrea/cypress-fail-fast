@@ -16,10 +16,12 @@ describe("support", () => {
   let beforeCallback;
   let getCurrentTest;
   let Cypress;
+  let CypressOnRunnableRun;
   let cy;
 
   const getSupportCallbacks = (options = {}) => {
     sandbox = sinon.createSandbox();
+    CypressOnRunnableRun = sandbox.spy();
     Cypress = {
       browser: {
         isHeaded: options.browserIsHeaded,
@@ -37,6 +39,7 @@ describe("support", () => {
       },
       runner: {
         stop: sandbox.spy(),
+        onRunnableRun: CypressOnRunnableRun,
       },
     };
     if (options.removeCypressBrowser) {
@@ -136,6 +139,13 @@ describe("support", () => {
           getSupportCallbacks(config);
           beforeCallback();
           expect(cy.task.callCount).toEqual(0);
+        });
+      });
+
+      describe("Cypress onRunnableRun method", () => {
+        it("should not be wrapped", () => {
+          getSupportCallbacks(config);
+          expect(Cypress.runner.onRunnableRun).toBe(CypressOnRunnableRun);
         });
       });
     });
@@ -322,6 +332,62 @@ describe("support", () => {
           beforeCallback();
           await wait(200);
           expect(Cypress.runner.stop.callCount).toEqual(0);
+        });
+      });
+
+      describe("Cypress onRunnableRun method", () => {
+        let runnableRun, runnable, args, firstArg;
+        beforeEach(() => {
+          firstArg = sandbox.spy();
+          runnableRun = sandbox.spy();
+          runnable = {};
+          args = [firstArg];
+        });
+
+        it("should be wrapped", () => {
+          getSupportCallbacks(config);
+          expect(Cypress.runner.onRunnableRun).not.toBe(CypressOnRunnableRun);
+        });
+
+        it("should be called with original arguments if runnable is not a hook", () => {
+          getSupportCallbacks(config);
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          expect(CypressOnRunnableRun.getCall(0).args).toEqual([runnableRun, runnable, args]);
+          expect(CypressOnRunnableRun.getCall(0).args[2][0]).toBe(firstArg);
+        });
+
+        it("should be called with a wrapped first arg if runnable is a hook", () => {
+          getSupportCallbacks(config);
+          runnable.type = "hook";
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          expect(CypressOnRunnableRun.getCall(0).args[2][0]).not.toBe(firstArg);
+        });
+
+        it("should call to original first arg", () => {
+          getSupportCallbacks(config);
+          runnable.type = "hook";
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          CypressOnRunnableRun.getCall(0).args[2][0]();
+          expect(firstArg.callCount).toEqual(1);
+        });
+
+        it("should call to original first arg without error even when it is received", () => {
+          getSupportCallbacks(config);
+          runnable.type = "hook";
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          CypressOnRunnableRun.getCall(0).args[2][0](new Error());
+          expect(firstArg.getCall(0).args[1]).toBe(undefined);
+        });
+
+        it("beforeEach method should call to stop runner if error is received in a hook", async () => {
+          getSupportCallbacks(config);
+          runnable.type = "hook";
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          CypressOnRunnableRun.getCall(0).args[2][0](new Error());
+          beforeEachCallback();
+          await wait(200);
+          expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
+          expect(Cypress.runner.stop.callCount).toEqual(1);
         });
       });
     });
