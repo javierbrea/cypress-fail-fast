@@ -425,7 +425,7 @@ describe("support", () => {
         });
         afterEachCallback();
         await wait(200);
-        expect(cy.task.callCount).toEqual(1);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
       });
     });
   };
