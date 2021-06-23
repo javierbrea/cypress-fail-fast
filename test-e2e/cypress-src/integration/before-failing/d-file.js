@@ -8,20 +8,20 @@ describe("List items", () => {
     it("should display title", () => {
       cy.get("h1").should("have.text", "Items list");
     });
-
-    it("should display second item", () => {
-      cy.get("ul li:eq(1)").should("have.text", "Second item");
-    });
   });
 
-  describe("before failing", () => {
-    before(() => {
+  describe("beforeEach failing", () => {
+    beforeEach(() => {
       cy.task("log", "Executing before hook");
       expect(true).to.be.false;
     });
 
     it("should display first item", () => {
       cy.get("ul li:eq(0)").should("have.text", "First item");
+    });
+
+    it("should display second item", () => {
+      cy.get("ul li:eq(1)").should("have.text", "Second item");
     });
   });
 

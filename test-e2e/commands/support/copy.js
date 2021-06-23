@@ -114,12 +114,14 @@ const copyCypressSpecs = (specsFolder, variant) => {
   const INTEGRATION_A_FILE = "a-file.js";
   const INTEGRATION_B_FILE = "b-file.js";
   const INTEGRATION_C_FILE = "c-file.js";
+  const INTEGRATION_D_FILE = "d-file.js";
 
   const integrationPath = path.resolve(CYPRESS_SRC_PATH, CYPRESS_INTEGRATION_PATH, specsFolder);
 
   const integrationAFile = path.resolve(integrationPath, INTEGRATION_A_FILE);
   const integrationBFile = path.resolve(integrationPath, INTEGRATION_B_FILE);
   const integrationCFile = path.resolve(integrationPath, INTEGRATION_C_FILE);
+  const integrationDFile = path.resolve(integrationPath, INTEGRATION_D_FILE);
 
   fsExtra.removeSync(destPaths.cypress.integration);
   fsExtra.ensureDirSync(destPaths.cypress.integration);
@@ -144,6 +146,15 @@ const copyCypressSpecs = (specsFolder, variant) => {
       toTypeScriptName(INTEGRATION_C_FILE, variant.typescript)
     )
   );
+  if (fsExtra.existsSync(integrationDFile)) {
+    fsExtra.copySync(
+      integrationDFile,
+      path.resolve(
+        destPaths.cypress.integration,
+        toTypeScriptName(INTEGRATION_D_FILE, variant.typescript)
+      )
+    );
+  }
 };
 
 module.exports = {
