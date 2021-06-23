@@ -82,13 +82,28 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     Cypress.runner.stop();
   }
 
+  function resetSkipFlag() {
+    cy.task(RESET_SKIP_TASK, null, { log: false });
+  }
+
+  function enableSkipMode() {
+    cy.task(LOG_TASK, SKIP_MESSAGE);
+    cy.task(SHOULD_SKIP_TASK, true);
+  }
+
+  function runIfSkipIsEnabled(callback) {
+    cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
+      if (value === true) {
+        callback();
+      }
+    });
+  }
+
   beforeEach(function () {
     if (pluginIsEnabled()) {
-      cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
-        if (value === true) {
-          this.currentTest.pending = true;
-          stopCypressRunner();
-        }
+      runIfSkipIsEnabled(() => {
+        this.currentTest.pending = true;
+        stopCypressRunner();
       });
     }
   });
@@ -102,8 +117,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
-      cy.task(LOG_TASK, SKIP_MESSAGE);
-      cy.task(SHOULD_SKIP_TASK, true);
+      enableSkipMode();
     }
   });
 
@@ -116,12 +130,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
           Do this only for headed runs because in headless runs,
           the `before` hook is executed for each spec file.
         */
-        cy.task(RESET_SKIP_TASK, null, { log: false });
+        resetSkipFlag();
       } else {
-        cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
-          if (value === true) {
-            stopCypressRunner();
-          }
+        runIfSkipIsEnabled(() => {
+          stopCypressRunner();
         });
       }
     }
