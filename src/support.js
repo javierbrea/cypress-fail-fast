@@ -5,7 +5,9 @@ const {
   STRATEGY_ENVIRONMENT_VAR,
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
-  // LOG_TASK,
+  LOG_TASK,
+  STOP_MESSAGE,
+  SKIP_MESSAGE,
   isFalsy,
   isTruthy,
   strategyIsSpec,
@@ -75,12 +77,17 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     return currentTest.state === "failed" && currentTest.currentRetry() === currentTest.retries();
   }
 
+  function stopCypressRunner() {
+    cy.task(LOG_TASK, STOP_MESSAGE);
+    Cypress.runner.stop();
+  }
+
   beforeEach(function () {
     if (pluginIsEnabled()) {
       cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
         if (value === true) {
           this.currentTest.pending = true;
-          Cypress.runner.stop();
+          stopCypressRunner();
         }
       });
     }
@@ -95,6 +102,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
+      cy.task(LOG_TASK, SKIP_MESSAGE);
       cy.task(SHOULD_SKIP_TASK, true);
     }
   });
@@ -112,7 +120,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       } else {
         cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
           if (value === true) {
-            Cypress.runner.stop();
+            stopCypressRunner();
           }
         });
       }
