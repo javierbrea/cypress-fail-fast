@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [3.0.0] - 2021-06-23
+
+### Added
+- feat(#119): Force the next test to fail when a "before" or "beforeEach" hook fails, so the execution is marked as "failed", and fail fast mode can be enabled.
+- feat: Add logs when skip mode is enabled, and when Cypress runner is stopped.
+
+### Changed
+- refactor: Improve code readability
+- chore(deps): Update dependencies
+
+### Removed
+- feat: Do not apply fail fast on other hooks apart from "before" and "beforeEach"
+
+### BREAKING CHANGES
+- Fail fast is only applied on "before" and "beforeEach" hooks failures. Other hooks are ignored.
+
 ## [2.4.0] - 2021-06-10
 
 ### Added

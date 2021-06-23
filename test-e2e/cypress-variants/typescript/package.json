@@ -10,8 +10,8 @@
     "cypress:run": "npm run report:clean && cypress run"
   },
   "devDependencies": {
-    "cypress": "7.4.0",
-    "typescript": "4.3.2",
+    "cypress": "7.5.0",
+    "typescript": "4.3.4",
     "cross-env": "7.0.3",
     "fs-extra": "10.0.0",
     "mochawesome": "6.2.2",
