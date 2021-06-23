@@ -58,7 +58,7 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 ### Environment variables
 
 * __`FAIL_FAST_STRATEGY`__: `'spec'|'run'|'parallel'`
-  * If `spec`, only remaining tests in current spec file are skipped.
+  * If `spec`, only remaining tests in current spec file are skipped. This mode only works in "headless" mode.
   * If `run`, all remaining tests in all spec files are skipped (default value).
   * Use `parallel` to [provide your own callbacks](#configuration-for-parallel-runs) allowing to notify from one run to the others when remaining tests should be skipped.
 * __`FAIL_FAST_ENABLED`__: `boolean = true` Allows disabling the "fail-fast" feature globally, but it could be still enabled for specific tests or describes using [configuration by test](#configuration-by-test).

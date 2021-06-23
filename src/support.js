@@ -6,13 +6,15 @@ const {
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
   LOG_TASK,
+  STOP_MESSAGE,
+  SKIP_MESSAGE,
   isFalsy,
   isTruthy,
   strategyIsSpec,
 } = require("./helpers");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
-  let hookFailed, hookFailedName;
+  let hookFailed, hookFailedName, hookError;
 
   function isHeaded() {
     return Cypress.browser && Cypress.browser.isHeaded;
@@ -75,23 +77,34 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     return currentTest.state === "failed" && currentTest.currentRetry() === currentTest.retries();
   }
 
+  function stopCypressRunner() {
+    cy.task(LOG_TASK, STOP_MESSAGE);
+    Cypress.runner.stop();
+  }
+
+  function resetSkipFlag() {
+    cy.task(RESET_SKIP_TASK, null, { log: false });
+  }
+
+  function enableSkipMode() {
+    cy.task(LOG_TASK, SKIP_MESSAGE);
+    cy.task(SHOULD_SKIP_TASK, true);
+  }
+
+  function runIfSkipIsEnabled(callback) {
+    cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
+      if (value === true) {
+        callback();
+      }
+    });
+  }
+
   beforeEach(function () {
     if (pluginIsEnabled()) {
-      if (hookFailed) {
-        // Mark skip flag as true if hook failed, and stop runner
-        cy.task(LOG_TASK, `"${hookFailedName}" hook failed, entering skip mode`);
-        cy.task(SHOULD_SKIP_TASK, true).then(() => {
-          this.currentTest.pending = true;
-          Cypress.runner.stop();
-        });
-      } else {
-        cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
-          if (value === true) {
-            this.currentTest.pending = true;
-            Cypress.runner.stop();
-          }
-        });
-      }
+      runIfSkipIsEnabled(() => {
+        this.currentTest.pending = true;
+        stopCypressRunner();
+      });
     }
   });
 
@@ -104,7 +117,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       testHasFailed(currentTest) &&
       shouldSkipRestOfTests(currentTest)
     ) {
-      cy.task(SHOULD_SKIP_TASK, true);
+      enableSkipMode();
     }
   });
 
@@ -117,12 +130,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
           Do this only for headed runs because in headless runs,
           the `before` hook is executed for each spec file.
         */
-        cy.task(RESET_SKIP_TASK, null, { log: false });
+        resetSkipFlag();
       } else {
-        cy.task(SHOULD_SKIP_TASK, null, { log: false }).then((value) => {
-          if (value === true) {
-            Cypress.runner.stop();
-          }
+        runIfSkipIsEnabled(() => {
+          stopCypressRunner();
         });
       }
     }
@@ -133,22 +144,33 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
   if (pluginIsEnabled()) {
     Cypress.runner.onRunnableRun = function (runnableRun, runnable, args) {
       const isHook = runnable.type === "hook";
+      const isBeforeHook = isHook && runnable.hookName.match(/before/);
 
       const next = args[0];
-      const wrappedNext = function (error) {
+      const setFailedFlag = function (error) {
         if (error) {
           hookFailedName = runnable.hookName;
+          hookError = error;
           hookFailed = true;
         }
         /* 
           Do not pass the error, because Cypress stops if there is an error on before hooks,
           so this plugin can't set the skip flag
         */
-        return next.call(this);
+        return next.call(/* this, error */);
       };
 
-      if (isHook) {
-        args[0] = wrappedNext;
+      const forceTestToFail = function () {
+        hookFailed = false;
+        hookError.message = `"${hookFailedName}" hook failed: ${hookError.message}`;
+        // Force next test to fail, so the plugin can set the skip flag, and the test is marked as failed
+        return next.call(this, hookError);
+      };
+
+      if (isBeforeHook) {
+        args[0] = setFailedFlag;
+      } else if (!isHook && hookFailed) {
+        args[0] = forceTestToFail;
       }
 
       return _onRunnableRun.apply(this, [runnableRun, runnable, args]);

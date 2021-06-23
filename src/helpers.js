@@ -5,6 +5,9 @@ const SHOULD_SKIP_TASK = "failFastShouldSkip";
 const RESET_SKIP_TASK = "failFastResetSkip";
 const LOG_TASK = "failFastLog";
 
+const STOP_MESSAGE = "Stopping Cypress runner due to a previous failure";
+const SKIP_MESSAGE = "Enabling skip mode";
+
 const STRATEGIES = ["spec", "parallel"];
 
 const TRUTHY_VALUES = [true, "true", 1, "1"];
@@ -43,6 +46,8 @@ module.exports = {
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
   LOG_TASK,
+  STOP_MESSAGE,
+  SKIP_MESSAGE,
   isTruthy,
   isFalsy,
   strategyIsParallel,

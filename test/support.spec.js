@@ -356,9 +356,18 @@ describe("support", () => {
           expect(CypressOnRunnableRun.getCall(0).args[2][0]).toBe(firstArg);
         });
 
-        it("should be called with a wrapped first arg if runnable is a hook", () => {
+        it("should be called with a wrapped first arg if runnable is a before hook", () => {
           getSupportCallbacks(config);
           runnable.type = "hook";
+          runnable.hookName = "before";
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          expect(CypressOnRunnableRun.getCall(0).args[2][0]).not.toBe(firstArg);
+        });
+
+        it("should be called with a wrapped first arg if runnable is a beforeEach hook", () => {
+          getSupportCallbacks(config);
+          runnable.type = "hook";
+          runnable.hookName = "beforeEach";
           Cypress.runner.onRunnableRun(runnableRun, runnable, args);
           expect(CypressOnRunnableRun.getCall(0).args[2][0]).not.toBe(firstArg);
         });
@@ -366,6 +375,7 @@ describe("support", () => {
         it("should call to original first arg", () => {
           getSupportCallbacks(config);
           runnable.type = "hook";
+          runnable.hookName = "beforeEach";
           Cypress.runner.onRunnableRun(runnableRun, runnable, args);
           CypressOnRunnableRun.getCall(0).args[2][0]();
           expect(firstArg.callCount).toEqual(1);
@@ -374,20 +384,31 @@ describe("support", () => {
         it("should call to original first arg without error even when it is received", () => {
           getSupportCallbacks(config);
           runnable.type = "hook";
+          runnable.hookName = "beforeEach";
           Cypress.runner.onRunnableRun(runnableRun, runnable, args);
           CypressOnRunnableRun.getCall(0).args[2][0](new Error());
           expect(firstArg.getCall(0).args[1]).toBe(undefined);
         });
 
-        it("beforeEach method should call to stop runner if error is received in a hook", async () => {
+        it("next test after the hook should be forced to fail with the hook error", async () => {
           getSupportCallbacks(config);
+          const hookError = new Error("foo error message");
           runnable.type = "hook";
+          runnable.hookName = "beforeEach";
           Cypress.runner.onRunnableRun(runnableRun, runnable, args);
-          CypressOnRunnableRun.getCall(0).args[2][0](new Error());
-          beforeEachCallback();
-          await wait(200);
-          expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
-          expect(Cypress.runner.stop.callCount).toEqual(1);
+          CypressOnRunnableRun.getCall(0).args[2][0](hookError);
+          runnable = {
+            type: "it",
+          };
+
+          const testCallbackSpy = sandbox.spy();
+          Cypress.runner.onRunnableRun(runnableRun, runnable, [testCallbackSpy]);
+          CypressOnRunnableRun.getCall(1).args[2][0]();
+          const testCallBackArgument = testCallbackSpy.getCall(0).args[0];
+          expect(testCallBackArgument).toBe(hookError);
+          expect(testCallBackArgument.message).toEqual(
+            '"beforeEach" hook failed: foo error message'
+          );
         });
       });
     });
@@ -404,7 +425,7 @@ describe("support", () => {
         });
         afterEachCallback();
         await wait(200);
-        expect(cy.task.callCount).toEqual(1);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
       });
     });
   };
