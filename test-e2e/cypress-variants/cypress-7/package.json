@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "babel-plugin-module-resolver": "4.1.0",
-    "cypress": "7.5.0",
+    "cypress": "7.7.0",
     "cross-env": "7.0.3",
     "fs-extra": "10.0.0",
     "mochawesome": "6.2.2",
