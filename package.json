@@ -39,6 +39,9 @@
     "test:mutation": "stryker run",
     "prepare": "is-ci || husky install"
   },
+  "peerDependencies": {
+    "cypress": "5.x || 6.x || 7.x || 8.x"
+  },
   "dependencies": {
     "chalk": "4.1.1"
   },
