@@ -122,7 +122,10 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
       }
       logs = splitLogsBySpec(await npmRun(["cypress:run"], cypressVariant.path, options.env));
       await npmRun(["report:create"], cypressVariant.path, options.env);
-      report = await readReport(cypressVariant.path);
+      report = await readReport(cypressVariant.path).catch(() => {
+        console.warn("Mochawesome report not found");
+        return null;
+      });
     }, 60000);
 
     tests(getLogs, getReport);
