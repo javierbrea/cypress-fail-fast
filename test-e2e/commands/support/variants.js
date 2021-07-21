@@ -17,6 +17,12 @@ const VARIANTS = [
     typescript: false,
   },
   {
+    name: "Cypress 8",
+    path: "cypress-8",
+    typescript: false,
+    pluginFile: "preprocessor-babel-config",
+  },
+  {
     name: "TypeScript",
     path: "typescript",
     typescript: true,
