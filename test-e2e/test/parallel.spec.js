@@ -44,7 +44,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[3],
+      cypress: cypressVariants[4],
       pluginFile: "parallel",
       specs: "all-tests-passing",
       specsResults: [
@@ -116,7 +116,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[3],
+      cypress: cypressVariants[4],
       pluginFile: "parallel",
       specs: "all-tests-passing",
       specsResults: [
