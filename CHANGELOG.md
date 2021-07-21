@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- chore(#129): Support Cypress v8.x in peerDependencies
+- chore(#129): Support Cypress v8.x in peerDependencies. Add E2E tests using Cypress v8
 ### Changed
 ### Fixed
 ### Removed
