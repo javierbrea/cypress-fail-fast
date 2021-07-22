@@ -113,9 +113,19 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
 
     beforeAll(async () => {
       copyCypressSpecs(options.specs, cypressVariant);
+      if (cypressVariant.pluginFile) {
+        copyCypressPluginFile(
+          cypressVariant.path,
+          cypressVariant.typescript,
+          cypressVariant.pluginFile
+        );
+      }
       logs = splitLogsBySpec(await npmRun(["cypress:run"], cypressVariant.path, options.env));
       await npmRun(["report:create"], cypressVariant.path, options.env);
-      report = await readReport(cypressVariant.path);
+      report = await readReport(cypressVariant.path).catch(() => {
+        console.warn("Mochawesome report not found");
+        return null;
+      });
     }, 60000);
 
     tests(getLogs, getReport);
@@ -168,12 +178,24 @@ const runParallelTests = (
           cypressVariant1.typescript,
           options1.pluginFile
         );
+      } else if (cypressVariant1.pluginFile) {
+        copyCypressPluginFile(
+          cypressVariant1.path,
+          cypressVariant1.typescript,
+          cypressVariant1.pluginFile
+        );
       }
       if (options2.pluginFile) {
         copyCypressPluginFile(
           cypressVariant2.path,
           cypressVariant2.typescript,
           options2.pluginFile
+        );
+      } else if (cypressVariant2.pluginFile) {
+        copyCypressPluginFile(
+          cypressVariant2.path,
+          cypressVariant2.typescript,
+          cypressVariant2.pluginFile
         );
       }
       const logs = await Promise.all([
@@ -195,10 +217,18 @@ const runParallelTests = (
 
     afterAll(() => {
       if (options1.pluginFile) {
-        copyCypressPluginFile(cypressVariant1.path, cypressVariant1.typescript);
+        copyCypressPluginFile(
+          cypressVariant1.path,
+          cypressVariant1.typescript,
+          cypressVariant1.pluginFile
+        );
       }
       if (options2.pluginFile) {
-        copyCypressPluginFile(cypressVariant2.path, cypressVariant2.typescript);
+        copyCypressPluginFile(
+          cypressVariant2.path,
+          cypressVariant2.typescript,
+          cypressVariant2.pluginFile
+        );
       }
       if (commonOptions.afterAll) {
         commonOptions.afterAll();
