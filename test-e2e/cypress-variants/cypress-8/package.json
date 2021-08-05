@@ -18,6 +18,6 @@
     "mochawesome": "6.2.2",
     "mochawesome-merge": "4.2.0",
     "mochawesome-report-generator": "5.2.0",
-    "webpack": "5.47.1"
+    "webpack": "5.48.0"
   }
 }
