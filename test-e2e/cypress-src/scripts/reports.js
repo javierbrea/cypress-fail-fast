@@ -13,7 +13,7 @@ function cypressPath(filePath) {
 function deletePreviousReports() {
   fsExtra.removeSync(cypressPath("results"));
   fsExtra.removeSync(cypressPath("mochawesome.json"));
-  fsExtra.removeSync(path.resolve("mochawesome-report"));
+  fsExtra.removeSync(path.resolve(__dirname, "..", "mochawesome-report"));
 }
 
 function mergeReports() {

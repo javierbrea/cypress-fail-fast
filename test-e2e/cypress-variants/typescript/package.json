@@ -7,15 +7,16 @@
     "report:clean": "cross-env node scripts/reports.js clean",
     "report:create": "cross-env node scripts/reports.js merge && marge cypress/mochawesome.json",
     "cypress:open": "cypress open",
+    "tsc": "tsc",
     "cypress:run": "npm run report:clean && cypress run"
   },
   "devDependencies": {
-    "cypress": "7.5.0",
-    "typescript": "4.3.5",
     "cross-env": "7.0.3",
+    "cypress": "7.5.0",
     "fs-extra": "10.0.0",
     "mochawesome": "6.2.2",
     "mochawesome-merge": "4.2.0",
-    "mochawesome-report-generator": "5.2.0"
+    "mochawesome-report-generator": "5.2.0",
+    "typescript": "4.3.5"
   }
 }

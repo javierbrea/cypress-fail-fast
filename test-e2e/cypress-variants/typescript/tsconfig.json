@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "target": "es5",
-    "lib": ["es5"],
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "dist",
     "types": ["cypress"]
   },
   "include": [
-    "**/*.ts"
-  ]
+    "**/*.ts",
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+  ],
 }

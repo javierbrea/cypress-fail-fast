@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [3.1.1] - 2021-08-21
+
+### Added
+- test(#151): Add TypeScript types check. Check types also in E2E tests
+- docs: Add Cypress v8.x support to docs
+
+### Changed
+- chore(deps): Update dependencies
+
+### Fixed
+- fix(#151): Fix TypeScript declarations. Remove `TestConfigOverrides` recursively references
+
 ## [3.1.0] - 2021-07-22
 
 ### Added

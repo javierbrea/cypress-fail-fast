@@ -113,6 +113,10 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
 
     beforeAll(async () => {
       copyCypressSpecs(options.specs, cypressVariant);
+      if (cypressVariant.typescript) {
+        console.log("Running tsc on typescript tests");
+        await npmRun(["tsc"], cypressVariant.path, options.env);
+      }
       if (cypressVariant.pluginFile) {
         copyCypressPluginFile(
           cypressVariant.path,
