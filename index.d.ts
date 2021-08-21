@@ -9,7 +9,7 @@ declare namespace Cypress {
     enabled?: boolean
   }
 
-  interface TestConfigOverrides extends Partial<TestConfigOverrides> {
+  interface TestConfigOverrides {
     /**
      * Configuration for fail-fast plugin
     */
