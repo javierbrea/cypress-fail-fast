@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - test(#151): Add TypeScript types check. Check types also in E2E tests
+- docs: Add Cypress v8.x support to docs
 
 ### Changed
 - chore(deps): Update dependencies

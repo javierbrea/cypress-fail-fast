@@ -51,7 +51,7 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 ## Limitations and notes
 
 * All spec files will be loaded, even after entering "skip mode", but every tests and hooks inside them will be skipped.
-* The `spec` strategy does not work in headed mode, because for Cypress events it is like running a single spec.
+* The `spec` strategy does not work in headed mode, because for Cypress events it is like running a single spec, so all remaining tests will be skipped.
 
 ## Configuration
 
@@ -82,14 +82,12 @@ or set the "env" key in the `cypress.json` configuration file:
 }
 ```
 
-
 ### Configuration by test
 
 If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
 
 * __`failFast`__: Configuration for the plugin, containing any of next properties:
   * __`enabled`__ : Indicates wheter a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. Note that the value defined in this property has priority over the value of the environment variable `CYPRESS_FAIL_FAST_ENABLED` _(but not over `CYPRESS_FAIL_FAST_PLUGIN`, which disables the plugin totally)_.
-
 
 #### Example
 
@@ -209,12 +207,13 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): 
 
 ## Tests
 
-To ensure the plugin stability, it is being tested with Cypress major versions 5.x, 6.x and 7.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
+To ensure the plugin stability, it is being tested with Cypress major versions 5.x, 6.x, 7.x and 8.x and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
 
 Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
 * [Cypress v5.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-5/package.json)
 * [Cypress v6.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-6/package.json)
 * [Cypress v7.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-7/package.json)
+* [Cypress v8.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-8/package.json)
 
 Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 
