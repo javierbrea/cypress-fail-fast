@@ -8,7 +8,7 @@ describe("List items", () => {
     cy.get("h1").should("have.text", "Items list");
   });
 
-  it("should display first item", () => {
+  it("should display first item", { retries: { runMode: 0, openMode: 3 } }, () => {
     cy.get("ul li:eq(0)").should("have.text", "First item");
   });
 

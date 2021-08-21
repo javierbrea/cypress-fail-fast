@@ -8,7 +8,7 @@ describe("List items", { failFast: { enabled: true } }, () => {
     cy.get("h1").should("have.text", "Items list");
   });
 
-  it("should display first item", { failFast: { enabled: false } }, () => {
+  it("should display first item", { retries: 2, failFast: { enabled: false } }, () => {
     cy.get("ul li:eq(0)").should("have.text", "Wrong text");
   });
 
