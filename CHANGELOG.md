@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [3.1.1] - 2021-08-21
+
+### Fixed
+- fix(#151): Fix TypeScript declarations. Remove `TestConfigOverrides` recursively references
+
+### Added
+- test(#151): Add TypeScript types check. Check types also in E2E tests.
+
 ## [3.1.0] - 2021-07-22
 
 ### Added
