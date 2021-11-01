@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [3.2.0] - 2021-11-01
+
+### Changed
+- chore(deps): Update devDependencies
+- chore(deps): Support any NodeJs version greater than 10.x.
+
+### Fixed
+- fix(#124): Skip nested before hooks when one fails (#164)
+
 ## [3.1.1] - 2021-08-21
 
 ### Added
