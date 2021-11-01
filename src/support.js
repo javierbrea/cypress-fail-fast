@@ -147,6 +147,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       const isBeforeHook = isHook && runnable.hookName.match(/before/);
 
       const next = args[0];
+
       const setFailedFlag = function (error) {
         if (error) {
           hookFailedName = runnable.hookName;
@@ -157,7 +158,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
           Do not pass the error, because Cypress stops if there is an error on before hooks,
           so this plugin can't set the skip flag
         */
-        return next.call(/* this, error */);
+        return next.call(this /*, error */);
       };
 
       const forceTestToFail = function () {
@@ -167,10 +168,13 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
         return next.call(this, hookError);
       };
 
-      if (isBeforeHook) {
-        args[0] = setFailedFlag;
+      if (isBeforeHook && hookFailed) {
+        // Skip other before hooks when one failed
+        return next();
       } else if (!isHook && hookFailed) {
         args[0] = forceTestToFail;
+      } else if (isBeforeHook) {
+        args[0] = setFailedFlag;
       }
 
       return _onRunnableRun.apply(this, [runnableRun, runnable, args]);

@@ -390,6 +390,24 @@ describe("support", () => {
           expect(firstArg.getCall(0).args[1]).toBe(undefined);
         });
 
+        it("next before hook after the hook should be skipped", async () => {
+          getSupportCallbacks(config);
+          const hookError = new Error("foo error message");
+          runnable.type = "hook";
+          runnable.hookName = "beforeEach";
+          Cypress.runner.onRunnableRun(runnableRun, runnable, args);
+          CypressOnRunnableRun.getCall(0).args[2][0](hookError);
+          runnable = {
+            type: "hook",
+            hookName: "beforeEach",
+          };
+
+          const testCallbackSpy = () => "foo";
+          expect(Cypress.runner.onRunnableRun(runnableRun, runnable, [testCallbackSpy])).toEqual(
+            "foo"
+          );
+        });
+
         it("next test after the hook should be forced to fail with the hook error", async () => {
           getSupportCallbacks(config);
           const hookError = new Error("foo error message");
