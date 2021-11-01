@@ -7,6 +7,8 @@ const { splitLogsBySpec } = require("./logs");
 
 const AFTER_EVENT_LOG = "Executed test:after:run event in failed test";
 const BEFORE_HOOK_LOG = "Executing before hook";
+const SECOND_BEFORE_HOOK_LOG = "Executing second before hook";
+const BEFORE_EACH_HOOK_LOG = "Executing beforeEach hook";
 
 const wait = (time = 1000) => {
   return new Promise((resolve) => {
@@ -65,7 +67,16 @@ const expectLogNotPrinted = (log, getSpecLogs) => {
 };
 
 const getSpecTests = (
-  { spec = 1, logBefore = true, executed = null, passed = null, failed = null, skipped = null },
+  {
+    spec = 1,
+    logBefore = true,
+    logSecondBefore,
+    logBeforeEach,
+    executed = null,
+    passed = null,
+    failed = null,
+    skipped = null,
+  },
   getLogs,
   getReport
 ) => {
@@ -75,6 +86,12 @@ const getSpecTests = (
       expectLogPrinted(BEFORE_HOOK_LOG, getSpecLogs);
     } else {
       expectLogNotPrinted(BEFORE_HOOK_LOG, getSpecLogs);
+    }
+    if (logSecondBefore === false) {
+      expectLogNotPrinted(SECOND_BEFORE_HOOK_LOG, getSpecLogs);
+    }
+    if (logBeforeEach === false) {
+      expectLogNotPrinted(BEFORE_EACH_HOOK_LOG, getSpecLogs);
     }
     expectTestsAmount("executed", "Tests", executed, getSpecLogs);
     expectTestsAmount("passed", "Passing", passed, getSpecLogs);

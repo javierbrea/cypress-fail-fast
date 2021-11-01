@@ -6,6 +6,8 @@ runSpecsTests("When before hook fails", {
   specsResults: [
     {
       logBefore: true,
+      logSecondBefore: false,
+      logBeforeEach: false,
       executed: 4,
       passed: 0,
       failed: 1,
@@ -44,6 +46,8 @@ runSpecsTests("When before hook fails in spec mode", {
   specsResults: [
     {
       logBefore: true,
+      logSecondBefore: false,
+      logBeforeEach: false,
       executed: 4,
       passed: 0,
       failed: 1,
