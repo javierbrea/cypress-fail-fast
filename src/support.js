@@ -43,6 +43,18 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     if (test.cfg) {
       return test.cfg;
     }
+    // Cypress >9
+    if (
+      test.ctx &&
+      test.ctx.test &&
+      test.ctx.test._testConfig &&
+      test.ctx.test._testConfig.testConfigList &&
+      test.ctx.test._testConfig.testConfigList
+    ) {
+      return test.ctx.test._testConfig.testConfigList[
+        test.ctx.test._testConfig.testConfigList.length - 1
+      ].overrides;
+    }
     // Cypress >6.7
     if (test.ctx && test.ctx.test && test.ctx.test._testConfig) {
       return test.ctx.test._testConfig;
