@@ -39,8 +39,8 @@ jobs:
         run: npm run lint
       - name: Check types
         run: npm run tsc
-      - name: Test unit
-        run: npm run test:unit
+      #- name: Test unit
+      #  run: npm run test:unit
       - name: Test E2E
         run: npm run test:e2e:ci
         id: test-e2e
