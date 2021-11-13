@@ -12,6 +12,16 @@
       "matchPaths": ["test-e2e/cypress-variants/cypress-6/package.json"],
       "matchPackageNames": ["cypress"],
       "allowedVersions": "<7.0.0"
+    },
+    {
+      "matchPaths": ["test-e2e/cypress-variants/cypress-7/package.json"],
+      "matchPackageNames": ["cypress"],
+      "allowedVersions": "<8.0.0"
+    },
+    {
+      "matchPaths": ["test-e2e/cypress-variants/cypress-8/package.json"],
+      "matchPackageNames": ["cypress"],
+      "allowedVersions": "<9.0.0"
     }
   ]
 }

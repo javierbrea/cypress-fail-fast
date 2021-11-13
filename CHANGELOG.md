@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - chore(deps): Support any Cypress version greater than 5.x in peerDependencies.
 - chore(deps): Update devDependencies
+- chore(deps): Configure renovate to not upgrade Cypress major versions in E2E tests of versions 7.x and 8.x
 
 ## [3.2.0] - 2021-11-01
 
