@@ -6,7 +6,7 @@
     "serve": "serve -l 3000",
     "test": "jest --runInBand --verbose",
     "test:build": "cross-env node commands/build.js",
-    "test:install": "cd cypress-variants/cypress-5 && npm i && cd ../cypress-6 && npm i && cd ../cypress-7 && npm i && cd ../typescript && npm i && cd ../cypress-8 && npm i",
+    "test:install": "cd cypress-variants/cypress-5 && npm i && cd ../cypress-6 && npm i && cd ../cypress-7 && npm i && cd ../typescript && npm i && cd ../cypress-8 && npm i && cd ../cypress-9 && npm i",
     "serve-and-test": "start-server-and-test serve http-get://localhost:3000 test",
     "test:ci": "npm run test:build && npm run test:install && npm run serve-and-test"
   },

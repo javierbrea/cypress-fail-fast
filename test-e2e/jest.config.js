@@ -2,6 +2,9 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+  // Stop on first fail
+  bail: true,
+
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
 

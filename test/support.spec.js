@@ -64,10 +64,21 @@ describe("support", () => {
         };
 
     // Private property storing test config in Cypress >6.6
-    if (currentTest.currentTest && options.customConfigCtx) {
+    if (currentTest.currentTest && options.customConfigCypress7) {
       currentTest.currentTest.ctx = {
         test: {
-          _testConfig: options.customConfigCtx,
+          _testConfig: options.customConfigCypress7,
+        },
+      };
+    }
+
+    // Private property storing test config in Cypress >9.0
+    if (currentTest.currentTest && options.customConfigCypress9) {
+      currentTest.currentTest.ctx = {
+        test: {
+          _testConfig: {
+            testConfigList: [{}, { overrides: options.customConfigCypress9 }],
+          },
         },
       };
     }
@@ -568,7 +579,15 @@ describe("support", () => {
   });
 
   testAfterEachWithPluginEnabledAndConfigDisabled("in current test in Cypress >6.6", {
-    customConfigCtx: {
+    customConfigCypress7: {
+      failFast: {
+        enabled: false,
+      },
+    },
+  });
+
+  testAfterEachWithPluginEnabledAndConfigDisabled("in current test in Cypress >9.0", {
+    customConfigCypress9: {
       failFast: {
         enabled: false,
       },
