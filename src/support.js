@@ -49,11 +49,11 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       test.ctx.test &&
       test.ctx.test._testConfig &&
       test.ctx.test._testConfig.testConfigList &&
-      test.ctx.test._testConfig.testConfigList && [
-        test.ctx.test._testConfig.testConfigList.length - 1,
+      test.ctx.test._testConfig.testConfigList[
+        test.ctx.test._testConfig.testConfigList.length - 1
       ] &&
-      test.ctx.test._testConfig.testConfigList &&
-      [test.ctx.test._testConfig.testConfigList.length - 1].overrides
+      test.ctx.test._testConfig.testConfigList[test.ctx.test._testConfig.testConfigList.length - 1]
+        .overrides
     ) {
       return test.ctx.test._testConfig.testConfigList[
         test.ctx.test._testConfig.testConfigList.length - 1
