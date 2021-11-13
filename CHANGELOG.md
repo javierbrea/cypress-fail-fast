@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
-## [unreleased]
+## [3.3.0] - 2021-11-13
 
 ### Added
 - feat(#169): Support Cypress 9.x
@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - chore(deps): Support any Cypress version greater than 5.x in peerDependencies.
 - chore(deps): Update devDependencies
 - chore(deps): Configure renovate to not upgrade Cypress major versions in E2E tests of versions 7.x and 8.x
+
+### Removed
+- docs: Remove npm dependencies broken badge
 
 ## [3.2.0] - 2021-11-01
 
