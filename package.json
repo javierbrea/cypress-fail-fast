@@ -41,7 +41,7 @@
     "prepare": "is-ci || husky install"
   },
   "peerDependencies": {
-    "cypress": "5.x || 6.x || 7.x || 8.x"
+    "cypress": ">=5.0.0"
   },
   "dependencies": {
     "chalk": "4.1.2"

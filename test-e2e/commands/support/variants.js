@@ -23,6 +23,12 @@ const VARIANTS = [
     pluginFile: "preprocessor-babel-config",
   },
   {
+    name: "Cypress 9",
+    path: "cypress-9",
+    typescript: false,
+    pluginFile: "preprocessor-babel-config",
+  },
+  {
     name: "TypeScript",
     path: "typescript",
     typescript: true,
