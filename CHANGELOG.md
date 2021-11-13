@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [unreleased]
+
+### Added
+- feat(#169): Support Cypress 9.x
+- test(#169): Run E2E tests also with Cypress 9.x
+- chore: Do not run pipelines with Node.js v12.x in order to make tests lighter
+
+### Changed
+- chore(deps): Support any Cypress version greater than 5.x in peerDependencies.
+- chore(deps): Update devDependencies
+
 ## [3.2.0] - 2021-11-01
 
 ### Changed
