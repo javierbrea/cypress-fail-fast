@@ -15,7 +15,7 @@
     "cypress": "9.1.1",
     "cross-env": "7.0.3",
     "fs-extra": "10.0.0",
-    "mochawesome": "6.3.1",
+    "mochawesome": "7.0.1",
     "mochawesome-merge": "4.2.0",
     "mochawesome-report-generator": "5.2.0",
     "webpack": "5.64.1"
