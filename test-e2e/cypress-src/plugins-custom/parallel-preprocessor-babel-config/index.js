@@ -34,6 +34,23 @@ module.exports = (on, config) => {
       console.log(message);
       return null;
     },
+    waitUntilRunIsCancelled: function () {
+      console.log("Waiting until other run fails");
+      return new Promise((resolve) => {
+        const checkFileExists = setInterval(() => {
+          if (fsExtra.pathExistsSync(storageFile)) {
+            clearInterval(checkFileExists);
+            console.log("Other run failed!");
+            resolve(true);
+          }
+        }, 500);
+        setTimeout(() => {
+          console.log("Timeout: other run didn't fail!");
+          clearInterval(checkFileExists);
+          resolve(false);
+        }, 20000);
+      });
+    },
   });
 
   delete defaults.webpackOptions.module.rules[0].use[0].options.presets;

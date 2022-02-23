@@ -2,14 +2,19 @@ const chalk = require("chalk");
 const {
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
+  FAILED_TESTS_TASK,
+  RESET_FAILED_TESTS_TASK,
   LOG_TASK,
   STRATEGY_ENVIRONMENT_VAR,
-  strategyIsParallel,
-} = require("./helpers");
+  LOG_PREFIX,
+} = require("./helpers/constants");
+
+const { strategyIsParallel } = require("./helpers/config");
 
 module.exports = (on, config, pluginConfig = {}) => {
   // store skip flag
   let shouldSkipFlag = false;
+  let failedTests = 0;
 
   const parallelCallbacks =
     strategyIsParallel(config.env[STRATEGY_ENVIRONMENT_VAR]) && !!pluginConfig.parallelCallbacks
@@ -43,8 +48,18 @@ module.exports = (on, config, pluginConfig = {}) => {
       }
       return shouldSkip();
     },
+    [FAILED_TESTS_TASK]: function (value) {
+      if (value === true) {
+        failedTests++;
+      }
+      return failedTests;
+    },
+    [RESET_FAILED_TESTS_TASK]: function () {
+      failedTests = 0;
+      return null;
+    },
     [LOG_TASK]: function (message) {
-      console.log(`${chalk.yellow("[fail-fast]")} ${message}`);
+      console.log(`${chalk.yellow(LOG_PREFIX)} ${message}`);
       return null;
     },
   });
