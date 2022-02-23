@@ -1,6 +1,6 @@
-const { isTruthy, isFalsy } = require("../src/helpers");
+const { isTruthy, isFalsy } = require("../src/helpers/config");
 
-describe("helpers", () => {
+describe("config", () => {
   describe("isTruthy", () => {
     it("should return true when value is true as boolean", () => {
       expect(isTruthy(true)).toEqual(true);

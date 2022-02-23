@@ -6,8 +6,9 @@ const {
   RESET_FAILED_TESTS_TASK,
   LOG_TASK,
   STRATEGY_ENVIRONMENT_VAR,
-  strategyIsParallel,
-} = require("./helpers");
+} = require("./helpers/constants");
+
+const { strategyIsParallel } = require("./helpers/config");
 
 module.exports = (on, config, pluginConfig = {}) => {
   // store skip flag
