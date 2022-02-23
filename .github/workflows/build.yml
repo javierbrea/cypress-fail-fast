@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - release
+      - feat-186-bail-option
   pull_request:
 jobs:
   test:
