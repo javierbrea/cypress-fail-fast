@@ -10,6 +10,13 @@ const BEFORE_HOOK_LOG = "Executing before hook";
 const SECOND_BEFORE_HOOK_LOG = "Executing second before hook";
 const BEFORE_EACH_HOOK_LOG = "Executing beforeEach hook";
 
+function findCypressVariant(variantVersion) {
+  if (variantVersion === "latest") {
+    return cypressVariants.find((variant) => !!variant.isLatest);
+  }
+  return cypressVariants.find((variant) => variant.version === variantVersion);
+}
+
 const wait = (time = 1000) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -168,7 +175,7 @@ const waitAndRun = (time, run) => {
   if (!time) {
     return run();
   }
-  return wait(time).then(() => run());
+  return wait(time).then(run);
 };
 
 const runParallelTests = (
@@ -264,8 +271,8 @@ const runParallelTests = (
 const runParallelSpecsTests = (description, runsOptions, options) => {
   describe(description, () => {
     runParallelTests(
-      runsOptions[0].cypress,
-      runsOptions[1].cypress,
+      findCypressVariant(runsOptions[0].cypressVersion),
+      findCypressVariant(runsOptions[1].cypressVersion),
       getParallelSpecsStatusesTests(1, runsOptions[0].specsResults),
       getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
       runsOptions[0],

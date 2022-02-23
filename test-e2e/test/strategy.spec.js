@@ -2,6 +2,7 @@ const { runSpecsTests } = require("./support/testsRunner");
 
 runSpecsTests("When strategy is spec", {
   specs: "describe-disabled-test-enabled",
+  skipVariants: false,
   specsResults: [
     {
       logBefore: true,
@@ -31,8 +32,8 @@ runSpecsTests("When strategy is spec", {
 });
 
 runSpecsTests("When strategy is run", {
-  skipVariants: true,
   specs: "describe-disabled-test-enabled",
+  skipVariants: true,
   specsResults: [
     {
       logBefore: true,
@@ -62,8 +63,8 @@ runSpecsTests("When strategy is run", {
 });
 
 runSpecsTests("When strategy is parallel", {
-  skipVariants: true,
   specs: "describe-disabled-test-enabled",
+  skipVariants: true,
   specsResults: [
     {
       logBefore: true,

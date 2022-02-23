@@ -2,6 +2,7 @@ const { runSpecsTests } = require("./support/testsRunner");
 
 runSpecsTests("When it is enabled in describe but disabled in test", {
   specs: "describe-enabled-test-disabled",
+  skipVariants: false,
   specsResults: [
     {
       logBefore: true,
@@ -29,6 +30,7 @@ runSpecsTests("When it is enabled in describe but disabled in test", {
 
 runSpecsTests("When it is disabled in describe but enabled in test", {
   specs: "describe-disabled-test-enabled",
+  skipVariants: false,
   specsResults: [
     {
       logBefore: true,
@@ -55,8 +57,8 @@ runSpecsTests("When it is disabled in describe but enabled in test", {
 });
 
 runSpecsTests("When it is disabled in environment, disabled in describe and enabled in test", {
-  skipVariants: true,
   specs: "describe-disabled-test-enabled",
+  skipVariants: true,
   specsResults: [
     {
       logBefore: true,
@@ -88,8 +90,8 @@ runSpecsTests("When it is disabled in environment, disabled in describe and enab
 runSpecsTests(
   "When it is disabled in describe, enabled in test but plugin is disabled in environment",
   {
-    skipVariants: true,
     specs: "describe-disabled-test-enabled",
+    skipVariants: true,
     specsResults: [
       {
         logBefore: true,
@@ -122,8 +124,8 @@ runSpecsTests(
 runSpecsTests(
   "When it is disabled in environment but enabled in configuration in grandparent suites",
   {
-    skipVariants: true,
     specs: "grandparent-describe-enabled",
+    skipVariants: true,
     specsResults: [
       {
         logBefore: true,

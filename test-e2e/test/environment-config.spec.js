@@ -2,6 +2,7 @@ const { runSpecsTests } = require("./support/testsRunner");
 
 runSpecsTests("When it has default configuration", {
   specs: "environment-config-only",
+  skipVariants: false,
   specsResults: [
     {
       logBefore: true,
@@ -29,6 +30,7 @@ runSpecsTests("When it has default configuration", {
 
 runSpecsTests("When it is disabled using plugin environment variable", {
   specs: "environment-config-only",
+  skipVariants: false,
   specsResults: [
     {
       logBefore: true,
