@@ -2,7 +2,7 @@ describe("List items", () => {
   before(() => {
     cy.task("log", "Executing before hook");
     cy.visit("/");
-    cy.wait(10000);
+    cy.task("waitUntilRunIsCancelled");
   });
 
   it("should display title", () => {

@@ -33,6 +33,20 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): 
       console.log(message);
       return null;
     },
+    waitUntilRunIsCancelled: function () {
+      return new Promise((resolve) => {
+        const checkFileExists = setInterval(() => {
+          if (fsExtra.pathExistsSync(storageFile)) {
+            clearInterval(checkFileExists);
+            resolve(true);
+          }
+        }, 500);
+        setTimeout(() => {
+          clearInterval(checkFileExists);
+          resolve(false);
+        }, 20000);
+      });
+    },
   });
 
   return config;
