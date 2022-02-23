@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - test(e2e): Increase tests stability. Fix flaky test in parallel specs
 - test(e2e): Turn tsc check into an assertion
 - refactor: Reduce cognitive complexity
+- chore(deps): Update devDependencies
 
 ## [3.3.0] - 2021-11-13
 
