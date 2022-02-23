@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
-## [unreleased]
+## [3.4.0] - 2022-02-24
 
 ### Added
 - feat(#186): Add CYPRESS_FAIL_FAST_BAIL option
