@@ -5,7 +5,7 @@ const stripAnsi = require("strip-ansi");
 const ENCODING_TYPE = "utf8";
 const VARIANTS_FOLDER = path.resolve(__dirname, "..", "..", "cypress-variants");
 
-const npmRun = (commands, variant, env) => {
+const npmRun = (commands, variant, env, { getCode = false } = {}) => {
   let npmProcess;
   const logs = [];
   const logData = (log) => {
@@ -34,8 +34,12 @@ const npmRun = (commands, variant, env) => {
     npmProcess.stdout.on("data", logData);
     npmProcess.stderr.on("data", logData);
 
-    npmProcess.on("close", () => {
-      resolve(logs.join("\n"));
+    npmProcess.on("close", (code) => {
+      if (getCode) {
+        resolve(code);
+      } else {
+        resolve(logs.join("\n"));
+      }
     });
   });
 };

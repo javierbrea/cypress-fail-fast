@@ -134,14 +134,14 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
   describe(`Executed in ${cypressVariant.name}`, () => {
     let logs;
     let report;
+    let tscExitCode;
     const getLogs = (specIndex) => logs[specIndex];
     const getReport = () => report;
 
     beforeAll(async () => {
       copyCypressSpecs(options.specs, cypressVariant);
       if (cypressVariant.typescript) {
-        console.log("Running tsc on typescript tests");
-        await npmRun(["tsc"], cypressVariant.path, options.env);
+        tscExitCode = await npmRun(["tsc"], cypressVariant.path, options.env, { getCode: true });
       }
       if (cypressVariant.pluginFile) {
         copyCypressPluginFile(
@@ -158,6 +158,14 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
       });
     }, 60000);
 
+    if (cypressVariant.typescript) {
+      describe("TypeScript", () => {
+        it("should run compiler without errors", () => {
+          expect(tscExitCode).toEqual(0);
+        });
+      });
+    }
+
     tests(getLogs, getReport);
   });
 };
@@ -167,7 +175,8 @@ const runSpecsTests = (description, options = {}) => {
     cypressVariants.forEach((cypressVariant) => {
       if (
         (options.skipVariants && cypressVariant.skippable) ||
-        (runOnlyLatest && !cypressVariant.isLatest)
+        (runOnlyLatest && !cypressVariant.isLatest) ||
+        (!!options.cypressVersion && options.cypressVersion !== cypressVariant.version)
       ) {
         return;
       }
