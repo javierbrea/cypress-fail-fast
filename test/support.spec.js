@@ -36,6 +36,9 @@ describe("support", () => {
         if (envKey === "FAIL_FAST_STRATEGY") {
           return options.strategy;
         }
+        if (envKey === "FAIL_FAST_BAIL") {
+          return options.bail;
+        }
       },
       runner: {
         stop: sandbox.spy(),
@@ -46,8 +49,13 @@ describe("support", () => {
       delete Cypress.browser;
     }
     cy = {
-      task: sandbox.spy(() => {
-        return Promise.resolve(options.shouldSkip);
+      task: sandbox.spy((taskName) => {
+        if (taskName === "failFastShouldSkip") {
+          return Promise.resolve(options.shouldSkip);
+        } else if (taskName === "failFastFailedTests") {
+          return Promise.resolve(options.failedTests || 1);
+        }
+        return Promise.resolve(null);
       }),
     };
     const currentTest = options.disableCurrentTest
@@ -106,7 +114,7 @@ describe("support", () => {
   });
 
   const testPluginDisabled = (extraDescription, config) => {
-    describe(`when plugin is disabled ${extraDescription}`, () => {
+    describe(extraDescription, () => {
       describe("beforeEach callback", () => {
         it("should not call to any plugin task", () => {
           getSupportCallbacks(config);
@@ -163,7 +171,7 @@ describe("support", () => {
   };
 
   const testPluginAndFailFastEnabled = (extraDescription, config) => {
-    describe(`when plugin and failFast are enabled ${extraDescription}`, () => {
+    describe(extraDescription, () => {
       describe("beforeEach callback", () => {
         it("should call stop runner if failFastShouldSkip returns true", async () => {
           getSupportCallbacks({
@@ -443,8 +451,8 @@ describe("support", () => {
     });
   };
 
-  const testAfterEachWithPluginEnabledAndConfigEnabled = (extraDescription, config) => {
-    describe(`afterEach callback when plugin is enabled and config is enabled ${extraDescription}`, () => {
+  const afterEachShouldSetPluginFlag = (extraDescription, config) => {
+    describe(extraDescription, () => {
       it("should set plugin flag", async () => {
         getSupportCallbacks({
           ...config,
@@ -459,8 +467,8 @@ describe("support", () => {
     });
   };
 
-  const testAfterEachWithPluginEnabledAndConfigDisabled = (extraDescription, config) => {
-    describe(`afterEach callback when plugin is enabled and config is disabled ${extraDescription}`, () => {
+  const afterEachShouldNotSetPluginFlag = (extraDescription, config) => {
+    describe(extraDescription, () => {
       it("should not set plugin flag", async () => {
         getSupportCallbacks({
           ...config,
@@ -470,189 +478,213 @@ describe("support", () => {
         });
         afterEachCallback();
         await wait(200);
-        expect(cy.task.callCount).toEqual(0);
+        expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(false);
       });
     });
   };
 
-  testPluginDisabled("with false as string", {
-    enabled: true,
-    pluginEnabled: "false",
+  describe("when plugin is disabled", () => {
+    testPluginDisabled("with false as string", {
+      enabled: true,
+      pluginEnabled: "false",
+    });
+
+    testPluginDisabled("with false as boolean", {
+      enabled: true,
+      pluginEnabled: false,
+    });
+
+    testPluginDisabled("with 0", {
+      enabled: true,
+      pluginEnabled: 0,
+    });
+
+    testPluginDisabled("with 0 string", {
+      enabled: true,
+      pluginEnabled: "0",
+    });
   });
 
-  testPluginDisabled("with false as boolean", {
-    enabled: true,
-    pluginEnabled: false,
+  describe("when plugin and failFast are enabled", () => {
+    testPluginAndFailFastEnabled("by default", {});
+
+    testPluginAndFailFastEnabled("using environment vars", {
+      enabled: true,
+      pluginEnabled: true,
+    });
+
+    testPluginAndFailFastEnabled("using environment vars as strings", {
+      enabled: "true",
+      pluginEnabled: "true",
+    });
+
+    testPluginAndFailFastEnabled("using environment vars as numbers", {
+      enabled: 1,
+      pluginEnabled: 1,
+    });
   });
 
-  testPluginDisabled("with 0", {
-    enabled: true,
-    pluginEnabled: 0,
-  });
+  describe("afterEach callback", () => {
+    describe("when plugin is enabled and config is enabled", () => {
+      afterEachShouldSetPluginFlag("by default", {});
 
-  testPluginDisabled("with 0 string", {
-    enabled: true,
-    pluginEnabled: "0",
-  });
-
-  testPluginAndFailFastEnabled("by default", {});
-
-  testPluginAndFailFastEnabled("using environment vars", {
-    enabled: true,
-    pluginEnabled: true,
-  });
-
-  testPluginAndFailFastEnabled("using environment vars as strings", {
-    enabled: "true",
-    pluginEnabled: "true",
-  });
-
-  testPluginAndFailFastEnabled("using environment vars as numbers", {
-    enabled: 1,
-    pluginEnabled: 1,
-  });
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("by default", {});
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("in environment variable as boolean", {
-    enabled: true,
-  });
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("in environment variable as string", {
-    enabled: "true",
-  });
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("in environment variable as number", {
-    enabled: 1,
-  });
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("in environment variable as number string", {
-    enabled: "1",
-  });
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("in test but disabled in grandparent", {
-    customConfig: {
-      failFast: {
+      afterEachShouldSetPluginFlag("in environment variable as boolean", {
         enabled: true,
-      },
-    },
-    testParent: {
-      cfg: {
-        failFast: {
-          enabled: false,
+      });
+
+      afterEachShouldSetPluginFlag("in environment variable as string", {
+        enabled: "true",
+      });
+
+      afterEachShouldSetPluginFlag("in environment variable as number", {
+        enabled: 1,
+      });
+
+      afterEachShouldSetPluginFlag("in environment variable as number string", {
+        enabled: "1",
+      });
+
+      afterEachShouldSetPluginFlag("in test but disabled in grandparent", {
+        customConfig: {
+          failFast: {
+            enabled: true,
+          },
         },
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigEnabled("in test but disabled in environment", {
-    enabled: false,
-    customConfig: {
-      failFast: {
-        enabled: true,
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in environment variable", {
-    enabled: false,
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in environment variable as string", {
-    enabled: "false",
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in environment variable as number", {
-    enabled: 0,
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in environment variable as number string", {
-    enabled: "0",
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in current test", {
-    customConfig: {
-      failFast: {
-        enabled: false,
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in current test in Cypress >6.6", {
-    customConfigCypress7: {
-      failFast: {
-        enabled: false,
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in current test in Cypress >9.0", {
-    customConfigCypress9: {
-      failFast: {
-        enabled: false,
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in current test but enabled in environment", {
-    enabled: true,
-    customConfig: {
-      failFast: {
-        enabled: false,
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in parent test", {
-    testParent: {
-      cfg: {
-        failFast: {
-          enabled: false,
-        },
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in parent test but enabled in environment", {
-    enabled: true,
-    testParent: {
-      cfg: {
-        failFast: {
-          enabled: false,
-        },
-      },
-    },
-  });
-
-  testAfterEachWithPluginEnabledAndConfigDisabled("in grandparent test", {
-    testParent: {
-      parent: {
-        parent: {
+        testParent: {
           cfg: {
             failFast: {
               enabled: false,
             },
           },
         },
-      },
-    },
-  });
+      });
 
-  testAfterEachWithPluginEnabledAndConfigDisabled(
-    "in grandparent test but enabled in environment",
-    {
-      enabled: true,
-      testParent: {
-        parent: {
+      afterEachShouldSetPluginFlag("in test but disabled in environment", {
+        enabled: false,
+        customConfig: {
+          failFast: {
+            enabled: true,
+          },
+        },
+      });
+    });
+
+    describe("when plugin is enabled and config is disabled", () => {
+      afterEachShouldNotSetPluginFlag("in environment variable", {
+        enabled: false,
+      });
+
+      afterEachShouldNotSetPluginFlag("in environment variable as string", {
+        enabled: "false",
+      });
+
+      afterEachShouldNotSetPluginFlag("in environment variable as number", {
+        enabled: 0,
+      });
+
+      afterEachShouldNotSetPluginFlag("in environment variable as number string", {
+        enabled: "0",
+      });
+
+      afterEachShouldNotSetPluginFlag("in current test", {
+        customConfig: {
+          failFast: {
+            enabled: false,
+          },
+        },
+      });
+
+      afterEachShouldNotSetPluginFlag("in current test in Cypress >6.6", {
+        customConfigCypress7: {
+          failFast: {
+            enabled: false,
+          },
+        },
+      });
+
+      afterEachShouldNotSetPluginFlag("in current test in Cypress >9.0", {
+        customConfigCypress9: {
+          failFast: {
+            enabled: false,
+          },
+        },
+      });
+
+      afterEachShouldNotSetPluginFlag("in current test but enabled in environment", {
+        enabled: true,
+        customConfig: {
+          failFast: {
+            enabled: false,
+          },
+        },
+      });
+
+      afterEachShouldNotSetPluginFlag("in parent test", {
+        testParent: {
+          cfg: {
+            failFast: {
+              enabled: false,
+            },
+          },
+        },
+      });
+
+      afterEachShouldNotSetPluginFlag("in parent test but enabled in environment", {
+        enabled: true,
+        testParent: {
+          cfg: {
+            failFast: {
+              enabled: false,
+            },
+          },
+        },
+      });
+
+      afterEachShouldNotSetPluginFlag("in grandparent test", {
+        testParent: {
           parent: {
-            cfg: {
-              failFast: {
-                enabled: false,
+            parent: {
+              cfg: {
+                failFast: {
+                  enabled: false,
+                },
               },
             },
           },
         },
-      },
-    }
-  );
+      });
+
+      afterEachShouldNotSetPluginFlag("in grandparent test but enabled in environment", {
+        enabled: true,
+        testParent: {
+          parent: {
+            parent: {
+              cfg: {
+                failFast: {
+                  enabled: false,
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+
+    describe("when bail config is set", () => {
+      afterEachShouldSetPluginFlag("and failed tests are equal to bail", {
+        failedTests: 2,
+        bail: 2,
+      });
+
+      afterEachShouldSetPluginFlag("and failed tests are greater than bail", {
+        failedTests: 3,
+        bail: 2,
+      });
+
+      afterEachShouldNotSetPluginFlag("and failed tests are lower than bail", {
+        failedTests: 2,
+        bail: 3,
+      });
+    });
+  });
 });

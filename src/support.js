@@ -3,13 +3,18 @@ const {
   PLUGIN_ENVIRONMENT_VAR,
   ENABLED_ENVIRONMENT_VAR,
   STRATEGY_ENVIRONMENT_VAR,
+  BAIL_ENVIRONMENT_VAR,
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
+  FAILED_TESTS_TASK,
+  RESET_FAILED_TESTS_TASK,
   LOG_TASK,
   STOP_MESSAGE,
   SKIP_MESSAGE,
+  FAILED_TEST_MESSAGE,
   isFalsy,
   isTruthy,
+  isDefined,
   strategyIsSpec,
 } = require("./helpers");
 
@@ -30,11 +35,21 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     return isTruthyValue;
   }
 
+  function numberEnvironmentVarValue(environmentVarName) {
+    const defaultValue = ENVIRONMENT_DEFAULT_VALUES[environmentVarName];
+    const value = Cypress.env(environmentVarName);
+    if (isDefined(value)) {
+      return Number(value);
+    }
+    return defaultValue;
+  }
+
   function getFailFastEnvironmentConfig() {
     return {
       plugin: booleanEnvironmentVarValue(PLUGIN_ENVIRONMENT_VAR),
       enabled: booleanEnvironmentVarValue(ENABLED_ENVIRONMENT_VAR),
       strategyIsSpec: strategyIsSpec(Cypress.env(STRATEGY_ENVIRONMENT_VAR)),
+      bail: numberEnvironmentVarValue(BAIL_ENVIRONMENT_VAR),
     };
   }
 
@@ -69,7 +84,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
   function getTestFailFastConfig(currentTest) {
     const testConfig = getTestConfig(currentTest);
     if (testConfig.failFast) {
-      return testConfig.failFast;
+      return {
+        ...getFailFastEnvironmentConfig(),
+        ...testConfig.failFast,
+      };
     }
     if (currentTest.parent) {
       return getTestFailFastConfig(currentTest.parent);
@@ -85,7 +103,11 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     return getFailFastEnvironmentConfig().plugin;
   }
 
-  function shouldSkipRestOfTests(currentTest) {
+  function bailConfig() {
+    return getFailFastEnvironmentConfig().bail;
+  }
+
+  function failFastIsEnabled(currentTest) {
     return getTestFailFastConfig(currentTest).enabled;
   }
 
@@ -102,9 +124,22 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     cy.task(RESET_SKIP_TASK, null, { log: false });
   }
 
+  function resetFailedTests() {
+    cy.task(RESET_FAILED_TESTS_TASK, null, { log: false });
+  }
+
   function enableSkipMode() {
     cy.task(LOG_TASK, SKIP_MESSAGE);
     cy.task(SHOULD_SKIP_TASK, true);
+  }
+
+  function registerFailureAndRunIfBailLimitIsReached(callback) {
+    cy.task(LOG_TASK, FAILED_TEST_MESSAGE);
+    cy.task(FAILED_TESTS_TASK, true, { log: false }).then((value) => {
+      if (value >= bailConfig()) {
+        callback();
+      }
+    });
   }
 
   function runIfSkipIsEnabled(callback) {
@@ -131,9 +166,11 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       currentTest &&
       pluginIsEnabled() &&
       testHasFailed(currentTest) &&
-      shouldSkipRestOfTests(currentTest)
+      failFastIsEnabled(currentTest)
     ) {
-      enableSkipMode();
+      registerFailureAndRunIfBailLimitIsReached(() => {
+        enableSkipMode();
+      });
     }
   });
 
@@ -147,6 +184,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
           the `before` hook is executed for each spec file.
         */
         resetSkipFlag();
+        resetFailedTests();
       } else {
         runIfSkipIsEnabled(() => {
           stopCypressRunner();

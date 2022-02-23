@@ -13,8 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+### Added
+- feat(#186): Add CYPRESS_FAIL_FAST_BAIL option
+
 ### Changed
 - chore(deps): Update package-lock files to NPM v8
+- test(e2e): Increase tests stability. Fix flaky test in parallel specs
 
 ## [3.3.0] - 2021-11-13
 

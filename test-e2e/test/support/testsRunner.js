@@ -10,6 +10,8 @@ const BEFORE_HOOK_LOG = "Executing before hook";
 const SECOND_BEFORE_HOOK_LOG = "Executing second before hook";
 const BEFORE_EACH_HOOK_LOG = "Executing beforeEach hook";
 
+const runOnlyLatest = process.env.TEST_ONLY_LATEST;
+
 function findCypressVariant(variantVersion) {
   if (variantVersion === "latest") {
     return cypressVariants.find((variant) => !!variant.isLatest);
@@ -163,7 +165,10 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
 const runSpecsTests = (description, options = {}) => {
   describe(description, () => {
     cypressVariants.forEach((cypressVariant) => {
-      if (options.skipVariants && cypressVariant.skippable) {
+      if (
+        (options.skipVariants && cypressVariant.skippable) ||
+        (runOnlyLatest && !cypressVariant.isLatest)
+      ) {
         return;
       }
       runVariantTests(cypressVariant, getSpecsStatusesTests(options.specsResults), options);
@@ -269,17 +274,19 @@ const runParallelTests = (
 };
 
 const runParallelSpecsTests = (description, runsOptions, options) => {
-  describe(description, () => {
-    runParallelTests(
-      findCypressVariant(runsOptions[0].cypressVersion),
-      findCypressVariant(runsOptions[1].cypressVersion),
-      getParallelSpecsStatusesTests(1, runsOptions[0].specsResults),
-      getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
-      runsOptions[0],
-      runsOptions[1],
-      options
-    );
-  });
+  if (!runOnlyLatest) {
+    describe(description, () => {
+      runParallelTests(
+        findCypressVariant(runsOptions[0].cypressVersion),
+        findCypressVariant(runsOptions[1].cypressVersion),
+        getParallelSpecsStatusesTests(1, runsOptions[0].specsResults),
+        getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
+        runsOptions[0],
+        runsOptions[1],
+        options
+      );
+    });
+  }
 };
 
 module.exports = {
