@@ -63,6 +63,7 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
   * Use `parallel` to [provide your own callbacks](#configuration-for-parallel-runs) allowing to notify from one run to the others when remaining tests should be skipped.
 * __`FAIL_FAST_ENABLED`__: `boolean = true` Allows disabling the "fail-fast" feature globally, but it could be still enabled for specific tests or describes using [configuration by test](#configuration-by-test).
 * __`FAIL_FAST_PLUGIN`__: `boolean = true` If `false`, it disables the "fail-fast" feature totally, ignoring even plugin [configurations by test](#configuration-by-test).
+* __`FAIL_FAST_BAIL`__: `Number = 1` Enable the skip mode immediately upon n number of failing test suite. Defaults to 1.
 
 #### Examples
 
@@ -77,7 +78,8 @@ or set the "env" key in the `cypress.json` configuration file:
   "env":
   {
     "FAIL_FAST_STRATEGY": "run",
-    "FAIL_FAST_ENABLED": true
+    "FAIL_FAST_ENABLED": true,
+    "FAIL_FAST_BAIL": 2,
   }
 }
 ```
