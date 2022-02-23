@@ -6,6 +6,7 @@ const {
   RESET_FAILED_TESTS_TASK,
   LOG_TASK,
   STRATEGY_ENVIRONMENT_VAR,
+  LOG_PREFIX,
 } = require("./helpers/constants");
 
 const { strategyIsParallel } = require("./helpers/config");
@@ -58,7 +59,7 @@ module.exports = (on, config, pluginConfig = {}) => {
       return null;
     },
     [LOG_TASK]: function (message) {
-      console.log(`${chalk.yellow("[fail-fast]")} ${message}`);
+      console.log(`${chalk.yellow(LOG_PREFIX)} ${message}`);
       return null;
     },
   });
