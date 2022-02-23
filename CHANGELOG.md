@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [unreleased]
+
+### Changed
+- chore(deps): Update package-lock files to NPM v8
+
 ## [3.3.0] - 2021-11-13
 
 ### Added
