@@ -2,8 +2,7 @@ describe("List items", () => {
   before(() => {
     cy.task("log", "Executing before hook");
     cy.visit("/");
-    cy.task("runBIsWaiting");
-    cy.task("waitUntilRunAIsCancelled");
+    cy.task("waitUntilRunBIsWaiting");
   });
 
   it("should display title", () => {
@@ -11,7 +10,7 @@ describe("List items", () => {
   });
 
   it("should display first item", () => {
-    cy.get("ul li:eq(0)").should("have.text", "First item");
+    cy.get("ul li:eq(0)").should("have.text", "Wrong text");
   });
 
   it("should display second item", () => {

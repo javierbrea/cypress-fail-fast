@@ -156,7 +156,7 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
         console.warn("Mochawesome report not found");
         return null;
       });
-    }, 60000);
+    }, 120000);
 
     if (cypressVariant.typescript) {
       describe("TypeScript", () => {

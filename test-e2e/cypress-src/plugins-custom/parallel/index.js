@@ -1,25 +1,38 @@
 const fsExtra = require("fs-extra");
 const path = require("path");
 
-const storageFile = path.resolve(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "..",
-  "parallel-storage",
-  "parallel-storage.json"
-);
+const storageFolder = path.resolve(__dirname, "..", "..", "..", "..", "parallel-storage");
+
+const cancelledFile = path.resolve(storageFolder, "run-a-is-cancelled.json");
+const waitingFile = path.resolve(storageFolder, "run-b-is-waiting.json");
+
+function waitForFile(filePath) {
+  return new Promise((resolve) => {
+    console.log(`Waiting until file exists: ${filePath}`);
+    const checkFileExists = setInterval(() => {
+      if (fsExtra.pathExistsSync(filePath)) {
+        clearInterval(checkFileExists);
+        console.log(`File exists: ${filePath}`);
+        resolve(true);
+      }
+    }, 500);
+    setTimeout(() => {
+      console.log(`Timeout. File not exists: ${filePath}`);
+      clearInterval(checkFileExists);
+      resolve(false);
+    }, 20000);
+  });
+}
 
 module.exports = (on, config) => {
   require("../../../../../plugin")(on, config, {
     parallelCallbacks: {
       onCancel: () => {
-        fsExtra.writeJsonSync(storageFile, { cancelled: true });
+        fsExtra.writeJsonSync(cancelledFile, { cancelled: true });
       },
       isCancelled: () => {
-        if (fsExtra.pathExistsSync(storageFile)) {
-          return fsExtra.readJsonSync(storageFile).cancelled;
+        if (fsExtra.pathExistsSync(cancelledFile)) {
+          return fsExtra.readJsonSync(cancelledFile).cancelled;
         }
         return false;
       },
@@ -32,22 +45,15 @@ module.exports = (on, config) => {
       console.log(message);
       return null;
     },
-    waitUntilRunIsCancelled: function () {
-      console.log("Waiting until other run fails");
-      return new Promise((resolve) => {
-        const checkFileExists = setInterval(() => {
-          if (fsExtra.pathExistsSync(storageFile)) {
-            clearInterval(checkFileExists);
-            console.log("Other run failed!");
-            resolve(true);
-          }
-        }, 500);
-        setTimeout(() => {
-          console.log("Timeout: other run didn't fail!");
-          clearInterval(checkFileExists);
-          resolve(false);
-        }, 20000);
-      });
+    waitUntilRunAIsCancelled: function () {
+      return waitForFile(cancelledFile);
+    },
+    waitUntilRunBIsWaiting: function () {
+      return waitForFile(waitingFile);
+    },
+    runBIsWaiting: function () {
+      fsExtra.writeJsonSync(waitingFile, { waiting: true });
+      return true;
     },
   });
 

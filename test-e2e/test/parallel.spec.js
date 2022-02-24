@@ -4,7 +4,9 @@ const fsExtra = require("fs-extra");
 const { runParallelSpecsTests } = require("./support/testsRunner");
 
 const removeParallelStorage = () => {
-  fsExtra.removeSync(path.resolve(__dirname, "..", "parallel-storage", "parallel-storage.json"));
+  const parallelStorageFolder = path.resolve(__dirname, "..", "parallel-storage");
+  fsExtra.removeSync(path.resolve(parallelStorageFolder, "run-a-is-cancelled.json"));
+  fsExtra.removeSync(path.resolve(parallelStorageFolder, "run-b-is-waiting.json"));
 };
 
 runParallelSpecsTests(
@@ -13,8 +15,7 @@ runParallelSpecsTests(
     {
       cypressVersion: "latest",
       pluginFile: "parallel-preprocessor-babel-config",
-      specs: "environment-config-only",
-      delay: 5000,
+      specs: "parallel-failing",
       specsResults: [
         {
           logBefore: true,
@@ -85,8 +86,7 @@ runParallelSpecsTests(
     {
       cypressVersion: "8",
       pluginFile: "parallel-preprocessor-babel-config",
-      specs: "environment-config-only",
-      delay: 5000,
+      specs: "parallel-failing",
       specsResults: [
         {
           logBefore: true,
@@ -157,8 +157,7 @@ runParallelSpecsTests(
     {
       cypressVersion: "latest",
       pluginFile: "parallel-preprocessor-babel-config",
-      specs: "environment-config-only",
-      delay: 5000,
+      specs: "parallel-failing",
       specsResults: [
         {
           logBefore: true,
