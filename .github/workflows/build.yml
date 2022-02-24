@@ -39,7 +39,7 @@ jobs:
       - name: Test unit
         run: npm run test:unit
       - name: Test E2E
-        run: npm run test:e2e:debug
+        run: npm run test:e2e:ci
         id: test-e2e
       - name: Upload test results
         uses: actions/upload-artifact@v2
