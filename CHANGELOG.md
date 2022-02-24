@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [3.4.0] - 2022-02-24
+
+### Added
+- feat(#186): Add CYPRESS_FAIL_FAST_BAIL option
+
+### Changed
+- chore(deps): Update package-lock files to NPM v8
+- test(e2e): Increase tests stability. Fix flaky test in parallel specs
+- test(e2e): Turn tsc check into an assertion
+- refactor: Reduce cognitive complexity
+- chore(deps): Update devDependencies
+
 ## [3.3.0] - 2021-11-13
 
 ### Added

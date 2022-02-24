@@ -10,6 +10,15 @@ const BEFORE_HOOK_LOG = "Executing before hook";
 const SECOND_BEFORE_HOOK_LOG = "Executing second before hook";
 const BEFORE_EACH_HOOK_LOG = "Executing beforeEach hook";
 
+const runOnlyLatest = process.env.TEST_ONLY_LATEST;
+
+function findCypressVariant(variantVersion) {
+  if (variantVersion === "latest") {
+    return cypressVariants.find((variant) => !!variant.isLatest);
+  }
+  return cypressVariants.find((variant) => variant.version === variantVersion);
+}
+
 const wait = (time = 1000) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -125,14 +134,14 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
   describe(`Executed in ${cypressVariant.name}`, () => {
     let logs;
     let report;
+    let tscExitCode;
     const getLogs = (specIndex) => logs[specIndex];
     const getReport = () => report;
 
     beforeAll(async () => {
       copyCypressSpecs(options.specs, cypressVariant);
       if (cypressVariant.typescript) {
-        console.log("Running tsc on typescript tests");
-        await npmRun(["tsc"], cypressVariant.path, options.env);
+        tscExitCode = await npmRun(["tsc"], cypressVariant.path, options.env, { getCode: true });
       }
       if (cypressVariant.pluginFile) {
         copyCypressPluginFile(
@@ -147,7 +156,15 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
         console.warn("Mochawesome report not found");
         return null;
       });
-    }, 60000);
+    }, 120000);
+
+    if (cypressVariant.typescript) {
+      describe("TypeScript", () => {
+        it("should run compiler without errors", () => {
+          expect(tscExitCode).toEqual(0);
+        });
+      });
+    }
 
     tests(getLogs, getReport);
   });
@@ -156,7 +173,11 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
 const runSpecsTests = (description, options = {}) => {
   describe(description, () => {
     cypressVariants.forEach((cypressVariant) => {
-      if (options.skipVariants && cypressVariant.skippable) {
+      if (
+        (options.skipVariants && cypressVariant.skippable) ||
+        (runOnlyLatest && !cypressVariant.isLatest) ||
+        (!!options.cypressVersion && options.cypressVersion !== cypressVariant.version)
+      ) {
         return;
       }
       runVariantTests(cypressVariant, getSpecsStatusesTests(options.specsResults), options);
@@ -168,7 +189,7 @@ const waitAndRun = (time, run) => {
   if (!time) {
     return run();
   }
-  return wait(time).then(() => run());
+  return wait(time).then(run);
 };
 
 const runParallelTests = (
@@ -262,17 +283,19 @@ const runParallelTests = (
 };
 
 const runParallelSpecsTests = (description, runsOptions, options) => {
-  describe(description, () => {
-    runParallelTests(
-      runsOptions[0].cypress,
-      runsOptions[1].cypress,
-      getParallelSpecsStatusesTests(1, runsOptions[0].specsResults),
-      getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
-      runsOptions[0],
-      runsOptions[1],
-      options
-    );
-  });
+  if (!runOnlyLatest) {
+    describe(description, () => {
+      runParallelTests(
+        findCypressVariant(runsOptions[0].cypressVersion),
+        findCypressVariant(runsOptions[1].cypressVersion),
+        getParallelSpecsStatusesTests(1, runsOptions[0].specsResults),
+        getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
+        runsOptions[0],
+        runsOptions[1],
+        options
+      );
+    });
+  }
 };
 
 module.exports = {

@@ -2,20 +2,21 @@ const path = require("path");
 const fsExtra = require("fs-extra");
 
 const { runParallelSpecsTests } = require("./support/testsRunner");
-const cypressVariants = require("../commands/support/variants");
 
 const removeParallelStorage = () => {
-  fsExtra.removeSync(path.resolve(__dirname, "..", "parallel-storage", "parallel-storage.json"));
+  const parallelStorageFolder = path.resolve(__dirname, "..", "parallel-storage");
+  fsExtra.removeSync(path.resolve(parallelStorageFolder, "run-a-is-cancelled.json"));
+  fsExtra.removeSync(path.resolve(parallelStorageFolder, "run-b-is-waiting.json"));
 };
 
 runParallelSpecsTests(
   "When parallel strategy is enabled and first tests run fails",
   [
     {
-      cypress: cypressVariants[2],
-      pluginFile: "parallel",
-      specs: "environment-config-only",
-      delay: 3000,
+      cypressVersion: "latest",
+      pluginFile: "parallel-preprocessor-babel-config",
+      specs: "parallel-failing",
+      delay: 5000,
       specsResults: [
         {
           logBefore: true,
@@ -44,7 +45,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[5],
+      cypressVersion: "ts",
       pluginFile: "parallel",
       specs: "all-tests-passing",
       specsResults: [
@@ -84,10 +85,10 @@ runParallelSpecsTests(
   "When parallel strategy is enabled and first tests run fails using Cypress v8",
   [
     {
-      cypress: cypressVariants[3],
+      cypressVersion: "8",
       pluginFile: "parallel-preprocessor-babel-config",
-      specs: "environment-config-only",
-      delay: 3000,
+      specs: "parallel-failing",
+      delay: 5000,
       specsResults: [
         {
           logBefore: true,
@@ -116,7 +117,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[2],
+      cypressVersion: "7",
       pluginFile: "parallel",
       specs: "all-tests-passing",
       specsResults: [
@@ -156,10 +157,10 @@ runParallelSpecsTests(
   "When parallel strategy is disabled and first tests run fails",
   [
     {
-      cypress: cypressVariants[2],
-      pluginFile: "parallel",
-      specs: "environment-config-only",
-      delay: 3000,
+      cypressVersion: "latest",
+      pluginFile: "parallel-preprocessor-babel-config",
+      specs: "parallel-failing",
+      delay: 5000,
       specsResults: [
         {
           logBefore: true,
@@ -188,8 +189,8 @@ runParallelSpecsTests(
       },
     },
     {
-      cypress: cypressVariants[5],
-      pluginFile: "parallel",
+      cypressVersion: "8",
+      pluginFile: "parallel-preprocessor-babel-config",
       specs: "all-tests-passing",
       specsResults: [
         {
