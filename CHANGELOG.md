@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [unreleased] - 2022-03-02
+- fix(#193): Do not log "Enabling skip mode" in every failed test. When a test fails, log "Failed tests: x/y", where `y` is the bail option.
+
 ## [3.4.0] - 2022-02-24
 
 ### Added
