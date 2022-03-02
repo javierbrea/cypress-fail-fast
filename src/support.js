@@ -38,9 +38,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
   }
 
   function registerFailureAndRunIfBailLimitIsReached(callback) {
-    cy.task(LOG_TASK, FAILED_TEST_MESSAGE);
     cy.task(FAILED_TESTS_TASK, true, { log: false }).then((value) => {
-      if (value >= bailConfig(Cypress)) {
+      const bail = bailConfig(Cypress);
+      cy.task(LOG_TASK, `${FAILED_TEST_MESSAGE}: ${value}/${bail}`);
+      if (value >= bail) {
         callback();
       }
     });

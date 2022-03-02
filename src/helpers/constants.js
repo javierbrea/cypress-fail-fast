@@ -11,7 +11,7 @@ const RESET_FAILED_TESTS_TASK = "failFastResetFailedTests";
 
 const STOP_MESSAGE = "Stopping Cypress runner due to a previous failure";
 const SKIP_MESSAGE = "Enabling skip mode";
-const FAILED_TEST_MESSAGE = "Enabling skip mode";
+const FAILED_TEST_MESSAGE = "Failed tests";
 const LOG_PREFIX = "[fail-fast]";
 
 const ENVIRONMENT_DEFAULT_VALUES = {
