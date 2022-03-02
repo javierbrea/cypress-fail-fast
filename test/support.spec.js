@@ -685,6 +685,47 @@ describe("support", () => {
         failedTests: 2,
         bail: 3,
       });
+
+      describe("failed tests log", () => {
+        it("should log 1/1 when first test fails and bail is 1", async () => {
+          getSupportCallbacks({
+            failedTests: 1,
+            bail: 1,
+            testState: "failed",
+            testCurrentRetry: 3,
+            testRetries: 3,
+          });
+          afterEachCallback();
+          await wait(200);
+          expect(cy.task.calledWith("failFastLog", "Failed tests: 1/1")).toBe(true);
+        });
+
+        it("should log 1/2 when first test fails and bail is 2", async () => {
+          getSupportCallbacks({
+            failedTests: 1,
+            bail: 2,
+            testState: "failed",
+            testCurrentRetry: 3,
+            testRetries: 3,
+          });
+          afterEachCallback();
+          await wait(200);
+          expect(cy.task.calledWith("failFastLog", "Failed tests: 1/2")).toBe(true);
+        });
+
+        it("should log 3/4 when third test fails and bail is 4", async () => {
+          getSupportCallbacks({
+            failedTests: 3,
+            bail: 4,
+            testState: "failed",
+            testCurrentRetry: 3,
+            testRetries: 3,
+          });
+          afterEachCallback();
+          await wait(200);
+          expect(cy.task.calledWith("failFastLog", "Failed tests: 3/4")).toBe(true);
+        });
+      });
     });
   });
 });
