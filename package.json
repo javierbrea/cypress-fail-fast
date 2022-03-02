@@ -44,7 +44,7 @@
     "cypress": ">=5.0.0"
   },
   "dependencies": {
-    "chalk": "4.1.2"
+    "chalk": "5.0.0"
   },
   "devDependencies": {
     "@stryker-mutator/core": "5.6.1",
