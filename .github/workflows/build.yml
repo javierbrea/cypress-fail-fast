@@ -9,6 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 2
       matrix:
         node: ["14.18.0", "16.13.0", "17.5.0", "18.2.0"]
     steps:
