@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [4.0.0] - 2022-05-30
+
+### Removed
+- chore: Drop support for Node.js versions lower than v14
+
+### Changed
+- chore(deps): Update devDependencies
+
 ## [3.4.1] - 2022-03-02
 
 ### Fixed
