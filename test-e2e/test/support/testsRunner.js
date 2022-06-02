@@ -1,7 +1,11 @@
 const path = require("path");
 const fs = require("fs");
 const cypressVariants = require("../../commands/support/variants");
-const { copyCypressSpecs, copyCypressPluginFile } = require("../../commands/support/copy");
+const {
+  copyCypressSpecs,
+  copyCypressPluginFile,
+  copyCypressConfigFile,
+} = require("../../commands/support/copy");
 const { npmRun, VARIANTS_FOLDER } = require("./npmCommandRunner");
 const { splitLogsBySpec } = require("./logs");
 
@@ -240,6 +244,20 @@ const runParallelTests = (
           cypressVariant2.pluginFile
         );
       }
+      if (options1.configFile) {
+        copyCypressConfigFile(
+          cypressVariant1.path,
+          options1.configFile,
+          cypressVariant1.configFile
+        );
+      }
+      if (options2.configFile) {
+        copyCypressConfigFile(
+          cypressVariant2.path,
+          options2.configFile,
+          cypressVariant2.configFile
+        );
+      }
       const logs = await Promise.all([
         waitAndRun(options1.delay, () =>
           npmRun(["cypress:run"], cypressVariant1.path, options1.env)
@@ -271,6 +289,12 @@ const runParallelTests = (
           cypressVariant2.typescript,
           cypressVariant2.pluginFile
         );
+      }
+      if (options1.configFile) {
+        copyCypressConfigFile(cypressVariant1.path, cypressVariant1.configFile);
+      }
+      if (options2.configFile) {
+        copyCypressConfigFile(cypressVariant2.path, cypressVariant2.configFile);
       }
       if (commonOptions.afterAll) {
         commonOptions.afterAll();

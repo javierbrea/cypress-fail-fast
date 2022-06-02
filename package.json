@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",
@@ -41,7 +41,7 @@
     "prepare": "is-ci || husky install"
   },
   "peerDependencies": {
-    "cypress": ">=5.0.0"
+    "cypress": ">=6.0.0"
   },
   "dependencies": {
     "chalk": "4.1.2"
