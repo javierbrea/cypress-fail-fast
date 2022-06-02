@@ -4,7 +4,7 @@ const variants = require("./support/variants");
 
 variants.forEach((variant) => {
   copyScripts(variant.path);
-  copyCypressSources(variant.path, variant.typescript);
+  copyCypressSources(variant);
   if (variant.typescript) {
     copyPluginToCypressSupport(variant.path);
   }
