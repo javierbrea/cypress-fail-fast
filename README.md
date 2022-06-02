@@ -29,6 +29,34 @@ Add the plugin to `devDependencies`
 npm i --save-dev cypress-fail-fast
 ```
 
+Now, depending on your Cypress version, use one of the next methods:
+
+### Installation on Cypress 10
+
+Inside `cypress.config.js` file:
+
+```javascript
+module.exports = {
+  e2e: {
+    setupNodeEvents(on, config) {
+      require("cypress-fail-fast/plugin")(on, config);
+      return config;
+    },
+    specPattern: "cypress/integration/**/*.js",
+  },
+};
+```
+
+Note: This example shows how to install the plugin for `e2e` testing type. Read [Cypress configuration docs](https://docs.cypress.io/guides/references/configuration) for further info.
+
+At the top of your support file (usually `cypress/support/e2e.js` for `e2e` testing type)
+
+```javascript
+import "cypress-fail-fast";
+```
+
+### Installation on Cypress versions lower than 10
+
 Inside `cypress/plugins/index.js`:
 
 ```javascript
@@ -168,6 +196,8 @@ These callbacks are executed only when the environment variable `FAIL_FAST_STRAT
 Here is an example of configuration that would skip tests on many parallel runs when one of them starts skipping tests. It would only work if all parallel runs have access to the folder where the `isCancelled` flag is being stored as a file (easy to achieve if all of your parallel runs are being executed on Docker images on a same machine, for example). _Note that this is only an example, you could also implement it storing the flag in a REST API, etc._
 
 ```js
+// Example valid for Cypress versions lower than 10. Use config file on Cypress 10
+
 const fs = require("fs");
 const path = require("path");
 
@@ -207,16 +237,18 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): 
 };
 ```
 
+Note: The example above is only valid for Cypress versions lower than 10. Use the configuration file in Cypress 10.
+
 ## Tests
 
-To ensure the plugin stability, it is being tested with Cypress major versions 5.x, 6.x, 7.x, 8.x and 9.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
+To ensure the plugin stability, it is being tested with Cypress major versions 6.x, 7.x, 8.x, 9.x and 10.x and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
 
 Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
-* [Cypress v5.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-5/package.json)
 * [Cypress v6.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-6/package.json)
 * [Cypress v7.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-7/package.json)
 * [Cypress v8.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-8/package.json)
 * [Cypress v9.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-9/package.json)
+* [Cypress v10.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-10/package.json)
 
 Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 

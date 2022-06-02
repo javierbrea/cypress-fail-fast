@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [5.0.0] - 2022-06-02
+
+### Added
+- feat(#213): Add support for Cypress 10.
+- test(#213): Run E2E tests using also Cypress 10. Adapt config.
+- docs(#213): Add docs about how to install the plugin in Cypress 10
+
+### Removed
+- chore: Drop support for Cypress 5
+
 ## [4.0.0] - 2022-05-30
 
 ### Removed

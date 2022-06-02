@@ -14,7 +14,7 @@ runParallelSpecsTests(
   [
     {
       cypressVersion: "latest",
-      pluginFile: "parallel-preprocessor-babel-config",
+      configFile: "parallel-preprocessor-babel-config.config.js",
       specs: "parallel-failing",
       delay: 5000,
       specsResults: [
@@ -158,7 +158,7 @@ runParallelSpecsTests(
   [
     {
       cypressVersion: "latest",
-      pluginFile: "parallel-preprocessor-babel-config",
+      configFile: "parallel-preprocessor-babel-config.config.js",
       specs: "parallel-failing",
       delay: 5000,
       specsResults: [
