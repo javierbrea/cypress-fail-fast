@@ -43,7 +43,7 @@ jobs:
         run: npm run test:e2e:ci
         id: test-e2e
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-${{ matrix.node }}
           path: coverage
