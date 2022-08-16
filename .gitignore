@@ -8,7 +8,7 @@
 
 # tests
 /coverage
-/dist
+/test/**/*.js
 
 # misc
 .DS_Store
