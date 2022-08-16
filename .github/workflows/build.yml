@@ -2,7 +2,7 @@ name: build
 on:
   push:
     branches:
-      - test-235-ts-types-cypress-10
+      - test-235-ts-types-cypress-9
 jobs:
   test:
     runs-on: ubuntu-latest
