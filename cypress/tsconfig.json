@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+      "types": [
+          "node",
+          "cypress",
+          "cypress-fail-fast"
+      ],
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "noEmit": true
+  },
+  "include": ["./**/*.ts"]
+}

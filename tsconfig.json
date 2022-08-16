@@ -1,15 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "dist",
-    "moduleResolution": "node",
-    "types": ["cypress"]
+      "jsx": "react",
+      "skipLibCheck": true,
+      "types": ["jest"],
+      "resolveJsonModule": true,
   },
-  "include": [
-    "*.ts",
-  ],
-  "exclude": [
-    "node_modules",
-  ],
+  "include": ["test/**/*.ts"]
 }

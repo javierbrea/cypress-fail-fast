@@ -1,6 +1,0 @@
-{
-  "sonarlint.connectedMode.project": {
-      "connectionId": "javierbrea",
-      "projectKey": "javierbrea_cypress-fail-fast"
-  }
-}
