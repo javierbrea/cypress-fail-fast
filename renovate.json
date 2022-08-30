@@ -22,6 +22,11 @@
       "matchPaths": ["test-e2e/cypress-variants/cypress-9/package.json"],
       "matchPackageNames": ["cypress"],
       "allowedVersions": "<10.0.0"
+    },
+    {
+      "matchPaths": ["package.json"],
+      "matchPackageNames": ["chalk"],
+      "allowedVersions": "<5.0.0"
     }
   ]
 }
