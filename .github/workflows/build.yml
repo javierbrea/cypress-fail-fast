@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - name: Cache node modules
@@ -43,7 +43,7 @@ jobs:
         run: npm run test:e2e:ci
         id: test-e2e
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-${{ matrix.node }}
           path: coverage
