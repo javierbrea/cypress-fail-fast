@@ -47,8 +47,8 @@
     "chalk": "4.1.2"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "6.1.2",
-    "@stryker-mutator/jest-runner": "6.1.2",
+    "@stryker-mutator/core": "6.3.0",
+    "@stryker-mutator/jest-runner": "6.3.0",
     "babel-eslint": "10.1.0",
     "cross-env": "7.0.3",
     "cypress": "9.7.0",
