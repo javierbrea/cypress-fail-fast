@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "5.15.5",
-    "babel-loader": "8.3.0",
+    "babel-loader": "9.1.0",
     "babel-plugin-module-resolver": "4.1.0",
     "cross-env": "7.0.3",
     "cypress": "9.7.0",
