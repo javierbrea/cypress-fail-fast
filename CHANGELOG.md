@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - feat(TypeScript): Extend suite configuration definitions for Cypress 11.x
 - test: Add Cypress v11 tests. Use Cypress 11 in TypeScript tests
 
+### Changed
+- chore(deps): Update devDependencies
+
 ### Removed
 - test: Drop support for Cypress 6
 
