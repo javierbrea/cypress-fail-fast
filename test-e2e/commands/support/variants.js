@@ -40,7 +40,7 @@ const VARIANTS = [
     name: "Cypress 11",
     path: "cypress-11",
     version: "11",
-    isLatest: false,
+    isLatest: true,
     typescript: false,
     skippable: false,
     configFile: "cypress.config.js",
