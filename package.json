@@ -1,6 +1,6 @@
 {
   "name": "cypress-fail-fast",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "Skip the rest of Cypress tests on first failure",
   "keywords": [
     "cypress",

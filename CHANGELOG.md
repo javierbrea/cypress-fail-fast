@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
-## [unreleased]
+## [6.0.0] - 2022-12-07
 
 ### Added
 - feat(#275): Extend suite configuration definitions for Cypress 11.x
