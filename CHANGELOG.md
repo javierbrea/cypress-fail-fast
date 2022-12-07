@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - test: Drop support for Cypress 6
 
+### Fixed
+- docs(#245): Fix parallel configuration example
+
 ## [5.0.1] - 2022-08-30
 
 ### Changed

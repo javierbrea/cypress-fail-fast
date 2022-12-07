@@ -209,7 +209,7 @@ module.exports = (on, config) => {
     parallelCallbacks: {
       onCancel: () => {
         // Create flag file when the plugin starts skipping tests
-        fs.writeFileSync(isCancelledFlagFile);
+        fs.writeFileSync(isCancelledFlagFile, "");
       },
       isCancelled: () => {
         // If any other run has created the file, start skipping tests
