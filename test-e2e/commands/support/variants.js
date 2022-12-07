@@ -1,13 +1,5 @@
 const VARIANTS = [
   {
-    name: "Cypress 6",
-    path: "cypress-6",
-    version: "6",
-    typescript: false,
-    skippable: true,
-    copyPlugin: true,
-  },
-  {
     name: "Cypress 7",
     path: "cypress-7",
     version: "7",
@@ -20,7 +12,7 @@ const VARIANTS = [
     path: "cypress-8",
     version: "8",
     typescript: false,
-    skippable: false,
+    skippable: true,
     pluginFile: "preprocessor-babel-config",
     copyPlugin: true,
   },
@@ -37,6 +29,17 @@ const VARIANTS = [
     name: "Cypress 10",
     path: "cypress-10",
     version: "10",
+    isLatest: false,
+    typescript: false,
+    skippable: true,
+    configFile: "cypress.config.js",
+    supportFile: "e2e.js",
+    copyPlugin: false,
+  },
+  {
+    name: "Cypress 11",
+    path: "cypress-11",
+    version: "11",
     isLatest: true,
     typescript: false,
     skippable: false,
@@ -49,7 +52,10 @@ const VARIANTS = [
     path: "typescript",
     version: "ts",
     skippable: true,
+    configFile: "cypress.config.ts",
+    supportFile: "e2e.ts",
     typescript: true,
+    copyPlugin: false,
   },
 ];
 
