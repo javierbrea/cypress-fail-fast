@@ -1,5 +1,5 @@
 {
-  "name": "cypress-fail-fast-v6-e2e-tests",
+  "name": "cypress-fail-fast-v11-e2e-tests",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,12 +9,15 @@
     "cypress:run": "npm run report:clean && cypress run"
   },
   "devDependencies": {
+    "@cypress/webpack-preprocessor": "5.15.6",
+    "babel-loader": "8.3.0",
     "babel-plugin-module-resolver": "4.1.0",
     "cross-env": "7.0.3",
-    "cypress": "6.9.1",
+    "cypress": "11.2.0",
     "fs-extra": "10.1.0",
     "mochawesome": "7.1.3",
     "mochawesome-merge": "4.2.1",
-    "mochawesome-report-generator": "6.2.0"
+    "mochawesome-report-generator": "6.2.0",
+    "webpack": "5.75.0"
   }
 }
