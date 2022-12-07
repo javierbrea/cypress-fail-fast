@@ -46,7 +46,8 @@ runParallelSpecsTests(
     },
     {
       cypressVersion: "ts",
-      pluginFile: "parallel",
+      configFile: "parallel-ts.config.js",
+      configFileDest: "cypress.config.js",
       specs: "all-tests-passing",
       specsResults: [
         {
