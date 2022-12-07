@@ -250,8 +250,8 @@ Latest versions used in the E2E tests can be checked in the `devDependencies` of
 * [Cypress v10.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-10/package.json)
 * [Cypress v11.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-11/package.json)
 
-* If you need Cypress 6 or Cypress 7 support, use @cypress-fail-fast 5.x
-* If you need Cypress 5 or lower, use @cypress-fail-fast <= 4.x
+* If you need Cypress 6 or Cypress 7 support, use `cypress-fail-fast` 5.x
+* If you need Cypress 5 or lower, use `cypress-fail-fast` <= 4.x
 
 Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 
