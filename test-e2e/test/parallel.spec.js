@@ -153,7 +153,6 @@ runParallelSpecsTests(
     afterAll: removeParallelStorage,
   }
 );
-/* 
 
 runParallelSpecsTests(
   "When parallel strategy is disabled and first tests run fails",
@@ -225,4 +224,4 @@ runParallelSpecsTests(
   {
     afterAll: removeParallelStorage,
   }
-); */
+);
