@@ -82,7 +82,7 @@ runParallelSpecsTests(
   }
 );
 
-runParallelSpecsTests(
+/* runParallelSpecsTests(
   "When parallel strategy is enabled and first tests run fails using Cypress v8",
   [
     {
@@ -224,4 +224,4 @@ runParallelSpecsTests(
   {
     afterAll: removeParallelStorage,
   }
-);
+); */
