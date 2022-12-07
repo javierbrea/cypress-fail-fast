@@ -6,7 +6,7 @@
     {
       "matchPaths": ["test-e2e/cypress-variants/cypress-7/package.json"],
       "matchPackageNames": ["cypress"],
-      "allowedVersions": "7.x"
+      "allowedVersions": "<7.6.0"
     },
     {
       "matchPaths": ["test-e2e/cypress-variants/cypress-8/package.json"],
