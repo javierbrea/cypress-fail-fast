@@ -86,7 +86,7 @@ runParallelSpecsTests(
   "When parallel strategy is enabled and first tests run fails using Cypress v8",
   [
     {
-      cypressVersion: "8",
+      cypressVersion: "9",
       pluginFile: "parallel-preprocessor-babel-config",
       specs: "parallel-failing",
       delay: 5000,
@@ -118,8 +118,8 @@ runParallelSpecsTests(
       },
     },
     {
-      cypressVersion: "7",
-      pluginFile: "parallel",
+      cypressVersion: "8",
+      pluginFile: "parallel-preprocessor-babel-config",
       specs: "all-tests-passing",
       specsResults: [
         {
@@ -190,7 +190,7 @@ runParallelSpecsTests(
       },
     },
     {
-      cypressVersion: "8",
+      cypressVersion: "9",
       pluginFile: "parallel-preprocessor-babel-config",
       specs: "all-tests-passing",
       specsResults: [
