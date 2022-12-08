@@ -5,6 +5,7 @@ const {
   copyCypressSpecs,
   copyCypressPluginFile,
   copyCypressConfigFile,
+  removeCypressConfigFile,
 } = require("../../commands/support/copy");
 const { npmRun, VARIANTS_FOLDER } = require("./npmCommandRunner");
 const { splitLogsBySpec } = require("./logs");
@@ -245,17 +246,23 @@ const runParallelTests = (
         );
       }
       if (options1.configFile) {
+        if (options1.configFileDest) {
+          removeCypressConfigFile(cypressVariant1.path, cypressVariant1.configFile);
+        }
         copyCypressConfigFile(
           cypressVariant1.path,
           options1.configFile,
-          cypressVariant1.configFile
+          options1.configFileDest || cypressVariant1.configFile
         );
       }
       if (options2.configFile) {
+        if (options2.configFileDest) {
+          removeCypressConfigFile(cypressVariant2.path, cypressVariant2.configFile);
+        }
         copyCypressConfigFile(
           cypressVariant2.path,
           options2.configFile,
-          cypressVariant2.configFile
+          options2.configFileDest || cypressVariant2.configFile
         );
       }
       const logs = await Promise.all([
@@ -290,12 +297,20 @@ const runParallelTests = (
           cypressVariant2.pluginFile
         );
       }
+      if (options1.configFileDest) {
+        removeCypressConfigFile(cypressVariant1.path, options1.configFileDest);
+      }
       if (options1.configFile) {
         copyCypressConfigFile(cypressVariant1.path, cypressVariant1.configFile);
+      }
+
+      if (options2.configFileDest) {
+        removeCypressConfigFile(cypressVariant2.path, options2.configFileDest);
       }
       if (options2.configFile) {
         copyCypressConfigFile(cypressVariant2.path, cypressVariant2.configFile);
       }
+
       if (commonOptions.afterAll) {
         commonOptions.afterAll();
       }

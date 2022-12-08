@@ -15,4 +15,11 @@ declare namespace Cypress {
     */
     failFast?: Partial<FailFastConfigOptions>
   }
+
+  interface SuiteConfigOverrides {
+    /**
+     * Configuration for fail-fast plugin
+    */
+    failFast?: Partial<FailFastConfigOptions>
+  }
 }

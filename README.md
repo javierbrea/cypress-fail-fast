@@ -209,7 +209,7 @@ module.exports = (on, config) => {
     parallelCallbacks: {
       onCancel: () => {
         // Create flag file when the plugin starts skipping tests
-        fs.writeFileSync(isCancelledFlagFile);
+        fs.writeFileSync(isCancelledFlagFile, "");
       },
       isCancelled: () => {
         // If any other run has created the file, start skipping tests
@@ -241,14 +241,17 @@ Note: The example above is only valid for Cypress versions lower than 10. Use th
 
 ## Tests
 
-To ensure the plugin stability, it is being tested with Cypress major versions 6.x, 7.x, 8.x, 9.x and 10.x and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
+To ensure the plugin stability, it is being tested with Cypress major versions 7.x, 8.x, 9.x, 10.x and 11.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
 
 Latest versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
-* [Cypress v6.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-6/package.json)
 * [Cypress v7.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-7/package.json)
 * [Cypress v8.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-8/package.json)
 * [Cypress v9.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-9/package.json)
 * [Cypress v10.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-10/package.json)
+* [Cypress v11.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-11/package.json)
+
+* If you need Cypress 6 or Cypress 7 support, use `cypress-fail-fast` 5.x
+* If you need Cypress 5 or lower, use `cypress-fail-fast` <= 4.x
 
 Anyway, if you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 

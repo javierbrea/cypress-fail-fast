@@ -87,6 +87,11 @@ const copyCypressConfigFile = (variantPath, configFileName, destConfigFileName) 
   fsExtra.copySync(pluginFile, path.resolve(destPaths.root, destConfigFileName || configFileName));
 };
 
+const removeCypressConfigFile = (variantPath, configFileName) => {
+  const destPaths = variantPaths(variantPath);
+  fsExtra.removeSync(path.resolve(destPaths.root, configFileName));
+};
+
 const copyCypressSources = (variant) => {
   const destPaths = variantPaths(variant.path);
   const BABEL_CONFIG_FILE = "babel.config.js";
@@ -183,4 +188,5 @@ module.exports = {
   copyCypressConfigFile,
   copyCypressPluginFile,
   copyScripts,
+  removeCypressConfigFile,
 };
