@@ -1,8 +1,11 @@
 describe("List items", () => {
   before(() => {
     cy.task("log", "Executing before hook");
-    cy.visit("/");
     cy.task("waitUntilRunBIsWaiting");
+  });
+
+  beforeEach(() => {
+    cy.visit("/");
   });
 
   it("should display title", () => {

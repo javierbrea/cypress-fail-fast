@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [7.0.0] - 2022-12-08
+
+### Added
+- test: Add Cypress v12 tests
+
+### Removed
+- test: Drop support for Cypress 7
+
 ## [6.0.0] - 2022-12-07
 
 ### Added

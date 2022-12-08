@@ -1,6 +1,9 @@
 describe("List items", { failFast: { enabled: false } }, () => {
   before(() => {
     cy.task("log", "Executing before hook");
+  });
+
+  beforeEach(() => {
     cy.visit("/");
   });
 
