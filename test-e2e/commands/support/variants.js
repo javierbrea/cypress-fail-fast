@@ -1,13 +1,5 @@
 const VARIANTS = [
   {
-    name: "Cypress 7",
-    path: "cypress-7",
-    version: "7",
-    typescript: false,
-    skippable: true,
-    copyPlugin: true,
-  },
-  {
     name: "Cypress 8",
     path: "cypress-8",
     version: "8",
@@ -40,6 +32,17 @@ const VARIANTS = [
     name: "Cypress 11",
     path: "cypress-11",
     version: "11",
+    isLatest: false,
+    typescript: false,
+    skippable: false,
+    configFile: "cypress.config.js",
+    supportFile: "e2e.js",
+    copyPlugin: false,
+  },
+  {
+    name: "Cypress 12",
+    path: "cypress-12",
+    version: "12",
     isLatest: true,
     typescript: false,
     skippable: false,
