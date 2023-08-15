@@ -43,7 +43,7 @@ const readReport = (variantPath) => {
         } else {
           resolve(data);
         }
-      }
+      },
     );
   });
 };
@@ -56,7 +56,7 @@ const expectTestsAmount = (status, statusKey, amount, getSpecLogs) => {
   if (amount !== null) {
     it(`should have ${status} ${amount} ${pluralize("test", amount)}`, () => {
       expect(getSpecLogs()).toEqual(
-        expect.stringMatching(new RegExp(`\\s*│\\s*${statusKey}:\\s*${amount}`))
+        expect.stringMatching(new RegExp(`\\s*│\\s*${statusKey}:\\s*${amount}`)),
       );
     });
   }
@@ -92,7 +92,7 @@ const getSpecTests = (
     skipped = null,
   },
   getLogs,
-  getReport
+  getReport,
 ) => {
   const getSpecLogs = () => getLogs(spec);
   describe(`Spec ${spec}`, () => {
@@ -152,7 +152,7 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
         copyCypressPluginFile(
           cypressVariant.path,
           cypressVariant.typescript,
-          cypressVariant.pluginFile
+          cypressVariant.pluginFile,
         );
       }
       logs = splitLogsBySpec(await npmRun(["cypress:run"], cypressVariant.path, options.env));
@@ -204,7 +204,7 @@ const runParallelTests = (
   tests2,
   options1 = {},
   options2 = {},
-  commonOptions = {}
+  commonOptions = {},
 ) => {
   describe(`Running in parallel ${cypressVariant1.name}:${options1.specs} and ${cypressVariant2.name}:${options2.specs}`, () => {
     let logs1;
@@ -223,26 +223,26 @@ const runParallelTests = (
         copyCypressPluginFile(
           cypressVariant1.path,
           cypressVariant1.typescript,
-          options1.pluginFile
+          options1.pluginFile,
         );
       } else if (cypressVariant1.pluginFile) {
         copyCypressPluginFile(
           cypressVariant1.path,
           cypressVariant1.typescript,
-          cypressVariant1.pluginFile
+          cypressVariant1.pluginFile,
         );
       }
       if (options2.pluginFile) {
         copyCypressPluginFile(
           cypressVariant2.path,
           cypressVariant2.typescript,
-          options2.pluginFile
+          options2.pluginFile,
         );
       } else if (cypressVariant2.pluginFile) {
         copyCypressPluginFile(
           cypressVariant2.path,
           cypressVariant2.typescript,
-          cypressVariant2.pluginFile
+          cypressVariant2.pluginFile,
         );
       }
       if (options1.configFile) {
@@ -252,7 +252,7 @@ const runParallelTests = (
         copyCypressConfigFile(
           cypressVariant1.path,
           options1.configFile,
-          options1.configFileDest || cypressVariant1.configFile
+          options1.configFileDest || cypressVariant1.configFile,
         );
       }
       if (options2.configFile) {
@@ -262,15 +262,15 @@ const runParallelTests = (
         copyCypressConfigFile(
           cypressVariant2.path,
           options2.configFile,
-          options2.configFileDest || cypressVariant2.configFile
+          options2.configFileDest || cypressVariant2.configFile,
         );
       }
       const logs = await Promise.all([
         waitAndRun(options1.delay, () =>
-          npmRun(["cypress:run"], cypressVariant1.path, options1.env)
+          npmRun(["cypress:run"], cypressVariant1.path, options1.env),
         ),
         waitAndRun(options2.delay, () =>
-          npmRun(["cypress:run"], cypressVariant2.path, options2.env)
+          npmRun(["cypress:run"], cypressVariant2.path, options2.env),
         ),
       ]);
 
@@ -280,21 +280,21 @@ const runParallelTests = (
       await npmRun(["report:create"], cypressVariant2.path, options2.env);
       report1 = await readReport(cypressVariant1.path);
       report2 = await readReport(cypressVariant2.path);
-    }, 60000);
+    }, 120000);
 
     afterAll(() => {
       if (options1.pluginFile) {
         copyCypressPluginFile(
           cypressVariant1.path,
           cypressVariant1.typescript,
-          cypressVariant1.pluginFile
+          cypressVariant1.pluginFile,
         );
       }
       if (options2.pluginFile) {
         copyCypressPluginFile(
           cypressVariant2.path,
           cypressVariant2.typescript,
-          cypressVariant2.pluginFile
+          cypressVariant2.pluginFile,
         );
       }
       if (options1.configFileDest) {
@@ -331,7 +331,7 @@ const runParallelSpecsTests = (description, runsOptions, options) => {
         getParallelSpecsStatusesTests(2, runsOptions[1].specsResults),
         runsOptions[0],
         runsOptions[1],
-        options
+        options,
       );
     });
   }

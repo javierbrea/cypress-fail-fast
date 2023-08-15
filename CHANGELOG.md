@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [unreleased]
+
+### Changed
+- chore(deps): Update devDependencies
+- chore(deps): Use NodeJs 16.x, 18.x and 20.x in pipelines
+
 ## [7.0.1] - 2023-04-04
 
 ### Changed

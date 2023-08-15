@@ -102,7 +102,7 @@ const copyCypressSources = (variant) => {
 
   const cypressConfigFile = path.resolve(
     CYPRESS_SRC_PATH,
-    variant.configFile || CYPRESS_CONFIG_FILE
+    variant.configFile || CYPRESS_CONFIG_FILE,
   );
   const babelConfigFile = path.resolve(CYPRESS_SRC_PATH, BABEL_CONFIG_FILE);
   const supportFile = path.resolve(supportPath, variant.supportFile || INDEX_FILE);
@@ -116,12 +116,12 @@ const copyCypressSources = (variant) => {
   fsExtra.ensureDirSync(destPaths.cypress.support);
   fsExtra.copySync(
     supportFile,
-    path.resolve(destPaths.cypress.support, variant.supportFile || INDEX_FILE)
+    path.resolve(destPaths.cypress.support, variant.supportFile || INDEX_FILE),
   );
 
   fsExtra.copySync(
     cypressConfigFile,
-    path.resolve(destPaths.root, variant.configFile || CYPRESS_CONFIG_FILE)
+    path.resolve(destPaths.root, variant.configFile || CYPRESS_CONFIG_FILE),
   );
 
   if (!variant.typescript) {
@@ -153,30 +153,30 @@ const copyCypressSpecs = (specsFolder, variant) => {
     integrationAFile,
     path.resolve(
       destPaths.cypress.integration,
-      toTypeScriptName(INTEGRATION_A_FILE, variant.typescript)
-    )
+      toTypeScriptName(INTEGRATION_A_FILE, variant.typescript),
+    ),
   );
   fsExtra.copySync(
     integrationBFile,
     path.resolve(
       destPaths.cypress.integration,
-      toTypeScriptName(INTEGRATION_B_FILE, variant.typescript)
-    )
+      toTypeScriptName(INTEGRATION_B_FILE, variant.typescript),
+    ),
   );
   fsExtra.copySync(
     integrationCFile,
     path.resolve(
       destPaths.cypress.integration,
-      toTypeScriptName(INTEGRATION_C_FILE, variant.typescript)
-    )
+      toTypeScriptName(INTEGRATION_C_FILE, variant.typescript),
+    ),
   );
   if (fsExtra.existsSync(integrationDFile)) {
     fsExtra.copySync(
       integrationDFile,
       path.resolve(
         destPaths.cypress.integration,
-        toTypeScriptName(INTEGRATION_D_FILE, variant.typescript)
-      )
+        toTypeScriptName(INTEGRATION_D_FILE, variant.typescript),
+      ),
     );
   }
 };
