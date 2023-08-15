@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - chore(deps): Use NodeJs 16.x, 18.x and 20.x in pipelines
 - refactor: Remove redundant double negation
 
+### Added
+- chore: Handle concurrency in pipelines
+
 ## [7.0.1] - 2023-04-04
 
 ### Changed
