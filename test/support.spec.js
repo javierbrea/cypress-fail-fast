@@ -423,7 +423,7 @@ describe("support", () => {
 
           const testCallbackSpy = () => "foo";
           expect(Cypress.runner.onRunnableRun(runnableRun, runnable, [testCallbackSpy])).toEqual(
-            "foo"
+            "foo",
           );
         });
 
@@ -444,7 +444,7 @@ describe("support", () => {
           const testCallBackArgument = testCallbackSpy.getCall(0).args[0];
           expect(testCallBackArgument).toBe(hookError);
           expect(testCallBackArgument.message).toEqual(
-            '"beforeEach" hook failed: foo error message'
+            '"beforeEach" hook failed: foo error message',
           );
         });
       });

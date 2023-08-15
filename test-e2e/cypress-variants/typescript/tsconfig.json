@@ -4,7 +4,8 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "dist",
-    "types": ["cypress"]
+    "types": ["cypress"],
+    "skipLibCheck": true,
   },
   "include": [
     "**/*.ts",

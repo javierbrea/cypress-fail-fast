@@ -57,16 +57,16 @@ function getFailFastEnvironmentConfig(Cypress) {
   return {
     plugin: booleanVarValue(
       Cypress.env(PLUGIN_ENVIRONMENT_VAR),
-      ENVIRONMENT_DEFAULT_VALUES[PLUGIN_ENVIRONMENT_VAR]
+      ENVIRONMENT_DEFAULT_VALUES[PLUGIN_ENVIRONMENT_VAR],
     ),
     enabled: booleanVarValue(
       Cypress.env(ENABLED_ENVIRONMENT_VAR),
-      ENVIRONMENT_DEFAULT_VALUES[ENABLED_ENVIRONMENT_VAR]
+      ENVIRONMENT_DEFAULT_VALUES[ENABLED_ENVIRONMENT_VAR],
     ),
     strategyIsSpec: strategyIsSpec(Cypress.env(STRATEGY_ENVIRONMENT_VAR)),
     bail: numericVarValue(
       Cypress.env(BAIL_ENVIRONMENT_VAR),
-      ENVIRONMENT_DEFAULT_VALUES[BAIL_ENVIRONMENT_VAR]
+      ENVIRONMENT_DEFAULT_VALUES[BAIL_ENVIRONMENT_VAR],
     ),
   };
 }
