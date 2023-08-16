@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
-## [unreleased]
+## [7.0.2] - 2023-08-16
 
 ### Changed
 - chore(deps): Update devDependencies
