@@ -24,7 +24,7 @@ module.exports = (on, config, pluginConfig = {}) => {
   const onCancelCallback = parallelCallbacks.onCancel;
 
   const shouldSkip = () => {
-    if (!!shouldSkipFlag) {
+    if (shouldSkipFlag) {
       return shouldSkipFlag;
     }
     if (isCancelledCallback) {

@@ -107,7 +107,7 @@ describe("plugin", () => {
                 isCancelled: () => true,
               },
             },
-            env
+            env,
           );
           expect(failFastShouldSkip()).toEqual(true);
         });
@@ -119,7 +119,7 @@ describe("plugin", () => {
                 isCancelled: () => null,
               },
             },
-            env
+            env,
           );
           expect(failFastShouldSkip()).toEqual(false);
         });
@@ -131,7 +131,7 @@ describe("plugin", () => {
                 isCancelled: () => false,
               },
             },
-            env
+            env,
           );
           failFastShouldSkip(true);
           expect(failFastShouldSkip()).toEqual(true);
@@ -145,7 +145,7 @@ describe("plugin", () => {
                 onCancel: spy,
               },
             },
-            env
+            env,
           );
           failFastShouldSkip(true);
           expect(spy.callCount).toEqual(1);
@@ -159,7 +159,7 @@ describe("plugin", () => {
                 onCancel: spy,
               },
             },
-            env
+            env,
           );
           failFastShouldSkip();
           failFastShouldSkip(false);
@@ -179,7 +179,7 @@ describe("plugin", () => {
                 isCancelled: () => true,
               },
             },
-            env
+            env,
           );
           expect(failFastShouldSkip()).toEqual(false);
         });
@@ -192,7 +192,7 @@ describe("plugin", () => {
                 isCancelled: spy,
               },
             },
-            env
+            env,
           );
           failFastShouldSkip();
           expect(spy.callCount).toEqual(0);
