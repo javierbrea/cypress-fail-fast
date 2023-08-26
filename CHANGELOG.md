@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [unreleased]
+
+### Fixed
+- fix(#290): Do not use optional chaining. It was producing an error in Cypress. See https://github.com/cypress-io/cypress/issues/9298
+
 ## [7.0.2] - 2023-08-16
 
 ### Changed

@@ -1,5 +1,5 @@
 function isHeaded(Cypress) {
-  return Cypress.browser?.isHeaded;
+  return Cypress.browser && Cypress.browser.isHeaded;
 }
 
 function testHasFailed(currentTest) {
@@ -55,16 +55,22 @@ function getTestConfig(test) {
   }
   // Cypress >9
   if (
-    test.ctx?.test?._testConfig?.testConfigList?.[
-      test.ctx?.test?._testConfig?.testConfigList?.length - 1
-    ]?.overrides
+    test.ctx &&
+    test.ctx.test &&
+    test.ctx.test._testConfig &&
+    test.ctx.test._testConfig.testConfigList &&
+    test.ctx.test._testConfig.testConfigList[
+      test.ctx.test._testConfig.testConfigList.length - 1
+    ] &&
+    test.ctx.test._testConfig.testConfigList[test.ctx.test._testConfig.testConfigList.length - 1]
+      .overrides
   ) {
     return test.ctx.test._testConfig.testConfigList[
       test.ctx.test._testConfig.testConfigList.length - 1
     ].overrides;
   }
   // Cypress >6.7
-  if (test.ctx?.test?._testConfig) {
+  if (test.ctx && test.ctx.test && test.ctx.test._testConfig) {
     return test.ctx.test._testConfig;
   }
   return {};
