@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - fix(#290): Do not use optional chaining. It was producing an error in Cypress. See https://github.com/cypress-io/cypress/issues/9298
 
+### Changed
+- test(deps): Update Cypress to latest version in TypeScript E2E tests
+
 ## [7.0.2] - 2023-08-16 [YANKED]
 
 ### Changed
