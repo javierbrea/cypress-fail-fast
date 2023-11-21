@@ -6,16 +6,16 @@
     "serve": "serve -l 3000",
     "test": "jest --runInBand --verbose",
     "test:build": "cross-env node commands/build.js",
-    "test:install": "cd cypress-variants/typescript && npm i && cd ../cypress-8 && npm i && cd ../cypress-9 && npm i && cd ../cypress-10 && npm i && cd ../cypress-11 && npm i && cd ../cypress-12 && npm i",
+    "test:install": "cd cypress-variants/typescript && npm i && cd ../cypress-9 && npm i && cd ../cypress-10 && npm i && cd ../cypress-11 && npm i && cd ../cypress-12 && npm i && cd ../cypress-13 && npm i",
     "serve-and-test": "start-server-and-test serve http-get://localhost:3000 test",
     "test:ci": "npm run test:build && npm run test:install && npm run serve-and-test"
   },
   "devDependencies": {
     "cross-env": "7.0.3",
     "fs-extra": "11.1.1",
-    "jest": "29.6.2",
-    "serve": "14.2.0",
-    "start-server-and-test": "2.0.0",
+    "jest": "29.7.0",
+    "serve": "14.2.1",
+    "start-server-and-test": "2.0.3",
     "strip-ansi": "6.0.0"
   }
 }

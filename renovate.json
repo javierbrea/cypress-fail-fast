@@ -1,13 +1,8 @@
 {
   "extends": [
-    "github>javierbrea/nodejs-ci-cd-shared-config"
+    "github>javierbrea/renovate-config"
   ],
   "packageRules": [
-    {
-      "matchPaths": ["test-e2e/cypress-variants/cypress-8/package.json"],
-      "matchPackageNames": ["cypress"],
-      "allowedVersions": "8.x"
-    },
     {
       "matchPaths": ["test-e2e/cypress-variants/cypress-9/package.json"],
       "matchPackageNames": ["cypress"],
@@ -27,6 +22,11 @@
       "matchPaths": ["test-e2e/cypress-variants/cypress-12/package.json"],
       "matchPackageNames": ["cypress"],
       "allowedVersions": "12.x"
+    },
+    {
+      "matchPaths": ["test-e2e/cypress-variants/cypress-13/package.json"],
+      "matchPackageNames": ["cypress"],
+      "allowedVersions": "13.x"
     },
     {
       "matchPaths": ["package.json"],
