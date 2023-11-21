@@ -241,17 +241,18 @@ Note: The example above is only valid for Cypress versions lower than 10. Use th
 
 ## Tests
 
-To ensure the plugin stability, the current major version is being tested with Cypress major versions 8.x, 9.x, 10.x, 11.x and 12.x, and new releases will be published for each new Cypress minor or major releases, updating the package E2E tests.
+To ensure the plugin stability, the current major version is being tested with Cypress major versions 9.x, 10.x, 11.x, 12.x and 13.x, and new releases will be published for each new Cypress minor or major releases, updating the E2E tests.
 
 Minor versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
-* [Cypress v8.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-8/package.json)
 * [Cypress v9.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-9/package.json)
 * [Cypress v10.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-10/package.json)
 * [Cypress v11.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-11/package.json)
 * [Cypress v12.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-12/package.json)
+* [Cypress v13.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-13/package.json)
 
-Even when current major version may work with previous Cypress versions, it is not tested, so, to be sure it works you should use:
+Even when current major version may work with previous Cypress versions, it is not currently tested, so, to be sure it works you should use:
 
+* Cypress 8.x may work, but it was tested until `cypress-fail-fast` 7.0.x
 * If you need Cypress 7 support, use `cypress-fail-fast` 6.x
 * If you need Cypress 6 support, use `cypress-fail-fast` 5.x
 * If you need Cypress 5 or lower, use `cypress-fail-fast` <= 4.x
