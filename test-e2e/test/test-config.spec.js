@@ -118,7 +118,7 @@ runSpecsTests(
     env: {
       CYPRESS_FAIL_FAST_PLUGIN: "false",
     },
-  }
+  },
 );
 
 runSpecsTests(
@@ -152,5 +152,5 @@ runSpecsTests(
     env: {
       CYPRESS_FAIL_FAST_ENABLED: "false",
     },
-  }
+  },
 );

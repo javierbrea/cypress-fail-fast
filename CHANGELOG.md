@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### BREAKING CHANGES
 
+## [7.1.0] - 2023-11-21
+
+### Added
+- test: Add Cypress v13 tests. Use Cypress 13 in TypeScript tests
+
+### Removed
+- test: Drop Cypress 12 tests
+
+### Changed
+- chore(deps): Update devDependencies
+
 ## [7.0.3] - 2023-08-26
 
 ### Fixed

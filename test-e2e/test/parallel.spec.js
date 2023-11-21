@@ -79,79 +79,7 @@ runParallelSpecsTests(
   ],
   {
     afterAll: removeParallelStorage,
-  }
-);
-
-runParallelSpecsTests(
-  "When parallel strategy is enabled and first tests run fails using Cypress v8",
-  [
-    {
-      cypressVersion: "9",
-      pluginFile: "parallel-preprocessor-babel-config",
-      specs: "parallel-failing",
-      delay: 5000,
-      specsResults: [
-        {
-          logBefore: true,
-          executed: 4,
-          passed: 1,
-          failed: 1,
-          skipped: 2,
-        },
-        {
-          logBefore: false,
-          executed: 4,
-          passed: 0,
-          failed: 0,
-          skipped: 4,
-        },
-        {
-          logBefore: false,
-          executed: 3,
-          passed: 0,
-          failed: 0,
-          skipped: 3,
-        },
-      ],
-      env: {
-        CYPRESS_FAIL_FAST_STRATEGY: "parallel",
-      },
-    },
-    {
-      cypressVersion: "8",
-      pluginFile: "parallel-preprocessor-babel-config",
-      specs: "all-tests-passing",
-      specsResults: [
-        {
-          logBefore: true,
-          executed: 4,
-          passed: 4,
-          failed: 0,
-          skipped: 0,
-        },
-        {
-          logBefore: true,
-          executed: 4,
-          passed: 0,
-          failed: 0,
-          skipped: 4,
-        },
-        {
-          logBefore: false,
-          executed: 4,
-          passed: 0,
-          failed: 0,
-          skipped: 4,
-        },
-      ],
-      env: {
-        CYPRESS_FAIL_FAST_STRATEGY: "parallel",
-      },
-    },
-  ],
-  {
-    afterAll: removeParallelStorage,
-  }
+  },
 );
 
 runParallelSpecsTests(
@@ -223,5 +151,5 @@ runParallelSpecsTests(
   ],
   {
     afterAll: removeParallelStorage,
-  }
+  },
 );
