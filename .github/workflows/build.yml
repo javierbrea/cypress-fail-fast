@@ -14,16 +14,16 @@ jobs:
     strategy:
       max-parallel: 2
       matrix:
-        node: ["16.14.0", "18.2.0", "20.5.1"]
+        node: ["18.20.2", "20.13.1", "22.2.0"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -46,7 +46,7 @@ jobs:
         run: npm run test:e2e:ci
         id: test-e2e
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.node }}
           path: coverage
@@ -56,13 +56,13 @@ jobs:
     needs: test
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Download test results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: coverage-18.2.0
+          name: coverage-20.13.1
           path: coverage
       - name: Coveralls
         uses: coverallsapp/github-action@master
