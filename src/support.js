@@ -21,8 +21,9 @@ const {
   testHasFailed,
   wrapCypressRunner,
   stopRunner,
-  getGlobalForceFailError,
-  setGlobalForceFailError,
+  getHookFailedError,
+  setHookFailedError,
+  shouldForceErrorOnFailedHook,
 } = require("./helpers/cypress");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
@@ -41,7 +42,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
 
   function enableSkipMode() {
     cy.task(LOG_TASK, SKIP_MESSAGE);
-    cy.task(SHOULD_SKIP_TASK, true);
+    return cy.task(SHOULD_SKIP_TASK, true);
   }
 
   function registerFailureAndRunIfBailLimitIsReached(callback) {
@@ -77,19 +78,22 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     if (
       currentTest &&
       pluginIsEnabled(Cypress) &&
-      (testHasFailed(currentTest) || getGlobalForceFailError()) &&
+      (testHasFailed(currentTest) || getHookFailedError()) &&
       failFastIsEnabled(currentTest, Cypress)
     ) {
       registerFailureAndRunIfBailLimitIsReached(() => {
-        enableSkipMode();
-        if (getGlobalForceFailError()) {
-          const error = getGlobalForceFailError();
-          setGlobalForceFailError(null);
-          if (!testHasFailed(currentTest)) {
-            // NOTE: Force the afterEach hook to fail after the test in case the test was not marked as failed. This happens in Cypress 13.
-            throw error;
+        enableSkipMode().then(() => {
+          if (getHookFailedError()) {
+            const error = getHookFailedError();
+            setHookFailedError(null);
+            // istanbul ignore next
+            if (!testHasFailed(currentTest) && shouldForceErrorOnFailedHook()) {
+              // NOTE: Force the afterEach hook to fail after the test in case the test was not marked as failed. This happens in Cypress 13.
+              // istanbul ignore next
+              throw error;
+            }
           }
-        }
+        });
       });
     }
   });

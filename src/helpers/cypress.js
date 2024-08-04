@@ -1,4 +1,5 @@
 let hookFailedError = null;
+let forceErrorOnFailedHook = true;
 
 function isHeaded(Cypress) {
   return Cypress.browser && Cypress.browser.isHeaded;
@@ -8,11 +9,19 @@ function testHasFailed(currentTest) {
   return currentTest.state === "failed" && currentTest.currentRetry() === currentTest.retries();
 }
 
-function setGlobalForceFailError(error) {
+function shouldForceErrorOnFailedHook() {
+  return forceErrorOnFailedHook;
+}
+
+function setForceErrorOnFailedHook(value) {
+  return (forceErrorOnFailedHook = value);
+}
+
+function setHookFailedError(error) {
   hookFailedError = error;
 }
 
-function getGlobalForceFailError() {
+function getHookFailedError() {
   return hookFailedError;
 }
 
@@ -43,7 +52,7 @@ function wrapCypressRunner(Cypress) {
       hookError.message = `"${hookFailedName}" hook failed: ${hookError.message}`;
 
       // NOTE: In Cypress 13, passing the error does not produce the test to fail, so, we also set a global variable to force the afterEach hook to fail after the test
-      setGlobalForceFailError(hookError);
+      setHookFailedError(hookError);
       return next.call(this, hookError);
     };
 
@@ -98,6 +107,8 @@ module.exports = {
   wrapCypressRunner,
   getTestConfig,
   stopRunner,
-  setGlobalForceFailError,
-  getGlobalForceFailError,
+  setHookFailedError,
+  getHookFailedError,
+  shouldForceErrorOnFailedHook,
+  setForceErrorOnFailedHook,
 };

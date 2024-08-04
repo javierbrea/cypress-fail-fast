@@ -1,5 +1,6 @@
 const sinon = require("sinon");
 const support = require("../src/support");
+const { setHookFailedError, setForceErrorOnFailedHook } = require("../src/helpers/cypress");
 
 const wait = (time) => {
   return new Promise((resolve) => {
@@ -240,6 +241,24 @@ describe("support", () => {
           afterEachCallback();
           await wait(200);
           expect(cy.task.callCount).toEqual(0);
+        });
+
+        it("should set plugin flag if current test state is not failed but the hookFailed flag is set", async () => {
+          const hookError = new Error("foo error message");
+          setForceErrorOnFailedHook(false);
+          setHookFailedError(hookError);
+
+          getSupportCallbacks({
+            ...config,
+            shouldSkip: true,
+            testState: "passed",
+            testCurrentRetry: 3,
+            testRetries: 3,
+          });
+          afterEachCallback();
+          await wait(500);
+          expect(Cypress.runner.stop.callCount).toEqual(0);
+          expect(cy.task.calledWith("failFastShouldSkip", true)).toEqual(true);
         });
 
         it("should not set plugin flag if current test retry is not the last one", async () => {
