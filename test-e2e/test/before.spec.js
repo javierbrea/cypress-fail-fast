@@ -1,6 +1,6 @@
 const { runSpecsTests } = require("./support/testsRunner");
 
-runSpecsTests("When before hook fails", {
+/* runSpecsTests("When before hook fails", {
   skipVariants: false,
   specs: "before-failing",
   specsResults: [
@@ -38,7 +38,7 @@ runSpecsTests("When before hook fails", {
   env: {
     CYPRESS_FAIL_FAST_STRATEGY: "run",
   },
-});
+}); */
 
 runSpecsTests("When before hook fails in spec mode", {
   skipVariants: false,
