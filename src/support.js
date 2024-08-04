@@ -16,7 +16,14 @@ const {
   currentStrategyIsSpec,
 } = require("./helpers/config");
 
-const { isHeaded, testHasFailed, wrapCypressRunner, stopRunner } = require("./helpers/cypress");
+const {
+  isHeaded,
+  testHasFailed,
+  wrapCypressRunner,
+  stopRunner,
+  getGlobalForceFailError,
+  setGlobalForceFailError,
+} = require("./helpers/cypress");
 
 function support(Cypress, cy, beforeEach, afterEach, before) {
   function stopCypressRunner() {
@@ -70,11 +77,15 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
     if (
       currentTest &&
       pluginIsEnabled(Cypress) &&
-      testHasFailed(currentTest) &&
+      (testHasFailed(currentTest) || getGlobalForceFailError()) &&
       failFastIsEnabled(currentTest, Cypress)
     ) {
       registerFailureAndRunIfBailLimitIsReached(() => {
         enableSkipMode();
+        if (getGlobalForceFailError()) {
+          setGlobalForceFailError(null);
+          throw getGlobalForceFailError();
+        }
       });
     }
   });

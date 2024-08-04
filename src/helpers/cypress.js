@@ -6,12 +6,22 @@ function testHasFailed(currentTest) {
   return currentTest.state === "failed" && currentTest.currentRetry() === currentTest.retries();
 }
 
+function setGlobalForceFailError(error) {
+  // eslint-disable-next-line no-undef
+  window.hookFailedError = error;
+}
+
+function getGlobalForceFailError() {
+  // eslint-disable-next-line no-undef
+  return window.hookFailedError;
+}
+
 function wrapCypressRunner(Cypress) {
   let hookFailed, hookFailedName, hookError;
   const _onRunnableRun = Cypress.runner.onRunnableRun;
   Cypress.runner.onRunnableRun = function (runnableRun, runnable, args) {
     const isHook = runnable.type === "hook";
-    const isBeforeHook = isHook && runnable.hookName.match(/before/);
+    const isBeforeHook = isHook && /before/.test(runnable.hookName);
 
     const next = args[0];
 
@@ -25,13 +35,15 @@ function wrapCypressRunner(Cypress) {
           Do not pass the error, because Cypress stops if there is an error on before hooks,
           so this plugin can't set the skip flag
         */
-      return next.call(this /*, error */);
+      return next.call(this /*, error*/);
     };
 
     const forceTestToFail = function () {
       hookFailed = false;
       hookError.message = `"${hookFailedName}" hook failed: ${hookError.message}`;
-      // Force next test to fail, so the plugin can set the skip flag, and the test is marked as failed
+
+      // NOTE: In Cypress 13, passing the error does not produce the test to fail, so, we also set a global variable to force the afterEach hook to fail after the test
+      setGlobalForceFailError(hookError);
       return next.call(this, hookError);
     };
 
@@ -86,4 +98,6 @@ module.exports = {
   wrapCypressRunner,
   getTestConfig,
   stopRunner,
+  setGlobalForceFailError,
+  getGlobalForceFailError,
 };
