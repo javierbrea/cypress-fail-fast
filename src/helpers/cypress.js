@@ -14,7 +14,7 @@ function shouldForceErrorOnFailedHook() {
 }
 
 function setForceErrorOnFailedHook(value) {
-  return (forceErrorOnFailedHook = value);
+  forceErrorOnFailedHook = value;
 }
 
 function setHookFailedError(error) {
