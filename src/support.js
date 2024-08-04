@@ -85,7 +85,10 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
         if (getGlobalForceFailError()) {
           const error = getGlobalForceFailError();
           setGlobalForceFailError(null);
-          throw error;
+          if (!testHasFailed(currentTest)) {
+            // NOTE: Force the afterEach hook to fail after the test in case the test was not marked as failed. This happens in Cypress 13.
+            throw error;
+          }
         }
       });
     }
