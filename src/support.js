@@ -83,8 +83,9 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
       registerFailureAndRunIfBailLimitIsReached(() => {
         enableSkipMode();
         if (getGlobalForceFailError()) {
+          const error = getGlobalForceFailError();
           setGlobalForceFailError(null);
-          throw getGlobalForceFailError();
+          throw error;
         }
       });
     }

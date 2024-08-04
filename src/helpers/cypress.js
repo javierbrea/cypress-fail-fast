@@ -1,3 +1,5 @@
+let hookFailedError = null;
+
 function isHeaded(Cypress) {
   return Cypress.browser && Cypress.browser.isHeaded;
 }
@@ -7,13 +9,11 @@ function testHasFailed(currentTest) {
 }
 
 function setGlobalForceFailError(error) {
-  // eslint-disable-next-line no-undef
-  window.hookFailedError = error;
+  hookFailedError = error;
 }
 
 function getGlobalForceFailError() {
-  // eslint-disable-next-line no-undef
-  return window.hookFailedError;
+  return hookFailedError;
 }
 
 function wrapCypressRunner(Cypress) {
