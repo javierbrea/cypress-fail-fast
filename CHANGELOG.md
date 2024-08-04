@@ -13,7 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [7.1.1] - 2024-08-04
 
+### Fixed
+
+- fix(#296): Force to set the `shouldSkip` flag to `true` when a before hook fails in Cypress 13.
+
 ### Changed
+- docs(#295): Change installation example to ES6 import syntax
 - chore(deps): Update devDependencies
 
 ## [7.1.0] - 2023-11-21
