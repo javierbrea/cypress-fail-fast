@@ -52,7 +52,7 @@
     "@stryker-mutator/jest-runner": "7.3.0",
     "cross-env": "7.0.3",
     "cypress": "13.13.2",
-    "eslint": "8.54.0",
+    "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "eslint-plugin-react": "7.35.0",
