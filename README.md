@@ -31,20 +31,26 @@ npm i --save-dev cypress-fail-fast
 
 Now, depending on your Cypress version, use one of the next methods:
 
-### Installation on Cypress 10
+### Installation on Cypress 10 and higher
 
-Inside `cypress.config.js` file:
+Inside `cypress.config.ts` file:
 
 ```javascript
-module.exports = {
+import cypressFailFast from "cypress-fail-fast/plugin";
+
+export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      require("cypress-fail-fast/plugin")(on, config);
-      return config;
+      cypressFailFast(on, config);
     },
-    specPattern: "cypress/integration/**/*.js",
   },
-};
+});
+```
+
+In case you are using JavaScript, you may explicit the file extension in some cases:
+
+```javascript
+import cypressFailFast from "cypress-fail-fast/plugin.js"
 ```
 
 Note: This example shows how to install the plugin for `e2e` testing type. Read [Cypress configuration docs](https://docs.cypress.io/guides/references/configuration) for further info.
