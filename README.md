@@ -105,15 +105,14 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 CYPRESS_FAIL_FAST_PLUGIN=false npm run cypress
 ```
 
-or set the "env" key in the `cypress.json` configuration file:
+or set the "env" key in the `cypress.config.ts` configuration file:
 
-```json
+```js
 {
-  "env":
-  {
-    "FAIL_FAST_STRATEGY": "run",
-    "FAIL_FAST_ENABLED": true,
-    "FAIL_FAST_BAIL": 2,
+  env: {
+    FAIL_FAST_STRATEGY: "run",
+    FAIL_FAST_ENABLED: true,
+    FAIL_FAST_BAIL: 2,
   }
 }
 ```
@@ -155,13 +154,12 @@ describe("All tests", {
 
 ##### You want to disable "fail-fast" in all specs except one:
 
-Set the `FAIL_FAST_ENABLED` key in the `cypress.json` configuration file:
+Set the `FAIL_FAST_ENABLED` key in the `cypress.config.ts` configuration file:
 
-```json
+```js
 {
-  "env":
-  {
-    "FAIL_FAST_ENABLED": false
+  env: {
+    FAIL_FAST_ENABLED: false
   }
 }
 ```
@@ -180,10 +178,7 @@ Set the `FAIL_FAST_PLUGIN` key in your local `cypress.env.json` configuration fi
 
 ```json
 {
-  "env":
-  {
-    "FAIL_FAST_PLUGIN": false
-  }
+  "FAIL_FAST_PLUGIN": false
 }
 ```
 
@@ -247,17 +242,14 @@ Note: The example above is only valid for Cypress versions lower than 10. Use th
 
 ## Tests
 
-To ensure the plugin stability, the current major version is being tested with Cypress major versions 9.x, 10.x, 11.x, 12.x and 13.x, and new releases will be published for each new Cypress minor or major releases, updating the E2E tests.
+To ensure the plugin stability, the current major version is being tested with Cypress major version 15.x, and new releases will be published for each new Cypress minor or major releases, updating the E2E tests.
 
 Minor versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
-* [Cypress v9.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-9/package.json)
-* [Cypress v10.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-10/package.json)
-* [Cypress v11.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-11/package.json)
-* [Cypress v12.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-12/package.json)
-* [Cypress v13.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-13/package.json)
+* [Cypress v15.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-15/package.json)
 
 Even when current major version may work with previous Cypress versions, it is not currently tested, so, to be sure it works you should use:
 
+* If you need Cypress 9.x to < 15.10.0 support, use `cypress-fail-fast` 7.x
 * Cypress 8.x may work, but it was tested until `cypress-fail-fast` 7.0.x
 * If you need Cypress 7 support, use `cypress-fail-fast` 6.x
 * If you need Cypress 6 support, use `cypress-fail-fast` 5.x
