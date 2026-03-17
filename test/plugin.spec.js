@@ -18,7 +18,8 @@ describe("plugin", () => {
     failFastShouldSkip = onEventSpy.getCall(0).args[1].failFastShouldSkip;
     failFastResetSkip = onEventSpy.getCall(0).args[1].failFastResetSkip;
     failFastFailedTests = onEventSpy.getCall(0).args[1].failFastFailedTests;
-    failFastResetFailedTests = onEventSpy.getCall(0).args[1].failFastResetFailedTests;
+    failFastResetFailedTests =
+      onEventSpy.getCall(0).args[1].failFastResetFailedTests;
     failFastLog = onEventSpy.getCall(0).args[1].failFastLog;
   };
 
@@ -229,7 +230,10 @@ describe("plugin", () => {
       getPluginMethods();
       sandbox.spy(console, "log");
       failFastLog(MESSAGE);
-      expect(console.log.getCall(0).args[0]).toEqual(`${chalk.yellow("[fail-fast]")} ${MESSAGE}`);
+      // eslint-disable-next-line no-console
+      expect(console.log.getCall(0).args[0]).toEqual(
+        `${chalk.yellow("[fail-fast]")} ${MESSAGE}`,
+      );
     });
 
     it("should return null", () => {

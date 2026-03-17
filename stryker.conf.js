@@ -1,4 +1,5 @@
-const BRANCH_NAME = process.env.TRAVIS_CURRENT_BRANCH || process.env.BRANCH_NAME;
+const BRANCH_NAME =
+  process.env.TRAVIS_CURRENT_BRANCH || process.env.BRANCH_NAME;
 const STRYKER_DASHBOARD_API_KEY = process.env.STRYKER_DASHBOARD_API_KEY;
 
 const BASE_CONFIG = {

@@ -1,14 +1,15 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 #environment variables
-/.env
+#.env
 
 # dependencies
 /node_modules
 
 # tests
-/coverage
-/dist
+/cypress/screenshots
+/cypress/fixtures
+/cypress/videos
 
 # misc
 .DS_Store
@@ -25,11 +26,5 @@ yarn-error.log*
 .idea
 .vs
 
-# stryker temp files
-/reports
-.stryker-tmp
-stryker.conf.local.js
-
 # caches
 .eslintcache
-.old

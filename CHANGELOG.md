@@ -9,7 +9,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 ### Fixed
 ### Removed
-### BREAKING CHANGES
+### Breaking Changes
+
+## [8.0.0] - 2025-03-17
+
+### Breaking Changes
+
+- feat(#301): Migrates plugin configuration from `Cypress.env()` to `Cypress.expose()`, as `Cypress.env()` was deprecated in Cypress 15.10 and will be removed in Cypress 16. **BREAKING CHANGE**
+- chore: Updates Cypress peer dependency to `>= 15.10.0`. **BREAKING CHANGE**
+
+### Changed
+
+- chore: Bumps package version to **8.0.0** (major version for breaking change)
+- test: Removes E2E test variants for Cypress 9, 10, 11, 12, 13. Adds E2E test variant for Cypress 15 (15.10.0).  Updates TypeScript E2E tests to use Cypress 15
+- docs: Removes legacy Cypress <10 installation docs, updates config examples to `cypress.config.js` format, updates compatibility table.
+
+### Removed
+
+- docs: Remove reference to environment variables in docs, and replace it with reference to configuration keys exposed with `Cypress.expose()`
+
 
 ## [7.1.1] - 2024-08-04
 
@@ -270,7 +288,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - test(e2e): Check that `test:after:run` event is executed in failed tests.
 
 ### Changed
-- feat: Do not stop runner from failed test hook and execute flag task "parallely" in order to let execute test:after:run events. (closes #61)
+- feat: Do not stop runner from failed test hook and execute flag task "parallelly" in order to let execute test:after:run events. (closes #61)
 - test(e2e): Update Cypress 6 to latest version.
 - chore(deps): Update devDependencies
 

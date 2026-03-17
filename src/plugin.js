@@ -17,7 +17,8 @@ module.exports = (on, config, pluginConfig = {}) => {
   let failedTests = 0;
 
   const parallelCallbacks =
-    strategyIsParallel(config.env[STRATEGY_ENVIRONMENT_VAR]) && !!pluginConfig.parallelCallbacks
+    strategyIsParallel(config.expose[STRATEGY_ENVIRONMENT_VAR]) &&
+    !!pluginConfig.parallelCallbacks
       ? pluginConfig.parallelCallbacks
       : {};
   const isCancelledCallback = parallelCallbacks.isCancelled;
@@ -59,6 +60,7 @@ module.exports = (on, config, pluginConfig = {}) => {
       return null;
     },
     [LOG_TASK]: function (message) {
+      // eslint-disable-next-line no-console
       console.log(`${chalk.yellow(LOG_PREFIX)} ${message}`);
       return null;
     },

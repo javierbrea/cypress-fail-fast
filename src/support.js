@@ -108,7 +108,7 @@ function support(Cypress, cy, beforeEach, afterEach, before) {
         resetFailedTests();
       } else {
         runIfSkipIsEnabled(() => {
-          stopCypressRunner();
+          // stopCypressRunner();
         });
       }
     }

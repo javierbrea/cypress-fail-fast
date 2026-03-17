@@ -4,12 +4,15 @@
     "module": "commonjs",
     "outDir": "dist",
     "moduleResolution": "node",
-    "types": ["cypress"]
+    "types": ["cypress"],
+    "skipLibCheck": true
   },
   "include": [
     "*.ts",
+    "test-e2e/**/integration/*.ts"
   ],
   "exclude": [
-    "node_modules"
-  ],
+    "node_modules",
+    "**/node_modules"
+  ]
 }

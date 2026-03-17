@@ -6,7 +6,10 @@ function isHeaded(Cypress) {
 }
 
 function testHasFailed(currentTest) {
-  return currentTest.state === "failed" && currentTest.currentRetry() === currentTest.retries();
+  return (
+    currentTest.state === "failed" &&
+    currentTest.currentRetry() === currentTest.retries()
+  );
 }
 
 function shouldForceErrorOnFailedHook() {
@@ -83,8 +86,9 @@ function getTestConfig(test) {
     test.ctx.test._testConfig.testConfigList[
       test.ctx.test._testConfig.testConfigList.length - 1
     ] &&
-    test.ctx.test._testConfig.testConfigList[test.ctx.test._testConfig.testConfigList.length - 1]
-      .overrides
+    test.ctx.test._testConfig.testConfigList[
+      test.ctx.test._testConfig.testConfigList.length - 1
+    ].overrides
   ) {
     return test.ctx.test._testConfig.testConfigList[
       test.ctx.test._testConfig.testConfigList.length - 1
@@ -98,7 +102,7 @@ function getTestConfig(test) {
 }
 
 function stopRunner(Cypress) {
-  Cypress.runner.stop();
+  Cypress.stop();
 }
 
 module.exports = {

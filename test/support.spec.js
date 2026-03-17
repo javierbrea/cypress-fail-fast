@@ -1,6 +1,9 @@
 const sinon = require("sinon");
 const support = require("../src/support");
-const { setHookFailedError, setForceErrorOnFailedHook } = require("../src/helpers/cypress");
+const {
+  setHookFailedError,
+  setForceErrorOnFailedHook,
+} = require("../src/helpers/cypress");
 
 const wait = (time) => {
   return new Promise((resolve) => {
@@ -115,7 +118,7 @@ describe("support", () => {
   });
 
   const testPluginDisabled = (extraDescription, config) => {
-    describe(extraDescription, () => {
+    describe(`${extraDescription}`, () => {
       describe("beforeEach callback", () => {
         it("should not call to any plugin task", () => {
           getSupportCallbacks(config);
@@ -172,7 +175,7 @@ describe("support", () => {
   };
 
   const testPluginAndFailFastEnabled = (extraDescription, config) => {
-    describe(extraDescription, () => {
+    describe(`${extraDescription}`, () => {
       describe("beforeEach callback", () => {
         it("should call stop runner if failFastShouldSkip returns true", async () => {
           getSupportCallbacks({
@@ -201,7 +204,9 @@ describe("support", () => {
           });
           beforeEachCallback();
           await wait(200);
-          expect(cy.task.calledWith("failFastShouldSkip", null, { log: false })).toEqual(true);
+          expect(
+            cy.task.calledWith("failFastShouldSkip", null, { log: false }),
+          ).toEqual(true);
         });
 
         it("should not call stop runner if failFastShouldSkip returns false", async () => {
@@ -390,7 +395,11 @@ describe("support", () => {
         it("should be called with original arguments if runnable is not a hook", () => {
           getSupportCallbacks(config);
           Cypress.runner.onRunnableRun(runnableRun, runnable, args);
-          expect(CypressOnRunnableRun.getCall(0).args).toEqual([runnableRun, runnable, args]);
+          expect(CypressOnRunnableRun.getCall(0).args).toEqual([
+            runnableRun,
+            runnable,
+            args,
+          ]);
           expect(CypressOnRunnableRun.getCall(0).args[2][0]).toBe(firstArg);
         });
 
@@ -441,9 +450,11 @@ describe("support", () => {
           };
 
           const testCallbackSpy = () => "foo";
-          expect(Cypress.runner.onRunnableRun(runnableRun, runnable, [testCallbackSpy])).toEqual(
-            "foo",
-          );
+          expect(
+            Cypress.runner.onRunnableRun(runnableRun, runnable, [
+              testCallbackSpy,
+            ]),
+          ).toEqual("foo");
         });
 
         it("next test after the hook should be forced to fail with the hook error", async () => {
@@ -458,7 +469,9 @@ describe("support", () => {
           };
 
           const testCallbackSpy = sandbox.spy();
-          Cypress.runner.onRunnableRun(runnableRun, runnable, [testCallbackSpy]);
+          Cypress.runner.onRunnableRun(runnableRun, runnable, [
+            testCallbackSpy,
+          ]);
           CypressOnRunnableRun.getCall(1).args[2][0]();
           const testCallBackArgument = testCallbackSpy.getCall(0).args[0];
           expect(testCallBackArgument).toBe(hookError);
@@ -471,7 +484,7 @@ describe("support", () => {
   };
 
   const afterEachShouldSetPluginFlag = (extraDescription, config) => {
-    describe(extraDescription, () => {
+    describe(`${extraDescription}`, () => {
       it("should set plugin flag", async () => {
         getSupportCallbacks({
           ...config,
@@ -487,7 +500,7 @@ describe("support", () => {
   };
 
   const afterEachShouldNotSetPluginFlag = (extraDescription, config) => {
-    describe(extraDescription, () => {
+    describe(`${extraDescription}`, () => {
       it("should not set plugin flag", async () => {
         getSupportCallbacks({
           ...config,
@@ -601,9 +614,12 @@ describe("support", () => {
         enabled: 0,
       });
 
-      afterEachShouldNotSetPluginFlag("in environment variable as number string", {
-        enabled: "0",
-      });
+      afterEachShouldNotSetPluginFlag(
+        "in environment variable as number string",
+        {
+          enabled: "0",
+        },
+      );
 
       afterEachShouldNotSetPluginFlag("in current test", {
         customConfig: {
@@ -629,14 +645,17 @@ describe("support", () => {
         },
       });
 
-      afterEachShouldNotSetPluginFlag("in current test but enabled in environment", {
-        enabled: true,
-        customConfig: {
-          failFast: {
-            enabled: false,
+      afterEachShouldNotSetPluginFlag(
+        "in current test but enabled in environment",
+        {
+          enabled: true,
+          customConfig: {
+            failFast: {
+              enabled: false,
+            },
           },
         },
-      });
+      );
 
       afterEachShouldNotSetPluginFlag("in parent test", {
         testParent: {
@@ -648,16 +667,19 @@ describe("support", () => {
         },
       });
 
-      afterEachShouldNotSetPluginFlag("in parent test but enabled in environment", {
-        enabled: true,
-        testParent: {
-          cfg: {
-            failFast: {
-              enabled: false,
+      afterEachShouldNotSetPluginFlag(
+        "in parent test but enabled in environment",
+        {
+          enabled: true,
+          testParent: {
+            cfg: {
+              failFast: {
+                enabled: false,
+              },
             },
           },
         },
-      });
+      );
 
       afterEachShouldNotSetPluginFlag("in grandparent test", {
         testParent: {
@@ -673,20 +695,23 @@ describe("support", () => {
         },
       });
 
-      afterEachShouldNotSetPluginFlag("in grandparent test but enabled in environment", {
-        enabled: true,
-        testParent: {
-          parent: {
+      afterEachShouldNotSetPluginFlag(
+        "in grandparent test but enabled in environment",
+        {
+          enabled: true,
+          testParent: {
             parent: {
-              cfg: {
-                failFast: {
-                  enabled: false,
+              parent: {
+                cfg: {
+                  failFast: {
+                    enabled: false,
+                  },
                 },
               },
             },
           },
         },
-      });
+      );
     });
 
     describe("when bail config is set", () => {
@@ -716,7 +741,9 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(cy.task.calledWith("failFastLog", "Failed tests: 1/1")).toBe(true);
+          expect(cy.task.calledWith("failFastLog", "Failed tests: 1/1")).toBe(
+            true,
+          );
         });
 
         it("should log 1/2 when first test fails and bail is 2", async () => {
@@ -729,7 +756,9 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(cy.task.calledWith("failFastLog", "Failed tests: 1/2")).toBe(true);
+          expect(cy.task.calledWith("failFastLog", "Failed tests: 1/2")).toBe(
+            true,
+          );
         });
 
         it("should log 3/4 when third test fails and bail is 4", async () => {
@@ -742,7 +771,9 @@ describe("support", () => {
           });
           afterEachCallback();
           await wait(200);
-          expect(cy.task.calledWith("failFastLog", "Failed tests: 3/4")).toBe(true);
+          expect(cy.task.calledWith("failFastLog", "Failed tests: 3/4")).toBe(
+            true,
+          );
         });
       });
     });

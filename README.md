@@ -15,7 +15,7 @@ It can be configured to skip all remaining tests in current spec file, in curren
 - [Installation](#installation)
 - [Limitations and notes](#limitations-and-notes)
 - [Configuration](#configuration)
-  * [Environment variables](#environment-variables)
+  * [Expose configuration keys](#expose-configuration-keys)
   * [Configuration by test](#configuration-by-test)
   * [Configuration examples for usual scenarios](#configuration-examples-for-usual-scenarios)
   * [Configuration for parallel runs](#configuration-for-parallel-runs)
@@ -70,7 +70,7 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 
 ## Configuration
 
-### Environment variables
+### Expose configuration keys
 
 * __`FAIL_FAST_STRATEGY`__: `'spec'|'run'|'parallel'`
   * If `spec`, only remaining tests in current spec file are skipped. This mode only works in "headless" mode.
@@ -82,15 +82,9 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 
 #### Examples
 
-```bash
-CYPRESS_FAIL_FAST_PLUGIN=false npm run cypress
-```
-
-or set the "env" key in the `cypress.config.js` configuration file:
-
 ```javascript
 export default defineConfig({
-  env: {
+  expose: {
     FAIL_FAST_STRATEGY: "run",
     FAIL_FAST_ENABLED: true,
     FAIL_FAST_BAIL: 2,
@@ -103,7 +97,7 @@ export default defineConfig({
 If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
 
 * __`failFast`__: Configuration for the plugin, containing any of next properties:
-  * __`enabled`__ : Indicates wheter a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. Note that the value defined in this property has priority over the value of the environment variable `CYPRESS_FAIL_FAST_ENABLED` _(but not over `CYPRESS_FAIL_FAST_PLUGIN`, which disables the plugin totally)_.
+  * __`enabled`__ : Indicates whether a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. Note that the value defined in this property has priority over the value of the configuration key `expose.CYPRESS_FAIL_FAST_ENABLED` _(but not over `expose.CYPRESS_FAIL_FAST_PLUGIN`, which disables the plugin totally)_.
 
 #### Example
 
@@ -139,7 +133,7 @@ Set the `FAIL_FAST_ENABLED` key in the `cypress.config.js` configuration file:
 
 ```javascript
 export default defineConfig({
-  env: {
+  expose: {
     FAIL_FAST_ENABLED: false,
   },
 });
@@ -159,7 +153,7 @@ Set the `FAIL_FAST_PLUGIN` key in your local `cypress.config.js` configuration f
 
 ```javascript
 export default defineConfig({
-  env: {
+  expose: {
     FAIL_FAST_PLUGIN: false,
   },
 });
@@ -175,7 +169,7 @@ To implement it, the plugin can receive an object with extra configuration as th
   * __`onCancel`__: `function()` This callback is executed on first test failure that produces the plugin starts skipping tests.
   * __`isCancelled`__: `function(): boolean` If this callback returns `true`, the plugin skips remaining tests.
 
-These callbacks are executed only when the environment variable `FAIL_FAST_STRATEGY` is set to `parallel`.
+These callbacks are executed only when the configuration key `expose.FAIL_FAST_STRATEGY` is set to `parallel`.
 
 Here is an example of configuration that would skip tests on many parallel runs when one of them starts skipping tests. It would only work if all parallel runs have access to the folder where the `isCancelled` flag is being stored as a file (easy to achieve if all of your parallel runs are being executed on Docker images on a same machine, for example). _Note that this is only an example, you could also implement it storing the flag in a REST API, etc._
 
@@ -210,7 +204,7 @@ export default defineConfig({
 });
 ```
 
-Note that this example requires to remove the created file when all of the runs have finished, or tests will always be skipped whenever any run starts again. So, the `FAIL_FAST_STRATEGY` environment variable should be set to `parallel` only in CI pipelines where the workspace is cleaned on finish, for example. 
+Note that this example requires to remove the created file when all of the runs have finished, or tests will always be skipped whenever any run starts again. So, the `expose.FAIL_FAST_STRATEGY` configuration key should be set to `parallel` only in CI pipelines where the workspace is cleaned on finish, for example. 
 
 ## Usage with TypeScript
 
@@ -237,12 +231,15 @@ To ensure the plugin stability, the current major version is being tested with C
 Minor versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
 * [Cypress v15.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-15/package.json)
 
-Even when current major version may work with previous Cypress versions, it is not currently tested, so, to be sure it works you should use:
+The current major version of the plugin supports Cypress 15.10.0 and above, but if you are using an older Cypress version, you can use the last compatible plugin version according to next compatibility table:
 
-* If you need Cypress 9.x to 13.x support, use `cypress-fail-fast` 7.x
-* If you need Cypress 7 support, use `cypress-fail-fast` 6.x
-* If you need Cypress 6 support, use `cypress-fail-fast` 5.x
-* If you need Cypress 5 or lower, use `cypress-fail-fast` <= 4.x
+| Cypress version | Compatible plugin version |
+|-----------------|---------------------------|
+| >=15.10.0       | 8.x                       |
+| 9.x to 14.x     | 7.x                       |
+| 7.x             | 6.x                       |
+| 6.x             | 5.x                       |
+| 5.x or lower    | <= 4.x                    |
 
 If you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
 

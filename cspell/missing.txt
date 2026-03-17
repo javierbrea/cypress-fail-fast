@@ -1,0 +1,15 @@
+Brea
+GHANGELOG
+commonmark
+coverallsapp
+javierbrea
+mochawesome
+parallelly
+prelint
+sonarcloud
+sonarqube
+sonarsource
+Styleguide
+Styleguides
+unstability
+wfile
