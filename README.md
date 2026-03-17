@@ -29,9 +29,7 @@ Add the plugin to `devDependencies`
 npm i --save-dev cypress-fail-fast
 ```
 
-Now, depending on your Cypress version, use one of the next methods:
-
-### Installation on Cypress 10 and higher
+### Installation
 
 Inside `cypress.config.ts` file:
 
@@ -56,23 +54,6 @@ import cypressFailFast from "cypress-fail-fast/plugin.js"
 Note: This example shows how to install the plugin for `e2e` testing type. Read [Cypress configuration docs](https://docs.cypress.io/guides/references/configuration) for further info.
 
 At the top of your support file (usually `cypress/support/e2e.js` for `e2e` testing type)
-
-```javascript
-import "cypress-fail-fast";
-```
-
-### Installation on Cypress versions lower than 10
-
-Inside `cypress/plugins/index.js`:
-
-```javascript
-module.exports = (on, config) => {
-  require("cypress-fail-fast/plugin")(on, config);
-  return config;
-};
-```
-
-At the top of `cypress/support/index.js`:
 
 ```javascript
 import "cypress-fail-fast";
@@ -105,17 +86,16 @@ From now, if one test fail after its last retry, the rest of tests will be skipp
 CYPRESS_FAIL_FAST_PLUGIN=false npm run cypress
 ```
 
-or set the "env" key in the `cypress.json` configuration file:
+or set the "env" key in the `cypress.config.js` configuration file:
 
-```json
-{
-  "env":
-  {
-    "FAIL_FAST_STRATEGY": "run",
-    "FAIL_FAST_ENABLED": true,
-    "FAIL_FAST_BAIL": 2,
-  }
-}
+```javascript
+export default defineConfig({
+  env: {
+    FAIL_FAST_STRATEGY: "run",
+    FAIL_FAST_ENABLED: true,
+    FAIL_FAST_BAIL: 2,
+  },
+});
 ```
 
 ### Configuration by test
@@ -155,15 +135,14 @@ describe("All tests", {
 
 ##### You want to disable "fail-fast" in all specs except one:
 
-Set the `FAIL_FAST_ENABLED` key in the `cypress.json` configuration file:
+Set the `FAIL_FAST_ENABLED` key in the `cypress.config.js` configuration file:
 
-```json
-{
-  "env":
-  {
-    "FAIL_FAST_ENABLED": false
-  }
-}
+```javascript
+export default defineConfig({
+  env: {
+    FAIL_FAST_ENABLED: false,
+  },
+});
 ```
 
 Enable "fail-fast" in those specs you want using [configurations by test](#configuration-by-test):
@@ -176,22 +155,21 @@ describe("All tests", { failFast: { enabled: true } }, () => {
 
 ##### You want to totally disable "fail-fast" in your local environment:
 
-Set the `FAIL_FAST_PLUGIN` key in your local `cypress.env.json` configuration file:
+Set the `FAIL_FAST_PLUGIN` key in your local `cypress.config.js` configuration file:
 
-```json
-{
-  "env":
-  {
-    "FAIL_FAST_PLUGIN": false
-  }
-}
+```javascript
+export default defineConfig({
+  env: {
+    FAIL_FAST_PLUGIN: false,
+  },
+});
 ```
 
 ### Configuration for parallel runs
 
 The plugin configuration supports defining two callbacks that, used in combination, allow to skip tests in one run when other run starts skipping tests also. Where, or how do you store the "flag" that allows to communicate your runs is in your hands, the plugin does not care about it.
 
-To implement it, the plugin can receive an object with extra configuration as third argument when it is registered in the `cypress/plugins/index.js` file:
+To implement it, the plugin can receive an object with extra configuration as third argument when it is registered in the `cypress.config.js` file:
 
 * __`parallelCallbacks`__: Object containing next properties:
   * __`onCancel`__: `function()` This callback is executed on first test failure that produces the plugin starts skipping tests.
@@ -202,63 +180,66 @@ These callbacks are executed only when the environment variable `FAIL_FAST_STRAT
 Here is an example of configuration that would skip tests on many parallel runs when one of them starts skipping tests. It would only work if all parallel runs have access to the folder where the `isCancelled` flag is being stored as a file (easy to achieve if all of your parallel runs are being executed on Docker images on a same machine, for example). _Note that this is only an example, you could also implement it storing the flag in a REST API, etc._
 
 ```js
-// Example valid for Cypress versions lower than 10. Use config file on Cypress 10
+import { defineConfig } from "cypress";
+import cypressFailFast from "cypress-fail-fast/plugin";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const fs = require("fs");
-const path = require("path");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isCancelledFlagFile = path.resolve(__dirname, ".run-is-cancelled");
 
-// Flag file is stored in the /cypress folder
-const isCancelledFlagFile = path.resolve(__dirname, "..", ".run-is-cancelled");
-
-module.exports = (on, config) => {
-  require("cypress-fail-fast/plugin")(on, config, {
-    parallelCallbacks: {
-      onCancel: () => {
-        // Create flag file when the plugin starts skipping tests
-        fs.writeFileSync(isCancelledFlagFile, "");
-      },
-      isCancelled: () => {
-        // If any other run has created the file, start skipping tests
-        return fs.existsSync(isCancelledFlagFile);
-      },
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      cypressFailFast(on, config, {
+        parallelCallbacks: {
+          onCancel: () => {
+            // Create flag file when the plugin starts skipping tests
+            fs.writeFileSync(isCancelledFlagFile, "");
+          },
+          isCancelled: () => {
+            // If any other run has created the file, start skipping tests
+            return fs.existsSync(isCancelledFlagFile);
+          },
+        },
+      });
+      return config;
     },
-  });
-
-  return config;
-};
+  },
+});
 ```
 
 Note that this example requires to remove the created file when all of the runs have finished, or tests will always be skipped whenever any run starts again. So, the `FAIL_FAST_STRATEGY` environment variable should be set to `parallel` only in CI pipelines where the workspace is cleaned on finish, for example. 
 
 ## Usage with TypeScript
 
-If you are using [TypeScript in the Cypress plugins file][cypress-typescript], this plugin includes TypeScript declarations and can be imported like the following:
+If you are using [TypeScript in the Cypress configuration file][cypress-typescript], this plugin includes TypeScript declarations and can be imported like the following:
 
 ```ts
-import cypressFailFast = require("cypress-fail-fast/plugin");
+import cypressFailFast from "cypress-fail-fast/plugin";
+import { defineConfig } from "cypress";
 
-export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.PluginConfigOptions => {
-  cypressFailFast(on, config);
-  return config;
-};
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      cypressFailFast(on, config);
+      return config;
+    },
+  },
+});
 ```
-
-Note: The example above is only valid for Cypress versions lower than 10. Use the configuration file in Cypress 10.
 
 ## Tests
 
-To ensure the plugin stability, the current major version is being tested with Cypress major versions 9.x, 10.x, 11.x, 12.x and 13.x, and new releases will be published for each new Cypress minor or major releases, updating the E2E tests.
+To ensure the plugin stability, the current major version is being tested with Cypress 15.x, and new releases will be published for each new Cypress minor or major releases, updating the E2E tests.
 
 Minor versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
-* [Cypress v9.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-9/package.json)
-* [Cypress v10.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-10/package.json)
-* [Cypress v11.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-11/package.json)
-* [Cypress v12.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-12/package.json)
-* [Cypress v13.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-13/package.json)
+* [Cypress v15.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-15/package.json)
 
 Even when current major version may work with previous Cypress versions, it is not currently tested, so, to be sure it works you should use:
 
-* Cypress 8.x may work, but it was tested until `cypress-fail-fast` 7.0.x
+* If you need Cypress 9.x to 13.x support, use `cypress-fail-fast` 7.x
 * If you need Cypress 7 support, use `cypress-fail-fast` 6.x
 * If you need Cypress 6 support, use `cypress-fail-fast` 5.x
 * If you need Cypress 5 or lower, use `cypress-fail-fast` <= 4.x

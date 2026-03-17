@@ -27,7 +27,7 @@ describe("support", () => {
       browser: {
         isHeaded: options.browserIsHeaded,
       },
-      env: (envKey) => {
+      expose: (envKey) => {
         if (envKey === "FAIL_FAST_PLUGIN") {
           return options.pluginEnabled;
         }

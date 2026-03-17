@@ -118,8 +118,9 @@ runParallelSpecsTests(
       },
     },
     {
-      cypressVersion: "9",
-      pluginFile: "parallel-preprocessor-babel-config",
+      cypressVersion: "ts",
+      configFile: "parallel-ts.config.js",
+      configFileDest: "cypress.config.js",
       specs: "all-tests-passing",
       specsResults: [
         {
