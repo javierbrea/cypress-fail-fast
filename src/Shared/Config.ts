@@ -1,11 +1,11 @@
 import type * as Cypress from "cypress";
 
 import {
-  ENVIRONMENT_DEFAULT_VALUES,
-  PLUGIN_ENVIRONMENT_VAR,
-  ENABLED_ENVIRONMENT_VAR,
-  STRATEGY_ENVIRONMENT_VAR,
-  BAIL_ENVIRONMENT_VAR,
+  GLOBAL_CONFIG_DEFAULT_VALUES,
+  IGNORE_PER_TEST_CONFIG,
+  ENABLED_GLOBAL_CONFIG,
+  STRATEGY_GLOBAL_CONFIG,
+  BAIL_GLOBAL_CONFIG,
 } from "./Constants";
 
 import { FailFastGlobalConfig } from "./Config.types";
@@ -80,18 +80,18 @@ export function getFailFastEnvironmentConfig(
   Cyp: Cypress.Cypress,
 ): FailFastGlobalConfig {
   return {
-    plugin: booleanVarValue(
-      Cyp.expose(PLUGIN_ENVIRONMENT_VAR),
-      ENVIRONMENT_DEFAULT_VALUES[PLUGIN_ENVIRONMENT_VAR],
+    ignorePerTestConfig: booleanVarValue(
+      Cyp.expose(IGNORE_PER_TEST_CONFIG),
+      GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
     ),
     enabled: booleanVarValue(
-      Cyp.expose(ENABLED_ENVIRONMENT_VAR),
-      ENVIRONMENT_DEFAULT_VALUES[ENABLED_ENVIRONMENT_VAR],
+      Cyp.expose(ENABLED_GLOBAL_CONFIG),
+      GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
-    strategyIsSpec: strategyIsSpec(Cyp.expose(STRATEGY_ENVIRONMENT_VAR)),
+    strategyIsSpec: strategyIsSpec(Cyp.expose(STRATEGY_GLOBAL_CONFIG)),
     bail: numericVarValue(
-      Cyp.expose(BAIL_ENVIRONMENT_VAR),
-      ENVIRONMENT_DEFAULT_VALUES[BAIL_ENVIRONMENT_VAR],
+      Cyp.expose(BAIL_GLOBAL_CONFIG),
+      GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
     ),
   };
 }
@@ -106,12 +106,12 @@ export function currentStrategyIsSpec(Cyp: Cypress.Cypress) {
 }
 
 /**
- * Returns whether the fail-fast plugin is globally enabled.
+ * Returns whether the configuration per-test overrides should be ignored in favor of global configuration.
  * @param Cyp Cypress global object.
- * @returns `true` when plugin is enabled.
+ * @returns `true` when per-test configuration should be ignored.
  */
-export function pluginIsEnabled(Cyp: Cypress.Cypress) {
-  return getFailFastEnvironmentConfig(Cyp).plugin;
+export function shouldIgnorePerTestConfig(Cyp: Cypress.Cypress) {
+  return getFailFastEnvironmentConfig(Cyp).ignorePerTestConfig;
 }
 
 /**

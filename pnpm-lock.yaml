@@ -132,6 +132,9 @@ importers:
       cross-env:
         specifier: 7.0.3
         version: 7.0.3
+      cypress-fail-fast:
+        specifier: workspace:*
+        version: link:../..
       start-server-and-test:
         specifier: 2.0.5
         version: 2.0.5

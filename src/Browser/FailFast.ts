@@ -11,11 +11,7 @@ import {
   FAILED_TEST_MESSAGE,
 } from "../Shared/Constants";
 
-import {
-  bailConfig,
-  pluginIsEnabled,
-  currentStrategyIsSpec,
-} from "../Shared/Config";
+import { bailConfig, currentStrategyIsSpec } from "../Shared/Config";
 
 import { failFastIsEnabled, testHasFailed, isHeaded } from "./CypressHelpers";
 
@@ -112,24 +108,20 @@ export function registerFailFast(
    * @param context Mocha execution context.
    */
   function skipSuiteIfEnabled(context: Mocha.Context) {
-    if (pluginIsEnabled(Cyp)) {
-      runIfSkipIsEnabled(() => {
-        context.skip();
-      });
-    }
+    runIfSkipIsEnabled(() => {
+      context.skip();
+    });
   }
 
   before(function () {
-    if (pluginIsEnabled(Cyp)) {
-      if (isHeaded(Cyp) || currentStrategyIsSpec(Cyp)) {
-        /*
+    if (isHeaded(Cyp) || currentStrategyIsSpec(Cyp)) {
+      /*
           Reset the shouldSkip flag at the start of a run, so that it doesn't carry over into subsequent runs. Do this only for headed runs because in headless runs, the `before` hook is executed for each spec file.
         */
-        resetSkipFlag();
-        resetFailedTests();
-      } else {
-        skipSuiteIfEnabled(this);
-      }
+      resetSkipFlag();
+      resetFailedTests();
+    } else {
+      skipSuiteIfEnabled(this);
     }
   });
 
@@ -142,7 +134,6 @@ export function registerFailFast(
     const currentTest = this.currentTest;
     if (
       currentTest &&
-      pluginIsEnabled(Cyp) &&
       testHasFailed(currentTest) &&
       failFastIsEnabled(currentTest, Cyp)
     ) {

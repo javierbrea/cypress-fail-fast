@@ -1,3 +1,5 @@
+import type { FailFastConfig } from "cypress-fail-fast";
+
 import { pnpmRun } from "./CommandRunner";
 import { splitLogsBySpec } from "./Logs";
 
@@ -29,6 +31,8 @@ interface RunSpecsTestsOptions {
   specsFolder?: string;
   /** One entry per spec file, describing the expected test-status counts. */
   specsResults: SpecExpectedStatuses[];
+  /** Optional global fail-fast configuration to apply during the run. */
+  config?: FailFastConfig;
 }
 
 /**
@@ -133,7 +137,7 @@ const getSpecsStatusesTests = (
 const runVariantTests = (
   cypressVariant: string,
   tests: (getLogs: GetLogs) => void,
-  options: Pick<RunSpecsTestsOptions, "specsFolder"> = {},
+  options: Pick<RunSpecsTestsOptions, "specsFolder" | "config"> = {},
 ): void => {
   describe(`Executed in ${cypressVariant}`, () => {
     let logs: string[];
@@ -143,6 +147,19 @@ const runVariantTests = (
       logs = splitLogsBySpec(
         await pnpmRun(["cypress:run"], cypressVariant, {
           SPECS_FOLDER: options.specsFolder,
+          CONFIG_IGNORE_PER_TEST_CONFIG: options.config
+            ?.failFastIgnorePerTestConfig
+            ? String(options.config.failFastIgnorePerTestConfig)
+            : undefined,
+          CONFIG_ENABLED: options.config?.failFastEnabled
+            ? String(options.config.failFastEnabled)
+            : undefined,
+          CONFIG_STRATEGY: options.config?.failFastStrategy
+            ? String(options.config.failFastStrategy)
+            : undefined,
+          CONFIG_BAIL: options.config?.failFastBail
+            ? String(options.config.failFastBail)
+            : undefined,
         }),
       );
     }, 120000);

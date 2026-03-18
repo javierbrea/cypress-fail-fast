@@ -1,7 +1,10 @@
 import type * as Cypress from "cypress";
 import type * as Mocha from "mocha";
 
-import { getFailFastEnvironmentConfig } from "../Shared/Config";
+import {
+  getFailFastEnvironmentConfig,
+  shouldIgnorePerTestConfig,
+} from "../Shared/Config";
 import { FailFastGlobalConfig } from "src/Shared/Config.types";
 
 /**
@@ -36,6 +39,9 @@ function getTestFailFastConfig(
   test: Mocha.Test | Mocha.Suite,
   Cyp: Cypress.Cypress,
 ): FailFastGlobalConfig {
+  if (shouldIgnorePerTestConfig(Cyp)) {
+    return getFailFastEnvironmentConfig(Cyp);
+  }
   const testConfig = getTestConfig(test);
   if (testConfig) {
     return {

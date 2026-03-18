@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - release
+      # - feat/use-cypress-expose
   pull_request:
 concurrency:  
   group: ${{ github.workflow }}-${{ github.ref }}

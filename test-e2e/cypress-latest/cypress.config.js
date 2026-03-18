@@ -20,9 +20,9 @@ module.exports = {
   video: false,
   allowCypressEnv: false,
   expose: {
-    FAIL_FAST_STRATEGY: "run",
-    FAIL_FAST_BAIL: 1,
-    FAIL_FAST_PLUGIN: 1,
-    FAIL_FAST_ENABLED: 1,
+    failFastIgnorePerTestConfig: process.env.CONFIG_IGNORE_PER_TEST_CONFIG,
+    failFastEnabled: process.env.CONFIG__ENABLED,
+    failFastStrategy: process.env.CONFIG_STRATEGY,
+    failFastBail: process.env.CONFIG_BAIL,
   },
 };

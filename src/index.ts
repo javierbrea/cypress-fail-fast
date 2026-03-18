@@ -1,5 +1,7 @@
 import { registerFailFast } from "./Browser/FailFast";
 
+export type { FailFastConfig } from "./Shared/Config.types";
+
 /**
  * Cypress type augmentations for fail-fast configuration options.
  */
