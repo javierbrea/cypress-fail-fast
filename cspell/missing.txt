@@ -2,6 +2,7 @@ Brea
 GHANGELOG
 commonmark
 coverallsapp
+esmodules
 javierbrea
 mochawesome
 parallelly

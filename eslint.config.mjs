@@ -133,7 +133,7 @@ export default [
     },
   },
   {
-    files: ["test/**/*.spec.js", "test-e2e/runner/specs/support/**/*.js"],
+    files: ["test/**/*.spec.js", "test-e2e/runner/specs/support/**/*.ts"],
     plugins: {
       jest: pluginJest,
     },

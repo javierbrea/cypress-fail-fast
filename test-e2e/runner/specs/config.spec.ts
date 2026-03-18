@@ -1,4 +1,4 @@
-const { runSpecsTests } = require("./support/testsRunner");
+import { runSpecsTests } from "./support/TestsRunner";
 
 runSpecsTests("When it has default configuration", {
   cypressVariant: "cypress-latest",
