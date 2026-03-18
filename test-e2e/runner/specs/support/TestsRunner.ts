@@ -139,7 +139,7 @@ const runVariantTests = (
   tests: (getLogs: GetLogs) => void,
   options: Pick<RunSpecsTestsOptions, "specsFolder" | "config"> = {},
 ): void => {
-  describe(`Executed in ${cypressVariant}`, () => {
+  describe(`Executed in "${cypressVariant}". Specs folder "${options.specsFolder}"`, () => {
     let logs: string[];
     const getLogs: GetLogs = (specIndex) => logs[specIndex];
 

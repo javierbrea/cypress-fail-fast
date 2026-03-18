@@ -1,8 +1,4 @@
 describe("List items", () => {
-  before(() => {
-    cy.task("log", "Executing before hook");
-  });
-
   beforeEach(() => {
     cy.visit("/");
   });

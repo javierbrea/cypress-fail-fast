@@ -12,7 +12,6 @@ import typescriptParser from "@typescript-eslint/parser";
 import typescriptEslintPlugin from "@typescript-eslint/eslint-plugin";
 import pluginJest from "eslint-plugin-jest";
 import importPlugin from "eslint-plugin-import";
-import reactPlugin from "eslint-plugin-react";
 
 export default [
   {
@@ -133,7 +132,11 @@ export default [
     },
   },
   {
-    files: ["test/**/*.spec.js", "test-e2e/runner/specs/support/**/*.ts"],
+    files: [
+      "src/**/*.spec.ts",
+      "test-e2e/runner/specs/*.spec.ts",
+      "test-e2e/runner/specs/support/**/*.ts",
+    ],
     plugins: {
       jest: pluginJest,
     },
@@ -154,30 +157,6 @@ export default [
       "jest/no-hooks": [0],
       "jest/prefer-called-with": [0],
       "jest/require-to-throw-message": [0],
-    },
-  },
-  {
-    files: ["test-e2e/app/src/**/*.js"],
-    plugins: {
-      react: reactPlugin,
-    },
-    ...reactPlugin.configs.flat.recommended,
-    languageOptions: {
-      ...reactPlugin.configs.flat.recommended.languageOptions,
-      globals: {
-        ...globals.browser,
-      },
-    },
-    settings: {
-      react: {
-        pragma: "React",
-        version: "^17.0.0",
-      },
-    },
-    rules: {
-      "react/jsx-uses-react": "error",
-      "react/jsx-uses-vars": "error",
-      "react/react-in-jsx-scope": "off",
     },
   },
   {
