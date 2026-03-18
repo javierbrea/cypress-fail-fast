@@ -29,7 +29,7 @@ export function pnpmRun(
   variant: string,
   env: Record<string, string | undefined>,
   { getCode = false }: PnpmRunOptions = {},
-): Promise<string | number | null> {
+): Promise<string> {
   const logs: string[] = [];
 
   const logData = (log: string): void => {
@@ -60,7 +60,7 @@ export function pnpmRun(
 
     npmProcess.on("close", (code: number | null) => {
       if (getCode) {
-        resolve(code);
+        resolve(code?.toString() ?? "");
       } else {
         resolve(logs.join("\n"));
       }

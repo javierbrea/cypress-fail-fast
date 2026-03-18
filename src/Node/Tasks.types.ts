@@ -1,3 +1,6 @@
+/**
+ * Callback hooks used to coordinate fail-fast state in parallel runs.
+ */
 export type FailFastParallelCallbacks = {
   /**
    * onCancel callback.
@@ -13,6 +16,9 @@ export type FailFastParallelCallbacks = {
   isCancelled?(): boolean;
 };
 
+/**
+ * Node-side plugin options for cypress-fail-fast.
+ */
 export type FailFastPluginConfigOptions = {
   /**
    * Parallel callbacks.

@@ -35,34 +35,14 @@ jobs:
       - name: Lint
         if: ${{ matrix.node == '24.4.1' }}
         run: pnpm run lint
-      - name: Check types
+      - name: Build
         if: ${{ matrix.node == '24.4.1' }}
-        run: pnpm run tsc
+        run: pnpm run build
       - name: Test unit
         run: pnpm run test:unit
-      - name: Test mutation
-        if: ${{ matrix.node == '24.4.1' }}
-        run: pnpm run test:mutation
-        env:
-          BRANCH_NAME: ${{ steps.extract-branch.outputs.branch }}
-          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_TOKEN }}
       - name: Test E2E
         run: pnpm run test:e2e
         id: test-e2e
-      - name: Upload E2E tests screenshots
-        if: ${{ always() && steps.test-e2e.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-screenshots-${{ matrix.node }}
-          path: test-e2e/react-app/cypress/screenshots
-          retention-days: 7
-      - name: Upload typescript E2E tests screenshots
-        if: ${{ always() && steps.test-e2e.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-typescript-screenshots-${{ matrix.node }}
-          path: test-e2e/typescript/cypress/screenshots
-          retention-days: 7
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:

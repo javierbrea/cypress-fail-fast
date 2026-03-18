@@ -1,5 +1,9 @@
 import { registerFailFast } from "./Browser/FailFast";
 
+/**
+ * Cypress type augmentations for fail-fast configuration options.
+ */
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -27,4 +31,7 @@ declare global {
   }
 }
 
+/**
+ * Registers fail-fast browser hooks for use in Cypress support files.
+ */
 export default registerFailFast(Cypress, cy, before, beforeEach, afterEach);

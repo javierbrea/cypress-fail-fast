@@ -10,6 +10,12 @@ import {
 } from "../Shared/Constants";
 import type { FailFastPluginConfigOptions } from "./Tasks.types";
 
+/**
+ * Registers Node-side Cypress tasks used to coordinate fail-fast state.
+ * @param on Cypress plugin events registry.
+ * @param __config Cypress plugin configuration (unused).
+ * @param pluginConfig Optional plugin callbacks for parallel execution.
+ */
 export function registerFailFastTasks(
   on: Cypress.PluginEvents,
   __config: Cypress.PluginConfigOptions,
@@ -22,6 +28,10 @@ export function registerFailFastTasks(
   const isCancelledCallback = pluginConfig.parallelCallbacks?.isCancelled;
   const onCancelCallback = pluginConfig.parallelCallbacks?.onCancel;
 
+  /**
+   * Computes whether remaining tests should be skipped.
+   * @returns `true` when skip mode is active.
+   */
   const shouldSkip = () => {
     if (shouldSkipFlag) {
       return shouldSkipFlag;

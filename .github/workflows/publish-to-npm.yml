@@ -17,6 +17,8 @@ jobs:
         registry-url: 'https://registry.npmjs.org/'
     - name: Install dependencies
       run: pnpm install
+    - name: Build
+      run: pnpm run build
     - name: Publish package
       run: pnpm -r publish --no-git-checks
       env:
