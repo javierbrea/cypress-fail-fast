@@ -1,28 +1,26 @@
-const chalk = require("chalk");
-const {
+import type * as Cypress from "cypress";
+import chalk from "chalk";
+import {
   SHOULD_SKIP_TASK,
   RESET_SKIP_TASK,
   FAILED_TESTS_TASK,
   RESET_FAILED_TESTS_TASK,
   LOG_TASK,
-  STRATEGY_ENVIRONMENT_VAR,
   LOG_PREFIX,
-} = require("./helpers/constants");
+} from "../Shared/Constants";
+import type { FailFastPluginConfigOptions } from "./Tasks.types";
 
-const { strategyIsParallel } = require("./helpers/config");
-
-module.exports = (on, config, pluginConfig = {}) => {
+export function registerFailFastTasks(
+  on: Cypress.PluginEvents,
+  __config: Cypress.PluginConfigOptions,
+  pluginConfig: FailFastPluginConfigOptions = {},
+) {
   // store skip flag
   let shouldSkipFlag = false;
   let failedTests = 0;
 
-  const parallelCallbacks =
-    strategyIsParallel(config.expose[STRATEGY_ENVIRONMENT_VAR]) &&
-    !!pluginConfig.parallelCallbacks
-      ? pluginConfig.parallelCallbacks
-      : {};
-  const isCancelledCallback = parallelCallbacks.isCancelled;
-  const onCancelCallback = parallelCallbacks.onCancel;
+  const isCancelledCallback = pluginConfig.parallelCallbacks?.isCancelled;
+  const onCancelCallback = pluginConfig.parallelCallbacks?.onCancel;
 
   const shouldSkip = () => {
     if (shouldSkipFlag) {
@@ -65,6 +63,4 @@ module.exports = (on, config, pluginConfig = {}) => {
       return null;
     },
   });
-
-  return config;
-};
+}

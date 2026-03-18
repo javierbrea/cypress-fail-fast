@@ -3,6 +3,7 @@ import markdown from "@eslint/markdown";
 import prettier from "eslint-plugin-prettier";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import eslintConfigPrettier from "eslint-config-prettier";
+import eslintPluginCypress from "eslint-plugin-cypress";
 import js from "@eslint/js";
 import globals from "globals";
 // eslint-disable-next-line import/no-unresolved
@@ -11,8 +12,6 @@ import typescriptParser from "@typescript-eslint/parser";
 import typescriptEslintPlugin from "@typescript-eslint/eslint-plugin";
 import pluginJest from "eslint-plugin-jest";
 import importPlugin from "eslint-plugin-import";
-// eslint-disable-next-line import/no-unresolved
-import pluginCypress from "eslint-plugin-cypress/flat";
 import reactPlugin from "eslint-plugin-react";
 
 export default [
@@ -82,6 +81,16 @@ export default [
         2,
         { vars: "all", args: "after-used", ignoreRestSiblings: false },
       ],
+    },
+  },
+  {
+    files: ["src/index.ts"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...eslintPluginCypress.configs.globals.languageOptions.globals,
+      },
     },
   },
   {
@@ -174,9 +183,9 @@ export default [
   {
     files: ["**/*.cy.js", "**/*.cy.ts"],
     plugins: {
-      cypress: pluginCypress,
+      cypress: eslintPluginCypress,
     },
-    ...pluginCypress.configs.recommended,
+    ...eslintPluginCypress.configs.recommended,
   },
   // TODO: Add config for cypress tests
 ];

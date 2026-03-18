@@ -18,7 +18,14 @@ const expectTestsAmount = (status, statusKey, amount, getSpecLogs) => {
 };
 
 const getSpecTests = (
-  { spec = 1, executed = null, passed = null, failed = null, skipped = null },
+  {
+    spec = 1,
+    executed = null,
+    passed = null,
+    failed = null,
+    pending = null,
+    skipped = null,
+  },
   getLogs,
 ) => {
   const getSpecLogs = () => getLogs(spec);
@@ -26,7 +33,7 @@ const getSpecTests = (
     expectTestsAmount("executed", "Tests", executed, getSpecLogs);
     expectTestsAmount("passed", "Passing", passed, getSpecLogs);
     expectTestsAmount("failed", "Failing", failed, getSpecLogs);
-    expectTestsAmount("pending", "Pending", failed, getSpecLogs);
+    expectTestsAmount("pending", "Pending", pending, getSpecLogs);
     expectTestsAmount("skipped", "Skipped", skipped, getSpecLogs);
   });
 };
@@ -40,13 +47,15 @@ const getSpecsStatusesTests = (specsExpectedStatuses) => {
 };
 
 const runVariantTests = (cypressVariant, tests, options = {}) => {
-  describe(`Executed in ${cypressVariant.name}`, () => {
+  describe(`Executed in ${cypressVariant}`, () => {
     let logs;
     const getLogs = (specIndex) => logs[specIndex];
 
     beforeAll(async () => {
       logs = splitLogsBySpec(
-        await pnpmRun(["cypress:run"], cypressVariant.path, options.env),
+        await pnpmRun(["cypress:run"], cypressVariant, {
+          SPECS_FOLDER: options.specsFolder,
+        }),
       );
     }, 120000);
 
@@ -57,7 +66,7 @@ const runVariantTests = (cypressVariant, tests, options = {}) => {
 const runSpecsTests = (description, options = {}) => {
   describe(`${description}`, () => {
     runVariantTests(
-      { name: "cypress latest", path: "cypress-latest" },
+      options.cypressVariant,
       getSpecsStatusesTests(options.specsResults),
       options,
     );

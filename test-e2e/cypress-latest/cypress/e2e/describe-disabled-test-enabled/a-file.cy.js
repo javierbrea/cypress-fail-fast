@@ -7,6 +7,10 @@ describe("List items", { failFast: { enabled: false } }, () => {
     cy.visit("/");
   });
 
+  it("should display wrong title", () => {
+    cy.get("h1").should("have.text", "Foo");
+  });
+
   it("should display title", () => {
     cy.get("h1").should("have.text", "Items list");
   });

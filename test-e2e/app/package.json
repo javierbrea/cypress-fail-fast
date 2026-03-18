@@ -2,7 +2,7 @@
   "name": "cypress-fail-fast-e2e-app",
   "private": true,
   "scripts": {
-    "start": "serve -l 3000"
+    "start": "serve -l -S 3000"
   },
   "devDependencies": {
     "serve": "14.2.6"

@@ -6,7 +6,8 @@
     "run:specs": "jest --runInBand --verbose",
     "serve-app": "cd ../app && pnpm serve",
     "serve-and-test": "start-server-and-test serve-app http-get://127.0.0.1:3000 run:specs",
-    "test:e2e": "pnpm run serve-and-test"
+    "test:e2e": "pnpm run serve-and-test",
+    "test:e2e:debug": "cross-env DEBUG=true pnpm run serve-and-test"
   },
   "devDependencies": {
     "cross-env": "7.0.3",
