@@ -147,19 +147,22 @@ const runVariantTests = (
       logs = splitLogsBySpec(
         await pnpmRun(["cypress:run"], cypressVariant, {
           SPECS_FOLDER: options.specsFolder,
-          CONFIG_IGNORE_PER_TEST_CONFIG: options.config
-            ?.failFastIgnorePerTestConfig
-            ? String(options.config.failFastIgnorePerTestConfig)
-            : undefined,
-          CONFIG_ENABLED: options.config?.failFastEnabled
-            ? String(options.config.failFastEnabled)
-            : undefined,
-          CONFIG_STRATEGY: options.config?.failFastStrategy
-            ? String(options.config.failFastStrategy)
-            : undefined,
-          CONFIG_BAIL: options.config?.failFastBail
-            ? String(options.config.failFastBail)
-            : undefined,
+          CONFIG_IGNORE_PER_TEST_CONFIG:
+            options.config?.failFastIgnorePerTestConfig === undefined
+              ? undefined
+              : String(options.config.failFastIgnorePerTestConfig),
+          CONFIG_ENABLED:
+            options.config?.failFastEnabled === undefined
+              ? undefined
+              : String(options.config.failFastEnabled),
+          CONFIG_STRATEGY:
+            options.config?.failFastStrategy === undefined
+              ? undefined
+              : String(options.config.failFastStrategy),
+          CONFIG_BAIL:
+            options.config?.failFastBail === undefined
+              ? undefined
+              : String(options.config.failFastBail),
         }),
       );
     }, 120000);

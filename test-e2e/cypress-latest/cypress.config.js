@@ -21,7 +21,7 @@ module.exports = {
   allowCypressEnv: false,
   expose: {
     failFastIgnorePerTestConfig: process.env.CONFIG_IGNORE_PER_TEST_CONFIG,
-    failFastEnabled: process.env.CONFIG__ENABLED,
+    failFastEnabled: process.env.CONFIG_ENABLED,
     failFastStrategy: process.env.CONFIG_STRATEGY,
     failFastBail: process.env.CONFIG_BAIL,
   },
