@@ -31,8 +31,11 @@ importers:
         specifier: 7.5.1
         version: 7.5.1
       '@jest/globals':
-        specifier: ^30.3.0
+        specifier: 30.3.0
         version: 30.3.0
+      '@stryker-mutator/api':
+        specifier: 9.6.0
+        version: 9.6.0
       '@stryker-mutator/core':
         specifier: 9.6.0
         version: 9.6.0(@types/node@25.5.0)

@@ -1,29 +1,17 @@
-const BRANCH_NAME =
-  process.env.TRAVIS_CURRENT_BRANCH || process.env.BRANCH_NAME;
-const STRYKER_DASHBOARD_API_KEY = process.env.STRYKER_DASHBOARD_API_KEY;
-
-const BASE_CONFIG = {
-  ignorePatterns: ["**", "!*.js", "!src/**/*.js", "!test/**/*.js"],
-  packageManager: "npm",
-  thresholds: {
-    high: 80,
-    low: 60,
-    break: 80,
-  },
-  reporters: ["html", "clear-text", "progress", "dashboard"],
-  testRunner: "jest",
-  coverageAnalysis: "off",
-};
+// @ts-check
+/** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 
 const config = {
-  ...BASE_CONFIG,
-  dashboard:
-    BRANCH_NAME && STRYKER_DASHBOARD_API_KEY
-      ? {
-          project: "github.com/javierbrea/cypress-fail-fast",
-          version: BRANCH_NAME,
-        }
-      : undefined,
+  mutate: ["src/**/*.ts", "!src/**/*.spec.ts"],
+  packageManager: "pnpm",
+  reporters: ["html", "clear-text", "progress", "dashboard"],
+  dashboard: {
+    project: "github.com/javierbrea/cypress-fail-fast",
+  },
+  testRunner: "jest",
+  coverageAnalysis: "perTest",
+  plugins: ["@stryker-mutator/jest-runner"],
+  thresholds: { high: 90, low: 75, break: 75 },
 };
 
-module.exports = config;
+export default config;

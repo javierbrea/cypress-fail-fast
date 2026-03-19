@@ -1,5 +1,9 @@
 const cypressFailFastPlugin = require("cypress-fail-fast/plugin");
 
+const specPattern = process.env.SPECS_FOLDER
+  ? `cypress/e2e/${process.env.SPECS_FOLDER}/**.cy.js`
+  : "cypress/e2e/**/*.cy.js";
+
 module.exports = {
   e2e: {
     baseUrl: "http://localhost:3000",
@@ -54,7 +58,7 @@ module.exports = {
       });
       return config;
     },
-    specPattern: [`cypress/e2e/${process.env.SPECS_FOLDER}/**.cy.js`],
+    specPattern: [specPattern],
   },
   video: false,
   allowCypressEnv: false,

@@ -5,7 +5,7 @@
   "scripts": {
     "run:specs": "jest --runInBand --verbose",
     "check:types": "tsc --noEmit",
-    "serve-app": "cd ../app && pnpm serve",
+    "serve-app": "cd ../app && pnpm start",
     "serve-and-test": "start-server-and-test serve-app http-get://127.0.0.1:3000 run:specs",
     "test:e2e": "pnpm run check:types && pnpm run serve-and-test",
     "test:e2e:debug": "cross-env DEBUG=true pnpm run serve-and-test"
