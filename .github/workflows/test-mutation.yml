@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - release
+  pull_request:
+  workflow_dispatch:
 concurrency:  
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -12,30 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
-      id: extract-branch
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
     - uses: actions/setup-node@v4
       with:
         node-version: '22.x'
         registry-url: 'https://registry.npmjs.org/'
-    - name: Cache node modules
-      uses: actions/cache@v4
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install
     - name: Test mutation
-      run: npm run test:mutation
+      run: pnpm run test:mutation
       env:
-        BRANCH_NAME: ${{ steps.extract-branch.outputs.branch }}
         STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_TOKEN }}
+    - name: Upload test mutation report for elements
+      uses: actions/upload-artifact@v4
+      with:
+        name: report-test-mutation
+        path: reports/mutation
+        retention-days: 1

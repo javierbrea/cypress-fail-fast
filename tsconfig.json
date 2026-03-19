@@ -1,15 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "dist",
-    "moduleResolution": "node",
-    "types": ["cypress"]
-  },
-  "include": [
-    "*.ts",
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "extends": "./tsconfig.base.json",
+  "include": ["**/*"]
 }

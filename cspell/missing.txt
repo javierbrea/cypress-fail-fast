@@ -1,0 +1,16 @@
+Brea
+GHANGELOG
+commonmark
+coverallsapp
+esmodules
+javierbrea
+mochawesome
+parallelly
+prelint
+sonarcloud
+sonarqube
+sonarsource
+Styleguide
+Styleguides
+unstability
+wfile

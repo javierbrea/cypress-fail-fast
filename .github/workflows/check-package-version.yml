@@ -3,16 +3,13 @@ on:
   pull_request:
     branches:
       - main
-concurrency:  
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 jobs:
   check-package-version:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Get NPM version is new
+      - name: Get version is new
         id: check
         uses: EndBug/version-check@v2.1.4
         with:
@@ -25,17 +22,20 @@ jobs:
         run: |
           echo "Version not changed"
           exit 1
-      - name: Get NPM version
+      - name: Get version
         id: package-version
+        # cspell: disable-next-line
         uses: martinbeentjes/npm-get-version-action@v1.3.1
       - name: Check Changelog version
         id: changelog_reader
+        # cspell: disable-next-line
         uses: mindsers/changelog-reader-action@v2.2.3
         with:
           version: ${{ steps.package-version.outputs.current-version }}
           path: ./CHANGELOG.md
       - name: Read version from Sonar config
         id: sonar-version
+        # cspell: disable-next-line
         uses: christian-draeger/read-properties@1.1.1
         with:
           path: './sonar-project.properties'
