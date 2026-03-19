@@ -1,0 +1,31 @@
+// 5 tests, 2 failures, 3 passes, only the 2nd test should be retried, but the 3rd test should not be skipped because of the 1st test failure
+
+describe("List items", { failFast: { enabled: false } }, () => {
+  beforeEach(() => {
+    cy.visit("/");
+  });
+
+  it("should display wrong title", () => {
+    cy.get("h1").should("have.text", "Foo");
+  });
+
+  it("should display title", () => {
+    cy.get("h1").should("have.text", "Items list");
+  });
+
+  it(
+    "should display first item",
+    { retries: { runMode: 0, openMode: 3 }, failFast: { enabled: true } },
+    () => {
+      cy.get("ul li:eq(0)").should("have.text", "Wrong text");
+    },
+  );
+
+  it("should display second item", () => {
+    cy.get("ul li:eq(1)").should("have.text", "Second item");
+  });
+
+  it("should display third item", () => {
+    cy.get("ul li:eq(2)").should("have.text", "Third item");
+  });
+});

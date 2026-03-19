@@ -1,109 +1,104 @@
-# Contributing
+# How to contribute
 
-First off, thanks for taking the time to contribute!
+# Table of Contents
 
-The following is a set of guidelines for contributing to this project. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+- [Branching model](#branching-model)
+- [Pull Request](#pull-request)
+- [Release process](#release-process)
+   - [Versioning](#versioning)
+   - [Publishing](#publishing)
+- [License](#license)
+- [Code of Conduct](#code-of-conduct)
+- [Contributor License Agreement](#contributor-license-agreement)
 
-#### Table Of Contents
+# Branching model
 
-* [Code of Conduct](#code-of-conduct)
-* [Project governance](#project-governance)
-  * [Rules](#rules)
-  * [Releases](#releases)
-  * [Changes to this arrangement](#changes-to-this-arrangement)
-* [Pull Requests](#pull-requests)
-* [Styleguides](#styleguides)
-  * [Git Commit Messages](#git-commit-messages)
-  * [JavaScript Styleguide](#javascript-styleguide)
-  * [Tests Styleguide](#tests-styleguide)
-* [Developer's certificate of origin](#developers-certificate-of-origin)
+The repository follows a branching model based on two main branches: `main` and `release`. The `main` branch reflects the latest stable published version of the packages, while the `release` branch is used to prepare the next release.
 
-## Code of Conduct
+Some important points to consider:
 
-This project and everyone participating in it is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+* __The "main" branch must always reflect the latest stable published version of the packages in the repository__.
+* We have a "release" branch for the following reasons:
+   * To enable the maintainer to prepare the release of features without having to promote any unpublished changes to the "main" branch. By preparing the release we mainly mean to decide how to group changes in different releases and to update the `CHANGELOG.md` files and the version number of the package accordingly.
+   * It is long-lived because we also have bots that will open PRs. So, they can be configured to open PRs to the "release" branch, and their changes will also enter in the process of preparing the release, such as changes from any other contributor.
+* __The "release" branch is the default branch for PRs.__ Only a project maintainer should open a PR to the "main" branch, and only when the release is ready to be published.
+* Usually, feature branches should be short-lived, and they should be merged into the "release" branch as soon as possible. This way, the changes will be included in the next release, and the feature branch can be deleted.
 
-## Project Governance
+## Merging strategy
 
-Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit.
+We use the __squash and merge strategy for merging PRs to the release branch__. This means that all the changes in the PR will be squashed into a single commit before being merged. The reasons are:
 
-### Rules
+* To keep the history clean in the release branch
+* To make easier to understand the changes in each release.
 
-There are a few basic ground-rules for contributors:
+But we use the __merge commit strategy for merging PRs to the main branch from the release branch__. The reasons are:
 
-1. **No `--force` pushes** or modifying the Git history in any way.
-2. **All modifications** should be subject to a **pull request** to solicit feedback from other contributors. The base branch of the pull request should be the `release` branch.
-3. **All changes** to this project should be documented in the GHANGELOG.md file in the `unreleased` chapter until a formal release is declared.
+* To keep in the history the information about the features that were merged separately into the release branch. This is very important, because we may have changes from different packages in the release branch, or from features that are not related. Squashing all the changes into a single commit would make it difficult to understand or revert the changes for a specific package or feature.
+* To avoid having to rebase the release branch every time a PR is merged to the main branch.
 
-### Releases
+# Pull Request
 
-Declaring formal releases remains the prerogative of the project maintainer. 
+When you're finished with the changes, please ensure the following:
 
-### Changes to this arrangement
+* You have added tests for your changes.
+* You have updated the documentation if necessary.
+* You have run the linter and fixed any issues.
+* __You have added the necessary changes to the `CHANGELOG.md` file__, under the "unreleased" section at the beginning of the file.
+* You have modified the version of the package in the `package.json` file according to the [versioning](#versioning) section.
 
-This document may also be subject to pull-requests or changes by contributors where you believe you have something valuable to add or change.
+When you have checked these points, then you are ready to submit your pull request. To do so, follow these steps:
 
-## Pull Requests
+* __The target branch for the PR should be `release`.__ (Read [branching-model](#branching-model) for more information)
+* Fill the PR template. This template helps reviewers understand your changes as well as the purpose of your pull request.
+* Don't forget to [link PR to issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue) if you are solving one.
+* Enable the checkbox to [allow maintainer edits](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork) so the branch can be updated for a merge. Once you submit your PR, a maintainer will review your proposal. We may ask questions or request additional information.
+* We may ask for changes to be made before a PR can be merged, either using suggested changes or pull request comments. You can apply suggested changes directly through the UI. You can make any other changes in your fork, then commit them to your branch.
+* As you update your PR and apply changes, mark each conversation as resolved.
 
-* Fill in [the required template](PULL_REQUEST_TEMPLATE.md).
-* Do not include issue numbers in the PR title.
-* Follow the [JavaScript styleguide](#javascript-styleguide).
-* Follow the [Tests styleguide](#tests-styleguide).
-* All enhancements and bug fixes must be accompanied with all needed new related regression test.
-* Coverage of unit tests must remain 100%.
-* Run tests often. Tests are ran automatically when a PR is opened, but you still need to run them locally before creating it.
-* Document new features, or update documentation if changes affect to it.
-* End all files with a newline.
-* Place requires in the following order:
-    * Built in Node Modules (such as `path`)
-    * NPM Modules (such as `lodash`)
-    * Local Modules (using relative paths)
+# Release process
 
-## Styleguides
+## Versioning
 
-### Git Commit Messages
+First of all, you should know that the repository follows the [Semantic Versioning](https://semver.org/) specification. This means that the version number is composed of three parts: `MAJOR.MINOR.PATCH`. __Each package in the repository has its own version number, and it is independent of the others.__ (Except for the dependencies between them, of course)
+ 
+Please, follow these rules to update the version number:
 
-* Use [semmantic commit](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716)
+* __MAJOR__: When you make incompatible API changes.
+* __MINOR__: When you add functionality in a backwards-compatible manner.
+* __PATCH__: When:
+   * You make backwards-compatible bug fixes.
+   * You bump the version of a dependency which doesn't affect the API of the package. __This includes internal dependencies.__
 
-### JavaScript Styleguide
+## Publishing
 
-All JavaScript must adhere to the style defined in the `.eslintrc.json` file.
+Once the PR is approved and merged into the release branch, a project maintainer can start the release process when corresponding (sometimes it is not desired to release the changes immediately, so the maintainer can wait until more changes are merged to release them all together).
 
-### Tests Styleguide
+The release process is as follows:
 
-- Fail tests first. How do you know if it is actually testing anything if the assert never failed?
-- Treat `describe` as a noun or situation (Situations usually start with "when").
-- Treat `it` as a statement about state or how an operation changes state. Usually, all `it` should start with "should".
-- Prefer fewer asserts per `it`.
+* Checkout the `release` branch, and:
+   * Move changes in the "unreleased" section of the `CHANGELOG.md` files to a new version section that includes the version number and the release date.
+   * Check that every affected package has the correct version number in the `package.json` file.
+   * Commit the changes with the message `chore(release): description`.
+* Open a PR from the `release` branch to the `main` branch.
+   * Once the PR is approved and merged, the build pipeline will run in the `main` branch, but packages will not be published yet.
+   * Create a new release in GitHub for each package modified in the release, following the next instructions:
+      * Tag: `vX.Y.Z`
+      * Title: `Human readable title for the release`.
+      * Description: Copy the changes from the corresponding `CHANGELOG.md` file for the version you are releasing.
+   * Once the release is created, the package will be published to the npm registry automatically.
 
-#### Example
+# License
 
-```js
-describe("a dog", () => {
-  describe("when is happy", () => {
-    it("should wags its tail", () => {
-      expect(dog.tail.moving).to.be.true();
-    });
-  });
-});
-```
+By contributing to this project, you agree that your contributions will be licensed under the [LICENSE](../LICENSE) file in the root of this repository, and that you agree to the [Contributor License Agreement](#contributor-license-agreement).
 
-## Developer's Certificate of Origin
+# Code of Conduct
 
-By making a contribution to this project, I certify that:
+Please read our [Code of Conduct](../.github/CODE_OF_CONDUCT.md) before contributing.
 
-- (a) The contribution was created in whole or in part by me and I have the right to
-  submit it under the open source license indicated in the file; or
+# Contributor License Agreement
 
-- (b) The contribution is based upon previous work that, to the best of my knowledge, is
-  covered under an appropriate open source license and I have the right under that license
-  to submit that work with modifications, whether created in whole or in part by me, under
-  the same open source license (unless I am permitted to submit under a different
-  license), as indicated in the file; or
+This is a human-readable summary of (and not a substitute for) the [full agreement](./CLA.md). This highlights only some of the key terms of the CLA. It has no legal value and you should carefully review all the terms of the [actual CLA before agreeing](./CLA.md).
 
-- (c) The contribution was provided directly to me by some other person who certified
-  (a), (b) or (c) and I have not modified it.
+* __No Warranty or Support Obligations__. By making a contribution, you are not obligating yourself to provide support for the contribution, and you are not taking on any warranty obligations or providing any assurances about how it will perform.
 
-- (d) I understand and agree that this project and the contribution are public and that a
-  record of the contribution (including all personal information I submit with it,
-  including my sign-off) is maintained indefinitely and may be redistributed consistent
-  with this project or the open source license(s) involved.
+The [CLA](./CLA.md) does not change the terms of the underlying license used by our software such as the Business Source License, Mozilla Public License, or MIT License. You are still free to use our projects within your own projects or businesses, republish modified source code, and more subject to the terms of the project license. Please reference the appropriate license for the project you're contributing to to learn more.

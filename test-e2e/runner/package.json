@@ -1,0 +1,19 @@
+{
+  "name": "cypress-fail-fast-e2e-tests-runner",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "run:specs": "jest --runInBand --verbose",
+    "check:types": "tsc --noEmit",
+    "serve-app": "cd ../app && pnpm start",
+    "serve-and-test": "start-server-and-test serve-app http-get://127.0.0.1:3000 run:specs",
+    "test:e2e": "pnpm run check:types && pnpm run serve-and-test",
+    "test:e2e:debug": "cross-env DEBUG=true pnpm run serve-and-test"
+  },
+  "devDependencies": {
+    "cypress-fail-fast": "workspace:*",
+    "cross-env": "7.0.3",
+    "start-server-and-test": "2.0.5",
+    "strip-ansi": "6.0.0"
+  }
+}
