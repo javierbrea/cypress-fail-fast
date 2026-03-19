@@ -11,17 +11,19 @@ module.exports = {
         );
       };
 
-      let executedTests = 0;
+      let executedBeforeEach = 0;
       let consolePrinted = false;
 
       const shouldTriggerFailFastHook = () => {
-        executedTests++;
-        if (executedTests >= Number(process.env.ENABLE_SKIP_MODE_AFTER_TESTS)) {
+        executedBeforeEach++;
+        if (
+          executedBeforeEach > Number(process.env.ENABLE_SKIP_MODE_AFTER_TESTS)
+        ) {
           if (!consolePrinted) {
             consolePrinted = true;
             // eslint-disable-next-line no-console
             console.log(
-              `Custom shouldTriggerFailFast hook triggered fail-fast mode after ${executedTests} tests executed`,
+              `Custom shouldTriggerFailFast hook triggered fail-fast mode after ${executedBeforeEach - 1} tests executed`,
             );
           }
           return true;

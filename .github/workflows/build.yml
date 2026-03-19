@@ -33,12 +33,12 @@ jobs:
       - name: Check spelling
         if: ${{ matrix.node == '24.4.1' }}
         run: pnpm run cspell
-      - name: Lint
-        if: ${{ matrix.node == '24.4.1' }}
-        run: pnpm run lint
       - name: Build
         if: ${{ matrix.node == '24.4.1' }}
         run: pnpm run build
+      - name: Lint
+        if: ${{ matrix.node == '24.4.1' }}
+        run: pnpm run lint
       - name: Test unit
         run: pnpm run test:unit
       - name: Test E2E

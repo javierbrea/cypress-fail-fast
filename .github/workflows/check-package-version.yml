@@ -15,7 +15,7 @@ jobs:
         with:
           diff-search: true
           file-name: ./package.json
-          file-url: https://unpkg.com/cypress-localstorage-commands@latest/package.json
+          file-url: https://unpkg.com/cypress-fail-fast@latest/package.json
           static-checking: localIsNew
       - name: Check version is new
         if: steps.check.outputs.changed != 'true'

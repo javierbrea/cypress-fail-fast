@@ -125,13 +125,10 @@ const expectTestsAmount = (
  * @param getSpecLogs - Callback that returns the log string for the current spec.
  */
 const expectFailFastTriggeredHookToHaveBeenCalled = (
-  { strategy, test: failedTest }: HooksConfig["expectFailFastTriggeredLog"] = {
-    strategy: "spec",
-    test: {
-      name: "please provide a test name",
-      fullTitle: "please provide a full test title",
-    },
-  },
+  {
+    strategy,
+    test: failedTest,
+  }: NonNullable<HooksConfig["expectFailFastTriggeredLog"]>,
   getSpecLogs: () => string,
 ) => {
   it(`onFailFastTriggered hook should log the strategy and failed test information when fail-fast mode is triggered`, () => {

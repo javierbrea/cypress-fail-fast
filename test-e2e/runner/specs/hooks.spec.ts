@@ -41,13 +41,13 @@ runSpecsTests("When onFailFastTriggered is enabled", {
   },
 });
 
-runSpecsTests("When onFailFastTriggered is enabled", {
+runSpecsTests("When shouldTriggerFailFast is enabled", {
   cypressVariant: "cypress-latest",
   specsFolder: "grandparent-describe-enabled",
   config: {
     failFastStrategy: "spec",
     failFastIgnorePerTestConfig: true,
-    failFastBail: 2,
+    failFastBail: 4,
   },
   specsResults: [
     {
@@ -58,9 +58,9 @@ runSpecsTests("When onFailFastTriggered is enabled", {
     },
     {
       executed: 4,
-      passed: 0,
+      passed: 1,
       failed: 1,
-      pending: 3,
+      pending: 2,
     },
     {
       executed: 3,
@@ -71,6 +71,6 @@ runSpecsTests("When onFailFastTriggered is enabled", {
   ],
   hooks: {
     enableShouldTriggerFailFast: true,
-    enableSkipModeAfterTests: 5,
+    enableSkipModeAfterTests: 6,
   },
 });
