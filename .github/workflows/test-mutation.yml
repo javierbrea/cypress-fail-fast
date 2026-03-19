@@ -18,6 +18,8 @@ jobs:
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
       id: extract-branch
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
     - uses: actions/setup-node@v4
       with:
         node-version: '22.x'
