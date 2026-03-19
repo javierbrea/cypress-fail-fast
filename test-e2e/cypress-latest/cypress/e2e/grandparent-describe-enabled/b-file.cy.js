@@ -1,3 +1,5 @@
+// 4 tests should be executed, 1 should pass, 2 should fail and 1 should be pending.
+
 describe(
   "List items fail-fast enabled",
   { failFast: { enabled: true } },

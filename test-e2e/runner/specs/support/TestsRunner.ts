@@ -3,6 +3,13 @@ import type { FailFastConfig } from "cypress-fail-fast";
 import { pnpmRun } from "./CommandRunner";
 import { splitLogsBySpec } from "./Logs";
 
+type RetryConfig = {
+  /** Number of attempts for the test (retries + 1) */
+  attempts: number;
+  /** Description of the retried test */
+  test: string;
+};
+
 /** Expected test counts for a single Cypress spec file. */
 interface SpecExpectedStatuses {
   /** Number of executed tests, or `null`/`undefined` to skip this assertion. */
@@ -15,6 +22,8 @@ interface SpecExpectedStatuses {
   pending?: number | null;
   /** Number of skipped tests, or `null`/`undefined` to skip this assertion. */
   skipped?: number | null;
+  /** Optional array of retries expected for this spec. */
+  retries?: RetryConfig[];
 }
 
 /** {@link SpecExpectedStatuses} with the resolved 1-based spec index attached. */
@@ -24,7 +33,7 @@ interface ResolvedSpecStatuses extends SpecExpectedStatuses {
 }
 
 /** Options accepted by {@link runSpecsTests}. */
-interface RunSpecsTestsOptions {
+type RunSpecsTestsOptions = {
   /** Name of the Cypress variant directory to run tests in. */
   cypressVariant: string;
   /** Subfolder inside the variant's `cypress/e2e` directory that contains the specs. */
@@ -33,7 +42,9 @@ interface RunSpecsTestsOptions {
   specsResults: SpecExpectedStatuses[];
   /** Optional global fail-fast configuration to apply during the run. */
   config?: FailFastConfig;
-}
+  /** If `true`, only this test suite will be executed, skipping all others. */
+  only?: boolean;
+};
 
 /**
  * A function that returns the raw log output for a given 1-based spec index.
@@ -96,6 +107,7 @@ const getSpecTests = (
     failed = null,
     pending = null,
     skipped = null,
+    retries = [],
   }: ResolvedSpecStatuses,
   getLogs: GetLogs,
 ): void => {
@@ -106,6 +118,18 @@ const getSpecTests = (
     expectTestsAmount("failed", "Failing", failed, getSpecLogs);
     expectTestsAmount("pending", "Pending", pending, getSpecLogs);
     expectTestsAmount("skipped", "Skipped", skipped, getSpecLogs);
+    retries.forEach(({ attempts, test: testDescription }) => {
+      it(`should have ${attempts} attempt(s) for "${testDescription}"`, () => {
+        expect(getSpecLogs()).toEqual(
+          // should display first item (failed) (attempt 3)
+          expect.stringMatching(
+            new RegExp(
+              `\\s*${testDescription} \\(failed\\)\\s*\\(attempt ${attempts}\\)`,
+            ),
+          ),
+        );
+      });
+    });
   });
 };
 
@@ -184,7 +208,8 @@ export function runSpecsTests(
   description: string,
   options: RunSpecsTestsOptions,
 ): void {
-  describe(`${description}`, () => {
+  const method = options.only ? describe.only : describe;
+  method(`${description}`, () => {
     runVariantTests(
       options.cypressVariant,
       getSpecsStatusesTests(options.specsResults),

@@ -1,3 +1,5 @@
+// 5 tests, 2 failures, 3 passes, only the 2nd test should be retried, but the 3rd test should not be skipped because of the 1st test failure
+
 describe("List items", { failFast: { enabled: false } }, () => {
   beforeEach(() => {
     cy.visit("/");

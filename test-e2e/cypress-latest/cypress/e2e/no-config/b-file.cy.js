@@ -1,3 +1,5 @@
+// 4 tests. 4 passing, 0 failing
+
 describe("List items", () => {
   beforeEach(() => {
     cy.visit("/");

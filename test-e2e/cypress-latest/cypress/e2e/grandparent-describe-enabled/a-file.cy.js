@@ -1,3 +1,5 @@
+// 4 tests should be executed, 3 should pass, 1 should fail and 0 should be pending.
+
 describe("List items disabled", { failFast: { enabled: false } }, () => {
   beforeEach(() => {
     cy.visit("/");

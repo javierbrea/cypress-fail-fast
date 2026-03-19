@@ -1,3 +1,5 @@
+// 3 tests should be executed, 1 should pass, 1 should fail and 1 should be pending.
+
 describe("List items", () => {
   beforeEach(() => {
     cy.visit("/");

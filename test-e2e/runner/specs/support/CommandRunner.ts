@@ -35,7 +35,7 @@ export function pnpmRun(
   const logData = (log: string): void => {
     const cleanLog = stripAnsi(log.trim());
     if (cleanLog.length) {
-      if (process.env["DEBUG"] === "true") {
+      if (process.env["DEBUG"] === "true" || process.env["DEBUG"] === "1") {
         // eslint-disable-next-line no-console
         console.log(cleanLog);
       }

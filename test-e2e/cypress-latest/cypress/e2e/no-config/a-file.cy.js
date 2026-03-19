@@ -1,3 +1,5 @@
+// 4 tests. 2 passing, 2 failing
+
 describe("List items", () => {
   beforeEach(() => {
     cy.visit("/");
@@ -12,7 +14,7 @@ describe("List items", () => {
   });
 
   it("should display second item", () => {
-    cy.get("ul li:eq(1)").should("have.text", "Second item");
+    cy.get("ul li:eq(1)").should("have.text", "Wrong");
   });
 
   it("should display third item", () => {

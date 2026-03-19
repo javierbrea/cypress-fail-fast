@@ -1,3 +1,5 @@
+// 5 tests, 1 failure with 2 retries, but no failFast, so all tests should be executed
+
 describe("List items", { failFast: { enabled: true } }, () => {
   beforeEach(() => {
     cy.visit("/");
