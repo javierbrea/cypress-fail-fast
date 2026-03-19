@@ -199,3 +199,33 @@ runSpecsTests(
     ],
   },
 );
+
+runSpecsTests("When strategy is spec and bail is 2", {
+  cypressVariant: "cypress-latest",
+  specsFolder: "grandparent-describe-enabled",
+  config: {
+    failFastStrategy: "spec",
+    failFastIgnorePerTestConfig: true,
+    failFastBail: 2,
+  },
+  specsResults: [
+    {
+      executed: 4,
+      passed: 3,
+      failed: 1,
+      pending: 0,
+    },
+    {
+      executed: 4,
+      passed: 1,
+      failed: 2,
+      pending: 1,
+    },
+    {
+      executed: 3,
+      passed: 2,
+      failed: 1,
+      pending: 0,
+    },
+  ],
+});
