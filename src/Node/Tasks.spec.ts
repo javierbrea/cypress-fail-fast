@@ -22,6 +22,7 @@ import {
   LOG_PREFIX,
 } from "../Shared/Constants";
 import type { FailFastConfig } from "../Shared/Config.types";
+import { RUN_STRATEGY, SPEC_STRATEGY } from "../Shared/Config";
 import type {
   FailFastFailedTestData,
   FailFastPluginConfigOptions,
@@ -188,7 +189,7 @@ describe("registerFailFastTasks", () => {
 
     expect(onFailFastTriggered).toHaveBeenCalledTimes(1);
     expect(onFailFastTriggered).toHaveBeenCalledWith({
-      strategy: "run",
+      strategy: RUN_STRATEGY,
       test: failedTest,
     });
   });
@@ -220,19 +221,14 @@ describe("registerFailFastTasks", () => {
     tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
 
     expect(onFailFastTriggered).toHaveBeenCalledWith({
-      strategy: "spec",
+      strategy: SPEC_STRATEGY,
       test: failedTest,
     });
   });
 
-  it("passes context to shouldTriggerFailFast and clears test on reset", () => {
+  it("calls shouldTriggerFailFast without arguments", () => {
     const shouldTriggerFailFast = jest
-      .fn<
-        (context: {
-          strategy: "run" | "spec";
-          test?: FailFastFailedTestData;
-        }) => boolean
-      >()
+      .fn<() => boolean>()
       .mockReturnValue(false);
 
     const failedTest = {
@@ -251,14 +247,8 @@ describe("registerFailFastTasks", () => {
     tasks[RESET_SKIP_TASK]();
     tasks[SHOULD_SKIP_TASK]();
 
-    expect(shouldTriggerFailFast).toHaveBeenNthCalledWith(1, {
-      strategy: "run",
-      test: undefined,
-    });
-    expect(shouldTriggerFailFast).toHaveBeenNthCalledWith(2, {
-      strategy: "run",
-      test: undefined,
-    });
+    expect(shouldTriggerFailFast).toHaveBeenNthCalledWith(1);
+    expect(shouldTriggerFailFast).toHaveBeenNthCalledWith(2);
   });
 
   it("increments and resets failed tests counter", () => {

@@ -10,7 +10,7 @@ Skip the rest of your Cypress tests after the first failure.
 
 With Cypress Fail Fast, you can:
 
-- Skip all remaining tests in the current spec file, in the entire run, depending on the configured strategy.
+- Skip all remaining tests in the current spec file, or in the entire run, depending on the configured strategy.
 - Control fail-fast behavior at a per-test or per-suite level, so you can choose which failures should trigger fail-fast mode and which should not.
 - Set hooks to:
   - Run when fail-fast mode is triggered, so you can perform custom actions.
@@ -249,8 +249,6 @@ export default defineConfig({
   },
 });
 ```
-
-You are responsible for cleaning up the shared flag (for example, removing the file after all runs finish) so that subsequent runs do not start in a cancelled state.
 
 ## Limitations
 

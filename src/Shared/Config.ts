@@ -10,7 +10,8 @@ import {
 
 import { FailFastGlobalConfig } from "./Config.types";
 
-const SPEC_STRATEGY = "spec";
+export const SPEC_STRATEGY = "spec" as const;
+export const RUN_STRATEGY = "run" as const;
 
 const truthyValuesSet = new Set([true, "true", 1, "1"]);
 const falsyValuesSet = new Set([false, "false", 0, "0"]);
@@ -52,6 +53,17 @@ export function strategyIsSpec(value: string) {
   return value === SPEC_STRATEGY;
 }
 
+/**
+ * Normalizes a strategy value to one of the supported strategy constants.
+ * @param value Strategy value to normalize.
+ * @returns Normalized strategy value.
+ */
+export function strategyValue(
+  value: unknown,
+): FailFastGlobalConfig["strategy"] {
+  return strategyIsSpec(value as string) ? SPEC_STRATEGY : RUN_STRATEGY;
+}
+
 function isDefined(value: unknown) {
   return !isUndefined(value);
 }
@@ -79,7 +91,10 @@ function numericVarValue(value: unknown, defaultValue: number) {
 export function getFailFastEnvironmentConfig(
   Cyp: Cypress.Cypress,
 ): FailFastGlobalConfig {
+  const strategy = strategyValue(Cyp.expose(STRATEGY_GLOBAL_CONFIG));
+
   return {
+    strategy,
     ignorePerTestConfig: booleanVarValue(
       Cyp.expose(IGNORE_PER_TEST_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
@@ -88,9 +103,37 @@ export function getFailFastEnvironmentConfig(
       Cyp.expose(ENABLED_GLOBAL_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
-    strategyIsSpec: strategyIsSpec(Cyp.expose(STRATEGY_GLOBAL_CONFIG)),
+    strategyIsSpec: strategy === SPEC_STRATEGY,
     bail: numericVarValue(
       Cyp.expose(BAIL_GLOBAL_CONFIG),
+      GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
+    ),
+  };
+}
+
+/**
+ * Builds the effective fail-fast configuration from resolved plugin config values.
+ * @param config Cypress plugin configuration.
+ * @returns Parsed fail-fast global configuration.
+ */
+export function getFailFastPluginConfig(
+  config: Pick<Cypress.PluginConfigOptions, "expose">,
+): FailFastGlobalConfig {
+  const strategy = strategyValue(config.expose?.[STRATEGY_GLOBAL_CONFIG]);
+
+  return {
+    strategy,
+    ignorePerTestConfig: booleanVarValue(
+      config.expose?.[IGNORE_PER_TEST_CONFIG],
+      GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
+    ),
+    enabled: booleanVarValue(
+      config.expose?.[ENABLED_GLOBAL_CONFIG],
+      GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
+    ),
+    strategyIsSpec: strategy === SPEC_STRATEGY,
+    bail: numericVarValue(
+      config.expose?.[BAIL_GLOBAL_CONFIG],
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
     ),
   };

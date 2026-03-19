@@ -6,6 +6,7 @@ import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 import {
   getFailFastEnvironmentConfig,
   shouldIgnorePerTestConfig,
+  RUN_STRATEGY,
 } from "../Shared/Config";
 
 import {
@@ -122,6 +123,7 @@ describe("failFastIsEnabled", () => {
     mockedShouldIgnorePerTestConfig.mockReset();
 
     mockedGetFailFastEnvironmentConfig.mockReturnValue({
+      strategy: RUN_STRATEGY,
       ignorePerTestConfig: false,
       enabled: true,
       strategyIsSpec: false,

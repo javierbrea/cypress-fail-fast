@@ -130,8 +130,8 @@ export function registerFailFast(
   before(function () {
     if (isHeaded(Cyp) || currentStrategyIsSpec(Cyp)) {
       /*
-          Reset the shouldSkip flag at the start of a run, so that it doesn't carry over into subsequent runs. Do this only for headed runs because in headless runs, the `before` hook is executed for each spec file.
-        */
+        Reset the shouldSkip flag at the start of a run, so that it doesn't carry over into subsequent runs. Do this only for headed runs because in headless runs, the `before` hook is executed for each spec file.
+      */
       resetSkipFlag();
       resetFailedTests();
     } else {

@@ -9,11 +9,9 @@ import {
   LOG_TASK,
   LOG_PREFIX,
 } from "../Shared/Constants";
-import type { FailFastConfig } from "../Shared/Config.types";
+import { getFailFastPluginConfig } from "../Shared/Config";
 import type {
-  FailFastFailedTestData,
   FailFastPluginConfigOptions,
-  FailFastStrategy,
   TriggerFailFastTaskPayload,
 } from "./Tasks.types";
 
@@ -31,13 +29,7 @@ export function registerFailFastTasks(
   // store skip flag
   let shouldSkipFlag = false;
   let failedTests = 0;
-  let failedTestThatTriggeredFailFast: FailFastFailedTestData | undefined;
-
-  const exposedConfig = config as Cypress.PluginConfigOptions & {
-    expose?: FailFastConfig;
-  };
-  const strategy: FailFastStrategy =
-    exposedConfig.expose?.failFastStrategy === "spec" ? "spec" : "run";
+  const strategy = getFailFastPluginConfig(config).strategy;
 
   const shouldTriggerFailFastCallback =
     pluginConfig.hooks?.shouldTriggerFailFast;
@@ -48,12 +40,7 @@ export function registerFailFastTasks(
       return false;
     }
 
-    return (
-      shouldTriggerFailFastCallback({
-        strategy,
-        test: failedTestThatTriggeredFailFast,
-      }) || false
-    );
+    return shouldTriggerFailFastCallback() || false;
   }
 
   /**
@@ -76,19 +63,16 @@ export function registerFailFastTasks(
   on("task", {
     [RESET_SKIP_TASK]: function () {
       shouldSkipFlag = false;
-      failedTestThatTriggeredFailFast = undefined;
       return null;
     },
     [SHOULD_SKIP_TASK]: function () {
       return shouldSkip();
     },
     [TRIGGER_FAIL_FAST_TASK]: function (value: TriggerFailFastTaskPayload) {
-      failedTestThatTriggeredFailFast = value.test;
-
       if (onFailFastTriggeredCallback) {
         onFailFastTriggeredCallback({
           strategy,
-          test: failedTestThatTriggeredFailFast,
+          test: value.test,
         });
       }
 

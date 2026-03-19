@@ -14,8 +14,12 @@ import {
   isTruthy,
   isFalsy,
   isUndefined,
+  RUN_STRATEGY,
+  SPEC_STRATEGY,
   strategyIsSpec,
+  strategyValue,
   getFailFastEnvironmentConfig,
+  getFailFastPluginConfig,
   currentStrategyIsSpec,
   shouldIgnorePerTestConfig,
   bailConfig,
@@ -76,8 +80,16 @@ describe("isUndefined", () => {
 
 describe("strategyIsSpec", () => {
   it("returns true only when strategy is spec", () => {
-    expect(strategyIsSpec("spec")).toBe(true);
-    expect(strategyIsSpec("run")).toBe(false);
+    expect(strategyIsSpec(SPEC_STRATEGY)).toBe(true);
+    expect(strategyIsSpec(RUN_STRATEGY)).toBe(false);
+  });
+});
+
+describe("strategyValue", () => {
+  it("returns spec for spec and run otherwise", () => {
+    expect(strategyValue(SPEC_STRATEGY)).toBe(SPEC_STRATEGY);
+    expect(strategyValue(RUN_STRATEGY)).toBe(RUN_STRATEGY);
+    expect(strategyValue(undefined)).toBe(RUN_STRATEGY);
   });
 });
 
@@ -91,6 +103,7 @@ describe("getFailFastEnvironmentConfig", () => {
     });
 
     expect(getFailFastEnvironmentConfig(cypressLike)).toEqual({
+      strategy: RUN_STRATEGY,
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
       strategyIsSpec: false,
@@ -107,6 +120,7 @@ describe("getFailFastEnvironmentConfig", () => {
     });
 
     expect(getFailFastEnvironmentConfig(cypressLike)).toEqual({
+      strategy: RUN_STRATEGY,
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
       strategyIsSpec: false,
@@ -123,6 +137,7 @@ describe("getFailFastEnvironmentConfig", () => {
     });
 
     expect(getFailFastEnvironmentConfig(cypressLike)).toEqual({
+      strategy: SPEC_STRATEGY,
       ignorePerTestConfig: true,
       enabled: false,
       strategyIsSpec: true,
@@ -141,6 +156,32 @@ describe("getFailFastEnvironmentConfig", () => {
     expect(getFailFastEnvironmentConfig(cypressLike).bail).toBe(
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
     );
+  });
+});
+
+describe("getFailFastPluginConfig", () => {
+  it("uses default strategy when expose config is undefined", () => {
+    expect(
+      getFailFastPluginConfig({
+        expose: undefined,
+      } as unknown as Pick<Cypress.PluginConfigOptions, "expose">),
+    ).toMatchObject({
+      strategy: RUN_STRATEGY,
+      strategyIsSpec: false,
+    });
+  });
+
+  it("normalizes strategy from plugin expose config", () => {
+    expect(
+      getFailFastPluginConfig({
+        expose: {
+          failFastStrategy: SPEC_STRATEGY,
+        },
+      } as unknown as Pick<Cypress.PluginConfigOptions, "expose">),
+    ).toMatchObject({
+      strategy: SPEC_STRATEGY,
+      strategyIsSpec: true,
+    });
   });
 });
 

@@ -2,6 +2,8 @@
  * Effective global fail-fast configuration used during a Cypress run.
  */
 export type FailFastGlobalConfig = {
+  /** Normalized global fail-fast strategy. */
+  strategy: NonNullable<FailFastConfig["failFastStrategy"]>;
   /** When `true`, per-test fail-fast configuration will be ignored in favor of global configuration. */
   ignorePerTestConfig: boolean;
   /** When `true`, fail-fast behavior is enabled. */

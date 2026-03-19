@@ -13,16 +13,6 @@ export type FailFastFailedTestData = {
 };
 
 /**
- * Context provided to hooks that can decide to trigger fail-fast.
- */
-export type ShouldTriggerFailFastHookContext = {
-  /** Active global strategy. */
-  strategy: FailFastStrategy;
-  /** Latest failed test that triggered fail-fast in this run. */
-  test?: FailFastFailedTestData;
-};
-
-/**
  * Context provided when fail-fast is triggered from a failed test in the run.
  */
 export type OnFailFastTriggeredHookContext = {
@@ -45,7 +35,7 @@ export type FailFastHooks = {
    * Runs before each test execution to decide if fail-fast should be triggered.
    * Returning true enables skip mode.
    */
-  shouldTriggerFailFast?(context: ShouldTriggerFailFastHookContext): boolean;
+  shouldTriggerFailFast?(): boolean;
 };
 
 /**
