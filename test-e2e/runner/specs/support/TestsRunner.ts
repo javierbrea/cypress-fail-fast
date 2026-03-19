@@ -3,11 +3,36 @@ import type { FailFastConfig } from "cypress-fail-fast";
 import { pnpmRun } from "./CommandRunner";
 import { splitLogsBySpec } from "./Logs";
 
+/** Configuration for a single test retry, used in the expected spec results. */
 type RetryConfig = {
   /** Number of attempts for the test (retries + 1) */
   attempts: number;
   /** Description of the retried test */
   test: string;
+};
+
+/**
+ * Configuration for the optional hooks that can be used to coordinate fail-fast state across runs.
+ */
+type HooksConfig = {
+  /** When `true`, the `onFailFastTriggered` hook will be enabled. It simply logs the strategy and failed test when fail-fast is triggered. */
+  enableOnFailFastTriggered?: boolean;
+  /** Expected log message when the `onFailFastTriggered` hook is enabled. */
+  expectFailFastTriggeredLog?: {
+    /* Strategy used when triggering fail-fast mode. It can be either `"spec"` or `"run"`. */
+    strategy: FailFastConfig["failFastStrategy"];
+    /* Failed test that triggers fail-fast mode. It has to have `name` and `fullTitle` properties. */
+    test: {
+      /* Test title without parent suites. */
+      name: string;
+      /* Full test title including parent suites. */
+      fullTitle: string;
+    };
+  };
+  /** When `true`, the `shouldTriggerFailFast` hook will be enabled. It has to be enabled together with `enableSkipModeAfterTests` to have an effect. */
+  enableShouldTriggerFailFast?: boolean;
+  /** Number of failed tests required to trigger fail-fast mode when `shouldTriggerFailFast` is enabled. */
+  enableSkipModeAfterTests?: number;
 };
 
 /** Expected test counts for a single Cypress spec file. */
@@ -44,6 +69,8 @@ type RunSpecsTestsOptions = {
   config?: FailFastConfig;
   /** If `true`, only this test suite will be executed, skipping all others. */
   only?: boolean;
+  /** Optional hooks configuration to apply during the run. */
+  hooks?: HooksConfig;
 };
 
 /**
@@ -90,6 +117,53 @@ const expectTestsAmount = (
       );
     });
   }
+};
+
+/**
+ * Expects the `onFailFastTriggered` hook to have been called with the provided strategy and test information, by matching the spec logs with a regex.
+ * @param param0 - Expected strategy and failed test information to be included in the log message.
+ * @param getSpecLogs - Callback that returns the log string for the current spec.
+ */
+const expectFailFastTriggeredHookToHaveBeenCalled = (
+  { strategy, test: failedTest }: HooksConfig["expectFailFastTriggeredLog"] = {
+    strategy: "spec",
+    test: {
+      name: "please provide a test name",
+      fullTitle: "please provide a full test title",
+    },
+  },
+  getSpecLogs: () => string,
+) => {
+  it(`onFailFastTriggered hook should log the strategy and failed test information when fail-fast mode is triggered`, () => {
+    expect(getSpecLogs()).toEqual(
+      expect.stringMatching(
+        new RegExp(
+          `Fail-fast triggered with strategy "${strategy}" by test "${failedTest.fullTitle}"`,
+        ),
+      ),
+    );
+  });
+};
+
+/**
+ * Expects the `shouldTriggerFailFast` hook to have been called a certain number of tests
+ * @param numberOfTestsToTriggerSkip - The number of tests after which the hook should be triggered.
+ * @param getSpecLogs - Callback that returns the log string for the current spec.
+ */
+const expectShouldTriggerFailFastHookToHaveBeenCalled = (
+  numberOfTestsToTriggerSkip: number,
+  getSpecLogs: () => string,
+) => {
+  it(`shouldTriggerFailFast should have enabled fail-fast after ${numberOfTestsToTriggerSkip} tests executed`, () => {
+    expect(getSpecLogs()).toEqual(
+      expect.stringMatching(
+        // Custom shouldTriggerFailFast hook triggered fail-fast mode after ${executedTests} tests executed
+        new RegExp(
+          `Custom shouldTriggerFailFast hook triggered fail-fast mode after ${numberOfTestsToTriggerSkip} tests executed`,
+        ),
+      ),
+    );
+  });
 };
 
 /**
@@ -142,8 +216,43 @@ const getSpecTests = (
  */
 const getSpecsStatusesTests = (
   specsExpectedStatuses: SpecExpectedStatuses[],
+  hooks?: HooksConfig,
 ): ((getLogs: GetLogs) => void) => {
+  const {
+    enableOnFailFastTriggered,
+    expectFailFastTriggeredLog,
+    enableShouldTriggerFailFast,
+    enableSkipModeAfterTests,
+  } = hooks ?? {};
   return (getLogs: GetLogs): void => {
+    const getAllLogs = (): string => {
+      return specsExpectedStatuses.reduce(
+        (acc, _, index) => acc + getLogs(index + 1),
+        "",
+      );
+    };
+
+    const shouldTestTriggerHook =
+      enableShouldTriggerFailFast && enableSkipModeAfterTests !== undefined;
+    const shouldTestTriggeredHook =
+      enableOnFailFastTriggered && expectFailFastTriggeredLog;
+
+    if (shouldTestTriggerHook || shouldTestTriggeredHook) {
+      describe("hooks", () => {
+        if (shouldTestTriggerHook) {
+          expectShouldTriggerFailFastHookToHaveBeenCalled(
+            enableSkipModeAfterTests,
+            getAllLogs, // The hook is triggered before any test execution, so it will be included in the preamble logs.
+          );
+        }
+        if (shouldTestTriggeredHook) {
+          expectFailFastTriggeredHookToHaveBeenCalled(
+            expectFailFastTriggeredLog,
+            getAllLogs, // The hook is triggered after a test failure, so it will be included in the last spec's logs.
+          );
+        }
+      });
+    }
     specsExpectedStatuses.forEach((specExpectedStatuses, index) => {
       getSpecTests({ ...specExpectedStatuses, spec: index + 1 }, getLogs);
     });
@@ -161,7 +270,7 @@ const getSpecsStatusesTests = (
 const runVariantTests = (
   cypressVariant: string,
   tests: (getLogs: GetLogs) => void,
-  options: Pick<RunSpecsTestsOptions, "specsFolder" | "config"> = {},
+  options: Pick<RunSpecsTestsOptions, "specsFolder" | "config" | "hooks"> = {},
 ): void => {
   describe(`Executed in "${cypressVariant}". Specs folder "${options.specsFolder}"`, () => {
     let logs: string[];
@@ -187,6 +296,17 @@ const runVariantTests = (
             options.config?.failFastBail === undefined
               ? undefined
               : String(options.config.failFastBail),
+          ENABLE_ON_FAIL_FAST_TRIGGERED_HOOK: options.hooks
+            ?.enableOnFailFastTriggered
+            ? String(options.hooks.enableOnFailFastTriggered)
+            : undefined,
+          ENABLE_SHOULD_TRIGGER_FAIL_FAST_HOOK: options.hooks
+            ?.enableShouldTriggerFailFast
+            ? String(options.hooks.enableShouldTriggerFailFast)
+            : undefined,
+          ENABLE_SKIP_MODE_AFTER_TESTS: options.hooks?.enableSkipModeAfterTests
+            ? String(options.hooks.enableSkipModeAfterTests)
+            : undefined,
         }),
       );
     }, 120000);
@@ -212,7 +332,7 @@ export function runSpecsTests(
   method(`${description}`, () => {
     runVariantTests(
       options.cypressVariant,
-      getSpecsStatusesTests(options.specsResults),
+      getSpecsStatusesTests(options.specsResults, options.hooks),
       options,
     );
   });
