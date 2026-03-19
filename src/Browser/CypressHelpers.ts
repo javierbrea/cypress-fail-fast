@@ -13,7 +13,7 @@ import { FailFastGlobalConfig } from "src/Shared/Config.types";
  * @returns `true` when the browser is headed.
  */
 export function isHeaded(Cyp: Cypress.Cypress) {
-  return Cyp.browser && Cyp.browser.isHeaded;
+  return Cyp.browser?.isHeaded;
 }
 
 /**

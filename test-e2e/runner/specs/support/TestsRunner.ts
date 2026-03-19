@@ -112,7 +112,7 @@ const expectTestsAmount = (
     it(`should have ${status} ${amount} ${pluralize("test", amount)}`, () => {
       expect(getSpecLogs()).toEqual(
         expect.stringMatching(
-          new RegExp(`\\s*│\\s*${statusKey}:\\s*${amount}`),
+          new RegExp(String.raw`\s*│\s*${statusKey}:\s*${amount}`),
         ),
       );
     });
@@ -195,7 +195,7 @@ const getSpecTests = (
           // should display first item (failed) (attempt 3)
           expect.stringMatching(
             new RegExp(
-              `\\s*${testDescription} \\(failed\\)\\s*\\(attempt ${attempts}\\)`,
+              String.raw`\s*${testDescription} \(failed\)\s*\(attempt ${attempts}\)`,
             ),
           ),
         );
