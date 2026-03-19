@@ -6,232 +6,260 @@
 
 # Cypress Fail Fast
 
-Enables fail fast in Cypress, skipping the rest of tests on first failure.
+Skip the rest of your Cypress tests after the first failure.
 
-It can be configured to skip all remaining tests in current spec file, in current run, or even in parallel runs.
+With Cypress Fail Fast, you can:
+
+- Skip all remaining tests in the current spec file, in the entire run, depending on the configured strategy.
+- Control fail-fast behavior at a per-test or per-suite level, so you can choose which failures should trigger fail-fast mode and which should not.
+- Set hooks to:
+  - Run when fail-fast mode is triggered, so you can perform custom actions.
+  - Trigger fail-fast mode at any moment based on custom logic.
+  - Example use case: Coordinate multiple parallel runs so that when fail-fast mode is triggered in one run, the others start skipping tests as well.
 
 ## Table of Contents
 
 - [Installation](#installation)
-- [Limitations and notes](#limitations-and-notes)
+- [How it works](#how-it-works)
 - [Configuration](#configuration)
-  * [Expose configuration keys](#expose-configuration-keys)
-  * [Configuration by test](#configuration-by-test)
-  * [Configuration examples for usual scenarios](#configuration-examples-for-usual-scenarios)
-  * [Configuration for parallel runs](#configuration-for-parallel-runs)
+  - [Plugin options](#plugin-options)
+  - [Per-test configuration](#per-test-configuration)
+  - [Examples](#examples)
+  - [Hooks](#hooks)
+- [Limitations](#limitations)
 - [Usage with TypeScript](#usage-with-typescript)
+- [Compatibility](#compatibility)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
-Add the plugin to `devDependencies`
+Add the plugin to your `devDependencies`:
 
 ```bash
-npm i --save-dev cypress-fail-fast
+npm install --save-dev cypress-fail-fast
 ```
 
-### Installation
+Then register the plugin in your Cypress configuration (`cypress.config.ts` or `cypress.config.js`):
 
-Inside `cypress.config.ts` file:
-
-```javascript
+```ts
+// cypress.config.ts
+import { defineConfig } from "cypress";
 import cypressFailFast from "cypress-fail-fast/plugin";
 
 export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       cypressFailFast(on, config);
+      return config;
     },
   },
 });
 ```
 
-In case you are using JavaScript, you may explicit the file extension in some cases:
+At the top of your support file (for example `cypress/support/e2e.ts` or `cypress/support/e2e.js`):
 
-```javascript
-import cypressFailFast from "cypress-fail-fast/plugin.js"
-```
-
-Note: This example shows how to install the plugin for `e2e` testing type. Read [Cypress configuration docs](https://docs.cypress.io/guides/references/configuration) for further info.
-
-At the top of your support file (usually `cypress/support/e2e.js` for `e2e` testing type)
-
-```javascript
+```ts
 import "cypress-fail-fast";
 ```
 
-From now, if one test fail after its last retry, the rest of tests will be skipped:
+From now on, once a test fails (after its last retry), the plugin will enter "fail-fast" mode and start skipping the remaining tests according to the configured strategy. By default, the strategy is to skip all remaining tests in the entire run, but you can customize this behavior as explained in the [Configuration](#configuration) section.
 
-![Cypress results screenshot](docs/assets/cypress-fail-fast-screenshot.png)
+## How it works
 
-## Limitations and notes
+Cypress Fail Fast tracks when a test failure should trigger "fail-fast" mode and then uses Mocha's `this.skip()` to skip subsequent tests and hooks. Skipped tests will appear as **pending** in the Cypress results, which is the expected behavior when tests are skipped programmatically through Mocha.
 
-* All spec files will be loaded, even after entering "skip mode", but every tests and hooks inside them will be skipped.
-* The `spec` strategy does not work in headed mode, because for Cypress events it is like running a single spec, so all remaining tests will be skipped.
+The plugin uses a `beforeEach` hook to decide whether the current test should run or be skipped. This allows it to stop execution not only within the current spec file but also across the rest of the spec files in the run when the chosen strategy requires it.
 
 ## Configuration
 
-### Expose configuration keys
+All plugin configuration is provided through the Cypress configuration file using the `expose` option.
 
-* __`FAIL_FAST_STRATEGY`__: `'spec'|'run'|'parallel'`
-  * If `spec`, only remaining tests in current spec file are skipped. This mode only works in "headless" mode.
-  * If `run`, all remaining tests in all spec files are skipped (default value).
-  * Use `parallel` to [provide your own callbacks](#configuration-for-parallel-runs) allowing to notify from one run to the others when remaining tests should be skipped.
-* __`FAIL_FAST_ENABLED`__: `boolean = true` Allows disabling the "fail-fast" feature globally, but it could be still enabled for specific tests or describes using [configuration by test](#configuration-by-test).
-* __`FAIL_FAST_PLUGIN`__: `boolean = true` If `false`, it disables the "fail-fast" feature totally, ignoring even plugin [configurations by test](#configuration-by-test).
-* __`FAIL_FAST_BAIL`__: `Number = 1` Enable the skip mode immediately upon n number of failing test suite. Defaults to 1.
+### Plugin options
 
-#### Examples
+The following properties are supported:
 
-```javascript
-export default defineConfig({
-  expose: {
-    FAIL_FAST_STRATEGY: "run",
-    FAIL_FAST_ENABLED: true,
-    FAIL_FAST_BAIL: 2,
-  },
-});
-```
+- `failFastStrategy`: `"spec" | "run"` (default: `"run"`)
+  - `"spec"`: Skip remaining tests only in the current spec file.  
+  - `"run"` (default): Skip remaining tests in all spec files for the current run.  
 
-### Configuration by test
+- `failFastEnabled`: `boolean` (default: `true`)  
+  Enable or disable the fail-fast behavior globally. When set to `false`, fail-fast can still be enabled for specific tests or suites using per-test configuration.
 
-If you want to configure the plugin on a specific test, you can set this by using the `failFast` property in [test configuration](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Test-Configuration). The plugin allows next config values:
+- `failFastBail`: `number` (default: `1`)  
+  Number of failing test suites required before entering fail-fast mode. For example, `failFastBail: 2` will start skipping tests after failures in two different suites or spec files, depending on the strategy. When strategy is `"spec"`, failures are reset at the beginning of each spec file, so fail-fast mode will be triggered after the configured number of failures within the same spec. When strategy is `"run"`, failures are tracked across the entire run, so fail-fast mode will be triggered after the configured number of failures regardless of which spec files they occur in.
 
-* __`failFast`__: Configuration for the plugin, containing any of next properties:
-  * __`enabled`__ : Indicates whether a failure of the current test or children tests _(if configuration is [applied to a suite](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Suite-configuration))_ should produce to skip the rest of tests or not. Note that the value defined in this property has priority over the value of the configuration key `expose.CYPRESS_FAIL_FAST_ENABLED` _(but not over `expose.CYPRESS_FAIL_FAST_PLUGIN`, which disables the plugin totally)_.
+- `failFastIgnorePerTestConfig`: `boolean` (default: `false`)  
+  When `true`, the plugin ignores any per-test or per-suite `failFast` configuration and only uses the global options exposed through `expose`. This is useful when you want to control fail-fast exclusively at a global level (for example, disabling it completely or enabling it for the entire run) and avoid any accidental overrides in tests or suites.
 
-#### Example
+To configure the plugin options, use the `expose` property in your Cypress configuration:
 
-In the next example, tests are configured to "fail-fast" only in case the test with the "sanity test" description fails. If any of the other tests fails, "fail-fast" will not be applied.
-
-```js
-describe("All tests", {
-  failFast: {
-    enabled: false, // Children tests and describes will inherit this configuration
-  },
-}, () => {
-  it("sanity test", {
-    failFast: {
-      enabled: true, // Overwrite configuration defined in parents
-    },
-  }, () => {
-    // Will skip the rest of tests if this one fails
-    expect(true).to.be.true;
-  });
-
-  it("second test",() => {
-    // Will continue executing tests if this one fails
-    expect(true).to.be.true;
-  });
-});
-```
-
-### Configuration examples for usual scenarios
-
-##### You want to disable "fail-fast" in all specs except one:
-
-Set the `FAIL_FAST_ENABLED` key in the `cypress.config.js` configuration file:
-
-```javascript
-export default defineConfig({
-  expose: {
-    FAIL_FAST_ENABLED: false,
-  },
-});
-```
-
-Enable "fail-fast" in those specs you want using [configurations by test](#configuration-by-test):
-
-```js
-describe("All tests", { failFast: { enabled: true } }, () => {
-  // If any test in this describe fails, the rest of tests and specs will be skipped
-});
-```
-
-##### You want to totally disable "fail-fast" in your local environment:
-
-Set the `FAIL_FAST_PLUGIN` key in your local `cypress.config.js` configuration file:
-
-```javascript
-export default defineConfig({
-  expose: {
-    FAIL_FAST_PLUGIN: false,
-  },
-});
-```
-
-### Configuration for parallel runs
-
-The plugin configuration supports defining two callbacks that, used in combination, allow to skip tests in one run when other run starts skipping tests also. Where, or how do you store the "flag" that allows to communicate your runs is in your hands, the plugin does not care about it.
-
-To implement it, the plugin can receive an object with extra configuration as third argument when it is registered in the `cypress.config.js` file:
-
-* __`parallelCallbacks`__: Object containing next properties:
-  * __`onCancel`__: `function()` This callback is executed on first test failure that produces the plugin starts skipping tests.
-  * __`isCancelled`__: `function(): boolean` If this callback returns `true`, the plugin skips remaining tests.
-
-These callbacks are executed only when the configuration key `expose.FAIL_FAST_STRATEGY` is set to `parallel`.
-
-Here is an example of configuration that would skip tests on many parallel runs when one of them starts skipping tests. It would only work if all parallel runs have access to the folder where the `isCancelled` flag is being stored as a file (easy to achieve if all of your parallel runs are being executed on Docker images on a same machine, for example). _Note that this is only an example, you could also implement it storing the flag in a REST API, etc._
-
-```js
+```ts
+// cypress.config.ts
 import { defineConfig } from "cypress";
 import cypressFailFast from "cypress-fail-fast/plugin";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const isCancelledFlagFile = path.resolve(__dirname, ".run-is-cancelled");
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      cypressFailFast(on, config);
+      return config;
+    },
+    expose: {
+      failFastStrategy: "run",
+      failFastEnabled: true,
+      failFastBail: 1,
+      failFastIgnorePerTestConfig: false,
+    },
+  },
+});
+```
+
+### Per-test configuration
+
+You can configure fail-fast behavior at the test or suite level using the `failFast` property in Cypress test configuration. The plugin supports:
+
+- `failFast.enabled`: `boolean`  
+  Controls whether a failure in the current test (or in any of its children when applied to a suite) should trigger fail-fast mode. Per-test configuration takes precedence over the global `failFastEnabled` option, unless `failFastIgnorePerTestConfig` is set to `true`.
+
+Example:
+
+```ts
+describe(
+  "All tests",
+  {
+    failFast: {
+      enabled: false, // Children tests and suites will inherit this configuration
+    },
+  },
+  () => {
+    it(
+      "sanity test",
+      {
+        failFast: {
+          enabled: true, // Overrides configuration defined in parents
+        },
+      },
+      () => {
+        // If this test fails, remaining tests (and specs) will be skipped
+        expect(true).to.be.true;
+      },
+    );
+
+    it("second test", () => {
+      // If this test fails, fail-fast will not be applied
+      expect(true).to.be.true;
+    });
+  },
+);
+```
+
+### Examples
+
+#### Disable fail-fast by default and enable it only for specific specs
+
+```ts
+// cypress.config.ts
+export default defineConfig({
+  e2e: {
+    expose: {
+      failFastStrategy: "run",
+      failFastEnabled: false,
+    },
+  },
+});
+```
+
+Then enable fail-fast in specific suites:
+
+```ts
+describe(
+  "Critical tests",
+  {
+    failFast: { enabled: true },
+  },
+  () => {
+    // If any test in this suite fails, remaining tests and specs will be skipped
+  },
+);
+```
+
+#### Disable fail-fast completely and ignore per-test configuration
+
+```ts
+// cypress.config.ts
+export default defineConfig({
+  e2e: {
+    expose: {
+      failFastEnabled: false,
+      failFastIgnorePerTestConfig: true,
+    },
+  },
+});
+```
+
+With this configuration, fail-fast is disabled regardless of any `failFast` configuration defined in tests or suites.
+
+### Hooks
+
+Hooks allow you to run custom logic when fail-fast mode is triggered or to trigger fail-fast mode based on custom conditions. This can be useful for various purposes, such as coordinating multiple parallel runs with the mechanism that best fits your environment (for example, using a shared file, a database, or an API) as long as it can be accessed by all parallel runs.
+
+Supported hooks:
+
+- `onFailFastTriggered`: Run custom logic when fail-fast mode is triggered. For example, you can use this hook to log additional information or to notify an external system. The hook receives an object with the following properties:
+  - `strategy`: The fail-fast strategy that is being applied (`"spec"` or `"run"`).
+  - `test`: The failed test that triggered fail-fast mode, with the following properties:
+    - `name`: The title of the test that failed.
+    - `fullTitle`: The full title of the test that failed, including the titles of its parent suites.
+- `shouldTriggerFailFast`: Trigger fail-fast mode at any moment based on custom logic. For example, you can use this hook to trigger fail-fast mode when a certain threshold of failures is reached across parallel runs. The hook should return `true` to trigger fail-fast mode or `false` to continue without triggering it. This hook is called before each test execution, so be careful with the performance of the logic implemented here.
+
+Here you have an example of how to use these hooks to coordinate multiple parallel runs using a shared file as a flag:
+
+```ts
+// cypress.config.ts
+import { defineConfig } from "cypress";
+import fs from "node:fs";
+import path from "node:path";
+import cypressFailFast from "cypress-fail-fast/plugin";
+
+const testsSkippedFlagFile = path.resolve(__dirname, ".tests_skipped");
 
 export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       cypressFailFast(on, config, {
-        parallelCallbacks: {
-          onCancel: () => {
+        hooks: {
+          onFailFastTriggered: ({ strategy, test }) => {
             // Create flag file when the plugin starts skipping tests
-            fs.writeFileSync(isCancelledFlagFile, "");
+            // You can also use the spec and test information to implement more complex coordination logic if needed
+            fs.writeFileSync(testsSkippedFlagFile, "");
           },
-          isCancelled: () => {
+          shouldTriggerFailFast: () => {
             // If any other run has created the file, start skipping tests
-            return fs.existsSync(isCancelledFlagFile);
+            return fs.existsSync(testsSkippedFlagFile);
           },
         },
       });
+
       return config;
+    },
+    expose: {
+      failFastStrategy: "run",
     },
   },
 });
 ```
 
-Note that this example requires to remove the created file when all of the runs have finished, or tests will always be skipped whenever any run starts again. So, the `expose.FAIL_FAST_STRATEGY` configuration key should be set to `parallel` only in CI pipelines where the workspace is cleaned on finish, for example. 
+You are responsible for cleaning up the shared flag (for example, removing the file after all runs finish) so that subsequent runs do not start in a cancelled state.
 
-## Usage with TypeScript
+## Limitations
 
-If you are using [TypeScript in the Cypress configuration file][cypress-typescript], this plugin includes TypeScript declarations and can be imported like the following:
+- All spec files are still loaded even after entering fail-fast mode, but their tests will be skipped.
+- Skipped tests are reported as **pending** in the Cypress UI and in the results, because Mocha's `this.skip()` is used internally instead of `Cypress.stop()`. This is intentional, because using `Cypress.stop()` would mark the first test of each spec file as failed instead of pending, which is not the expected behavior for the plugin.
 
-```ts
-import cypressFailFast from "cypress-fail-fast/plugin";
-import { defineConfig } from "cypress";
+## Compatibility
 
-export default defineConfig({
-  e2e: {
-    setupNodeEvents(on, config) {
-      cypressFailFast(on, config);
-      return config;
-    },
-  },
-});
-```
-
-## Tests
-
-To ensure the plugin stability, the current major version is being tested with Cypress 15.x, and new releases will be published for each new Cypress minor or major releases, updating the E2E tests.
-
-Minor versions used in the E2E tests can be checked in the `devDependencies` of the `package.json` files of the E2E tests:
-* [Cypress v15.x](https://github.com/javierbrea/cypress-fail-fast/blob/main/test-e2e/cypress-variants/cypress-15/package.json)
-
-The current major version of the plugin supports Cypress 15.10.0 and above, but if you are using an older Cypress version, you can use the last compatible plugin version according to next compatibility table:
+Cypress Fail Fast stopped using `Cypress.env()` for configuration in version 8.0.0, so, from this version onwards, the plugin is only compatible with Cypress `>= 15.10.0`, which introduced the `expose` configuration option. If you are using an older version of Cypress, you can use the last compatible plugin version according to next compatibility table:
 
 | Cypress version | Compatible plugin version |
 |-----------------|---------------------------|
@@ -241,16 +269,12 @@ The current major version of the plugin supports Cypress 15.10.0 and above, but 
 | 6.x             | 5.x                       |
 | 5.x or lower    | <= 4.x                    |
 
-If you find any issue for a specific Cypress version, please report it at https://github.com/javierbrea/cypress-fail-fast/issues.
-
-## Acknowledgements
-
-This plugin has been developed based on the solutions proposed by the community on this [Cypress issue](https://github.com/cypress-io/cypress/issues/518), so thanks to all! I hope this plugin can be deprecated soon, as soon as the Cypress team adds native support for this feature. 😃
-
 ## Contributing
 
-Contributors are welcome.
-Please read the [contributing guidelines](.github/CONTRIBUTING.md) and [code of conduct](.github/CODE_OF_CONDUCT.md).
+Contributions are welcome. Please read the contributing guidelines and code of conduct before opening an issue or pull request.
+
+- [Contributing guidelines](.github/CONTRIBUTING.md)
+- [Code of conduct](.github/CODE_OF_CONDUCT.md)
 
 ## License
 

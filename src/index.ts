@@ -33,7 +33,12 @@ declare global {
   }
 }
 
+const plugin = registerFailFast(Cypress, cy, before, beforeEach, afterEach);
+
 /**
  * Registers fail-fast browser hooks for use in Cypress support files.
  */
-export default registerFailFast(Cypress, cy, before, beforeEach, afterEach);
+export default plugin;
+
+// For CommonJS compatibility
+module.exports = plugin;

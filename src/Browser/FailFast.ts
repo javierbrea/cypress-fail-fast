@@ -3,6 +3,7 @@ import type * as Mocha from "mocha";
 
 import {
   SHOULD_SKIP_TASK,
+  TRIGGER_FAIL_FAST_TASK,
   FAILED_TESTS_TASK,
   RESET_SKIP_TASK,
   RESET_FAILED_TESTS_TASK,
@@ -10,6 +11,10 @@ import {
   SKIP_MESSAGE,
   FAILED_TEST_MESSAGE,
 } from "../Shared/Constants";
+import type {
+  FailFastFailedTestData,
+  TriggerFailFastTaskPayload,
+} from "../Node/Tasks.types";
 
 import { bailConfig, currentStrategyIsSpec } from "../Shared/Config";
 
@@ -43,7 +48,7 @@ export function registerFailFast(
    * @returns Cypress chainable resolving to skip state.
    */
   function shouldSkip() {
-    return cy.task<boolean>(SHOULD_SKIP_TASK, null, { log: false });
+    return cy.task<boolean>(SHOULD_SKIP_TASK, undefined, { log: false });
   }
 
   /**
@@ -64,9 +69,18 @@ export function registerFailFast(
    * Enables skip mode for subsequent tests.
    * @returns Cypress chainable resolving when skip mode is enabled.
    */
-  function enableSkipMode() {
+  function enableSkipMode(failedTest: FailFastFailedTestData) {
     log(SKIP_MESSAGE);
-    return cy.task<void>(SHOULD_SKIP_TASK, true);
+    return cy.task<void>(TRIGGER_FAIL_FAST_TASK, {
+      test: failedTest,
+    } as TriggerFailFastTaskPayload);
+  }
+
+  function mapFailedTest(currentTest: Mocha.Test): FailFastFailedTestData {
+    return {
+      name: currentTest.title,
+      fullTitle: currentTest.fullTitle(),
+    };
   }
 
   /**
@@ -139,7 +153,7 @@ export function registerFailFast(
     ) {
       log(`Test "${currentTest.fullTitle()}" has failed`);
       registerFailureAndRunIfBailLimitIsReached(() => {
-        enableSkipMode();
+        enableSkipMode(mapFailedTest(currentTest));
       });
     }
   });

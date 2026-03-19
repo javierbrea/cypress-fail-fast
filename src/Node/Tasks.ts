@@ -2,31 +2,59 @@ import type * as Cypress from "cypress";
 import chalk from "chalk";
 import {
   SHOULD_SKIP_TASK,
+  TRIGGER_FAIL_FAST_TASK,
   RESET_SKIP_TASK,
   FAILED_TESTS_TASK,
   RESET_FAILED_TESTS_TASK,
   LOG_TASK,
   LOG_PREFIX,
 } from "../Shared/Constants";
-import type { FailFastPluginConfigOptions } from "./Tasks.types";
+import type { FailFastConfig } from "../Shared/Config.types";
+import type {
+  FailFastFailedTestData,
+  FailFastPluginConfigOptions,
+  FailFastStrategy,
+  TriggerFailFastTaskPayload,
+} from "./Tasks.types";
 
 /**
  * Registers Node-side Cypress tasks used to coordinate fail-fast state.
  * @param on Cypress plugin events registry.
- * @param __config Cypress plugin configuration (unused).
- * @param pluginConfig Optional plugin callbacks for parallel execution.
+ * @param config Cypress plugin configuration.
+ * @param pluginConfig Optional fail-fast plugin hooks.
  */
 export function registerFailFastTasks(
   on: Cypress.PluginEvents,
-  __config: Cypress.PluginConfigOptions,
+  config: Cypress.PluginConfigOptions,
   pluginConfig: FailFastPluginConfigOptions = {},
 ) {
   // store skip flag
   let shouldSkipFlag = false;
   let failedTests = 0;
+  let failedTestThatTriggeredFailFast: FailFastFailedTestData | undefined;
 
-  const isCancelledCallback = pluginConfig.parallelCallbacks?.isCancelled;
-  const onCancelCallback = pluginConfig.parallelCallbacks?.onCancel;
+  const exposedConfig = config as Cypress.PluginConfigOptions & {
+    expose?: FailFastConfig;
+  };
+  const strategy: FailFastStrategy =
+    exposedConfig.expose?.failFastStrategy === "spec" ? "spec" : "run";
+
+  const shouldTriggerFailFastCallback =
+    pluginConfig.hooks?.shouldTriggerFailFast;
+  const onFailFastTriggeredCallback = pluginConfig.hooks?.onFailFastTriggered;
+
+  function shouldTriggerFailFastFromHook() {
+    if (!shouldTriggerFailFastCallback) {
+      return false;
+    }
+
+    return (
+      shouldTriggerFailFastCallback({
+        strategy,
+        test: failedTestThatTriggeredFailFast,
+      }) || false
+    );
+  }
 
   /**
    * Computes whether remaining tests should be skipped.
@@ -36,9 +64,11 @@ export function registerFailFastTasks(
     if (shouldSkipFlag) {
       return shouldSkipFlag;
     }
-    if (isCancelledCallback) {
-      shouldSkipFlag = isCancelledCallback() || false;
+
+    if (shouldTriggerFailFastFromHook()) {
+      shouldSkipFlag = true;
     }
+
     return shouldSkipFlag;
   };
 
@@ -46,18 +76,27 @@ export function registerFailFastTasks(
   on("task", {
     [RESET_SKIP_TASK]: function () {
       shouldSkipFlag = false;
+      failedTestThatTriggeredFailFast = undefined;
       return null;
     },
-    [SHOULD_SKIP_TASK]: function (value) {
-      if (value === true) {
-        if (onCancelCallback) {
-          onCancelCallback();
-        }
-        shouldSkipFlag = value;
-      }
+    [SHOULD_SKIP_TASK]: function () {
       return shouldSkip();
     },
-    [FAILED_TESTS_TASK]: function (value) {
+    [TRIGGER_FAIL_FAST_TASK]: function (value: TriggerFailFastTaskPayload) {
+      failedTestThatTriggeredFailFast = value.test;
+
+      if (onFailFastTriggeredCallback) {
+        onFailFastTriggeredCallback({
+          strategy,
+          test: failedTestThatTriggeredFailFast,
+        });
+      }
+
+      shouldSkipFlag = true;
+
+      return shouldSkip();
+    },
+    [FAILED_TESTS_TASK]: function (value: boolean) {
       if (value === true) {
         failedTests++;
       }
@@ -67,7 +106,7 @@ export function registerFailFastTasks(
       failedTests = 0;
       return null;
     },
-    [LOG_TASK]: function (message) {
+    [LOG_TASK]: function (message: string) {
       // eslint-disable-next-line no-console
       console.log(`${chalk.yellow(LOG_PREFIX)} ${message}`);
       return null;

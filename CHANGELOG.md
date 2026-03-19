@@ -11,23 +11,39 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 ### Breaking Changes
 
-## [8.0.0] - 2025-03-17
+## [8.0.0] - 2026-03-19
 
 ### Breaking Changes
 
-- feat(#301): Migrates plugin configuration from `Cypress.env()` to `Cypress.expose()`, as `Cypress.env()` was deprecated in Cypress 15.10 and will be removed in Cypress 16. **BREAKING CHANGE**
-- chore: Updates Cypress peer dependency to `>= 15.10.0`. **BREAKING CHANGE**
+- **Configuration no longer uses `Cypress.env()` or environment variables.** All plugin options must be provided via `Cypress.expose()` in the Cypress configuration file.
+- Environment-based keys have been renamed:
+  - `FAIL_FAST_STRATEGY` → `failFastStrategy`
+  - `FAIL_FAST_ENABLED` → `failFastEnabled`
+  - `FAIL_FAST_BAIL` → `failFastBail`
+- Renamed `parallelCallbacks` plugin option to `hooks`, and changed its structure. Now it is an object with two optional properties: `onFailFastTriggered` and `shouldTriggerFailFast`. The first one is a callback that runs when fail-fast mode is triggered, and receives an object with the strategy being applied and the test that triggered it (`name` and `fullTitle`). The second one is a callback that runs before each test execution, and should return `true` to trigger fail-fast mode. It receives an object with the strategy being applied and the failed test that has triggered fail-fast mode.
+- Removed support for the `parallel` strategy. The plugin now uses hooks that work regardless of the strategy, so there is no need to specify a different strategy for managing parallel runs. It is now the responsibility of the user to implement the coordination mechanism for parallel runs if they want to use that feature.
+- The `FAIL_FAST_PLUGIN` option has been removed. Use the combination of `failFastEnabled` and `failFastIgnorePerTestConfig` instead.
+- Fail-fast behavior now uses Mocha `this.skip()`, which causes skipped tests to appear as **pending** in the results instead of **skipped**.
+- The plugin now requires **Cypress `>= 15.10.0`** and no longer supports older versions.
+
+### Added
+
+- feat: Support configuration via `Cypress.expose()` and new `failFast*` options.
+- feat: Add `failFastIgnorePerTestConfig` option to control whether per-test configuration is honored.
+- refactor: Migrate plugin and tests to TypeScript.
+- test(e2e): Simplify and speed up E2E tests.
 
 ### Changed
 
-- chore: Bumps package version to **8.0.0** (major version for breaking change)
-- test: Removes E2E test variants for Cypress 9, 10, 11, 12, 13. Adds E2E test variant for Cypress 15 (15.10.0).  Updates TypeScript E2E tests to use Cypress 15
-- docs: Removes legacy Cypress <10 installation docs, updates config examples to `cypress.config.js` format, updates compatibility table.
+- refactor: Use Mocha `this.skip()` internally instead of `Cypress.stop()` to implement fail-fast behavior.
+- test(e2e): Migrate E2E test projects to pnpm for dependency management.
+- chore(deps): Update devDependencies, removing unused packages and upgrading existing ones.
 
 ### Removed
 
-- docs: Remove reference to environment variables in docs, and replace it with reference to configuration keys exposed with `Cypress.expose()`
-
+- feat: Remove `parallel` strategy. Hooks now work regardless of the strategy.
+- test(e2e): Drop E2E tests for old Cypress versions.
+- chore: Remove workarounds and access to private Cypress APIs no longer needed with the new minimum supported version.
 
 ## [7.1.1] - 2024-08-04
 

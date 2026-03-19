@@ -9,8 +9,10 @@ export const STRATEGY_GLOBAL_CONFIG = "failFastStrategy" as const;
 /** Global config that defines the failure threshold. */
 export const BAIL_GLOBAL_CONFIG = "failFastBail" as const;
 
-/** Task name to read or update skip state. */
+/** Task name to read current skip state. */
 export const SHOULD_SKIP_TASK = "failFastShouldSkip";
+/** Task name to enable skip mode with fail-fast metadata. */
+export const TRIGGER_FAIL_FAST_TASK = "failFastTrigger";
 /** Task name to reset skip state. */
 export const RESET_SKIP_TASK = "failFastResetSkip";
 /** Task name to write plugin logs in Node process. */

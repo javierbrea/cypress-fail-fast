@@ -1,19 +1,58 @@
+import type { FailFastConfig } from "../Shared/Config.types";
+
+export type FailFastStrategy = NonNullable<FailFastConfig["failFastStrategy"]>;
+
 /**
- * Callback hooks used to coordinate fail-fast state in parallel runs.
+ * Lightweight failed test data shared with Node-side hooks.
  */
-export type FailFastParallelCallbacks = {
+export type FailFastFailedTestData = {
+  /** Test title without parent suites. */
+  name: string;
+  /** Full test title including parent suites. */
+  fullTitle: string;
+};
+
+/**
+ * Context provided to hooks that can decide to trigger fail-fast.
+ */
+export type ShouldTriggerFailFastHookContext = {
+  /** Active global strategy. */
+  strategy: FailFastStrategy;
+  /** Latest failed test that triggered fail-fast in this run. */
+  test?: FailFastFailedTestData;
+};
+
+/**
+ * Context provided when fail-fast is triggered from a failed test in the run.
+ */
+export type OnFailFastTriggeredHookContext = {
+  /** Active global strategy. */
+  strategy: FailFastStrategy;
+  /** Failed test that triggered fail-fast. */
+  test: FailFastFailedTestData;
+};
+
+/**
+ * Callback hooks used to coordinate fail-fast state across runs.
+ */
+export type FailFastHooks = {
   /**
-   * onCancel callback.
-   * Callback that will be executed on first test failure producing that cypress-fail-fast starts skipping tests.
+   * Runs when fail-fast mode is triggered from a failed test.
    */
-  onCancel?(): void;
+  onFailFastTriggered?(context: OnFailFastTriggeredHookContext): void;
 
   /**
-   * isCancelled callback.
-   * If this callback returns true, cypress-fail-fast will start skipping tests.
-   * @returns boolean. true if remaining tests should be skipped
+   * Runs before each test execution to decide if fail-fast should be triggered.
+   * Returning true enables skip mode.
    */
-  isCancelled?(): boolean;
+  shouldTriggerFailFast?(context: ShouldTriggerFailFastHookContext): boolean;
+};
+
+/**
+ * Payload accepted by the trigger-fail-fast task.
+ */
+export type TriggerFailFastTaskPayload = {
+  test: FailFastFailedTestData;
 };
 
 /**
@@ -21,8 +60,7 @@ export type FailFastParallelCallbacks = {
  */
 export type FailFastPluginConfigOptions = {
   /**
-   * Parallel callbacks.
-   * Callbacks to be executed when strategy is "parallel".
+   * Optional hooks to coordinate fail-fast across runs.
    */
-  parallelCallbacks?: FailFastParallelCallbacks;
+  hooks?: FailFastHooks;
 };

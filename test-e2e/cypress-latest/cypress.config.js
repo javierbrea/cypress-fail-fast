@@ -1,4 +1,4 @@
-const { default: cypressFailFastPlugin } = require("cypress-fail-fast/plugin");
+const cypressFailFastPlugin = require("cypress-fail-fast/plugin");
 
 module.exports = {
   e2e: {

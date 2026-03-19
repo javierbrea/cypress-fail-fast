@@ -5,6 +5,7 @@ import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 
 import {
   SHOULD_SKIP_TASK,
+  TRIGGER_FAIL_FAST_TASK,
   FAILED_TESTS_TASK,
   RESET_SKIP_TASK,
   RESET_FAILED_TESTS_TASK,
@@ -59,7 +60,7 @@ function createCyLike(initialShouldSkip = false, initialFailedTests = 0) {
   let failedTests = initialFailedTests;
 
   const task = jest.fn((taskName: string, value: unknown): unknown => {
-    if (taskName === SHOULD_SKIP_TASK && value === null) {
+    if (taskName === SHOULD_SKIP_TASK) {
       return {
         then: (callback: (currentValue: boolean) => void) => {
           callback(shouldSkip);
@@ -67,7 +68,12 @@ function createCyLike(initialShouldSkip = false, initialFailedTests = 0) {
       };
     }
 
-    if (taskName === SHOULD_SKIP_TASK && value === true) {
+    if (
+      taskName === TRIGGER_FAIL_FAST_TASK &&
+      typeof value === "object" &&
+      value !== null &&
+      "test" in value
+    ) {
       shouldSkip = true;
       return null;
     }
@@ -99,8 +105,9 @@ function createCyLike(initialShouldSkip = false, initialFailedTests = 0) {
   } as unknown as Cypress.cy;
 }
 
-function createCurrentTest(fullTitle = "a suite a test") {
+function createCurrentTest(fullTitle = "a suite a test", title = "a test") {
   return {
+    title,
     fullTitle: () => fullTitle,
   } as unknown as Mocha.Test;
 }
@@ -195,7 +202,7 @@ describe("registerFailFast", () => {
 
     beforeHook.getCallback()?.call(context);
 
-    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, null, {
+    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, undefined, {
       log: false,
     });
     expect(context.skip).toHaveBeenCalledTimes(1);
@@ -238,7 +245,7 @@ describe("registerFailFast", () => {
 
     beforeEachHook.getCallback()?.call(context);
 
-    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, null, {
+    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, undefined, {
       log: false,
     });
     expect(context.skip).toHaveBeenCalledTimes(1);
@@ -365,7 +372,10 @@ describe("registerFailFast", () => {
       `${FAILED_TEST_MESSAGE}: 1/2`,
     );
     expect(cyLike.task).not.toHaveBeenCalledWith(LOG_TASK, SKIP_MESSAGE);
-    expect(cyLike.task).not.toHaveBeenCalledWith(SHOULD_SKIP_TASK, true);
+    expect(cyLike.task).not.toHaveBeenCalledWith(
+      TRIGGER_FAIL_FAST_TASK,
+      expect.anything(),
+    );
   });
 
   it("enables skip mode when bail limit is reached", () => {
@@ -397,6 +407,11 @@ describe("registerFailFast", () => {
       `${FAILED_TEST_MESSAGE}: 1/1`,
     );
     expect(cyLike.task).toHaveBeenCalledWith(LOG_TASK, SKIP_MESSAGE);
-    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, true);
+    expect(cyLike.task).toHaveBeenCalledWith(TRIGGER_FAIL_FAST_TASK, {
+      test: {
+        name: "a test",
+        fullTitle: "suite should stop",
+      },
+    });
   });
 });

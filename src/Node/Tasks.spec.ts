@@ -14,13 +14,19 @@ import {
 
 import {
   SHOULD_SKIP_TASK,
+  TRIGGER_FAIL_FAST_TASK,
   RESET_SKIP_TASK,
   FAILED_TESTS_TASK,
   RESET_FAILED_TESTS_TASK,
   LOG_TASK,
   LOG_PREFIX,
 } from "../Shared/Constants";
-import type { FailFastPluginConfigOptions } from "./Tasks.types";
+import type { FailFastConfig } from "../Shared/Config.types";
+import type {
+  FailFastFailedTestData,
+  FailFastPluginConfigOptions,
+  TriggerFailFastTaskPayload,
+} from "./Tasks.types";
 import { registerFailFastTasks } from "./Tasks";
 
 type TaskHandler = (value?: unknown) => unknown;
@@ -28,19 +34,23 @@ type RegisteredTasks = Record<string, TaskHandler>;
 
 function createRegisteredTasks(
   pluginConfig?: FailFastPluginConfigOptions,
+  exposedConfig?: FailFastConfig,
 ): RegisteredTasks {
   const onMock = jest.fn();
+  const cypressConfig = {
+    expose: exposedConfig,
+  } as unknown as Cypress.PluginConfigOptions;
 
   if (pluginConfig) {
     registerFailFastTasks(
       onMock as unknown as Cypress.PluginEvents,
-      {} as Cypress.PluginConfigOptions,
+      cypressConfig,
       pluginConfig,
     );
   } else {
     registerFailFastTasks(
       onMock as unknown as Cypress.PluginEvents,
-      {} as Cypress.PluginConfigOptions,
+      cypressConfig,
     );
   }
 
@@ -53,6 +63,14 @@ function createRegisteredTasks(
   }
 
   return registration[1];
+}
+
+function createEnableSkipTaskPayload(
+  failedTestData: FailFastFailedTestData,
+): TriggerFailFastTaskPayload {
+  return {
+    test: failedTestData,
+  };
 }
 
 describe("registerFailFastTasks", () => {
@@ -74,6 +92,7 @@ describe("registerFailFastTasks", () => {
     expect(tasks).toMatchObject({
       [RESET_SKIP_TASK]: expect.any(Function),
       [SHOULD_SKIP_TASK]: expect.any(Function),
+      [TRIGGER_FAIL_FAST_TASK]: expect.any(Function),
       [FAILED_TESTS_TASK]: expect.any(Function),
       [RESET_FAILED_TESTS_TASK]: expect.any(Function),
       [LOG_TASK]: expect.any(Function),
@@ -83,67 +102,163 @@ describe("registerFailFastTasks", () => {
   it("returns false from should-skip task by default", () => {
     const tasks = createRegisteredTasks();
 
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(false);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(false);
   });
 
-  it("enables skip mode when should-skip task receives true", () => {
+  it("enables skip mode when trigger task receives failed test payload", () => {
     const tasks = createRegisteredTasks();
+    const failedTest = {
+      name: "a test",
+      fullTitle: "suite a test",
+    };
 
-    expect(tasks[SHOULD_SKIP_TASK](true)).toBe(true);
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(true);
+    expect(
+      tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest)),
+    ).toBe(true);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(true);
   });
 
   it("resets skip mode when reset-skip task is executed", () => {
     const tasks = createRegisteredTasks();
 
-    tasks[SHOULD_SKIP_TASK](true);
+    tasks[TRIGGER_FAIL_FAST_TASK](
+      createEnableSkipTaskPayload({
+        name: "a test",
+        fullTitle: "suite a test",
+      }),
+    );
 
     expect(tasks[RESET_SKIP_TASK]()).toBeNull();
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(false);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(false);
   });
 
-  it("uses parallel isCancelled callback and caches true result", () => {
-    const isCancelled = jest
+  it("uses shouldTriggerFailFast hook and caches true result", () => {
+    const shouldTriggerFailFast = jest
       .fn<() => boolean>()
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false);
 
     const tasks = createRegisteredTasks({
-      parallelCallbacks: {
-        isCancelled,
+      hooks: {
+        shouldTriggerFailFast,
       },
     });
 
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(true);
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(true);
-    expect(isCancelled).toHaveBeenCalledTimes(1);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(true);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(true);
+    expect(shouldTriggerFailFast).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps skip mode disabled when isCancelled callback returns false", () => {
-    const isCancelled = jest.fn<() => boolean>().mockReturnValue(false);
+  it("keeps skip mode disabled when shouldTriggerFailFast returns false", () => {
+    const shouldTriggerFailFast = jest
+      .fn<() => boolean>()
+      .mockReturnValue(false);
 
     const tasks = createRegisteredTasks({
-      parallelCallbacks: {
-        isCancelled,
+      hooks: {
+        shouldTriggerFailFast,
       },
     });
 
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(false);
-    expect(tasks[SHOULD_SKIP_TASK](null)).toBe(false);
-    expect(isCancelled).toHaveBeenCalledTimes(2);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(false);
+    expect(tasks[SHOULD_SKIP_TASK]()).toBe(false);
+    expect(shouldTriggerFailFast).toHaveBeenCalledTimes(2);
   });
 
-  it("calls parallel onCancel callback when enabling skip mode", () => {
-    const onCancel = jest.fn<() => void>();
+  it("calls onFailFastTriggered when enabling skip mode with payload", () => {
+    const onFailFastTriggered =
+      jest.fn<
+        (context: {
+          strategy: "run" | "spec";
+          test: FailFastFailedTestData;
+        }) => void
+      >();
+    const failedTest = {
+      name: "a test",
+      fullTitle: "suite a test",
+    };
+
     const tasks = createRegisteredTasks({
-      parallelCallbacks: {
-        onCancel,
+      hooks: {
+        onFailFastTriggered,
       },
     });
 
-    tasks[SHOULD_SKIP_TASK](true);
+    tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
 
-    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onFailFastTriggered).toHaveBeenCalledTimes(1);
+    expect(onFailFastTriggered).toHaveBeenCalledWith({
+      strategy: "run",
+      test: failedTest,
+    });
+  });
+
+  it("passes spec strategy to hooks when configured", () => {
+    const onFailFastTriggered =
+      jest.fn<
+        (context: {
+          strategy: "run" | "spec";
+          test: FailFastFailedTestData;
+        }) => void
+      >();
+    const failedTest = {
+      name: "a test",
+      fullTitle: "suite a test",
+    };
+
+    const tasks = createRegisteredTasks(
+      {
+        hooks: {
+          onFailFastTriggered,
+        },
+      },
+      {
+        failFastStrategy: "spec",
+      },
+    );
+
+    tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
+
+    expect(onFailFastTriggered).toHaveBeenCalledWith({
+      strategy: "spec",
+      test: failedTest,
+    });
+  });
+
+  it("passes context to shouldTriggerFailFast and clears test on reset", () => {
+    const shouldTriggerFailFast = jest
+      .fn<
+        (context: {
+          strategy: "run" | "spec";
+          test?: FailFastFailedTestData;
+        }) => boolean
+      >()
+      .mockReturnValue(false);
+
+    const failedTest = {
+      name: "a test",
+      fullTitle: "suite a test",
+    };
+
+    const tasks = createRegisteredTasks({
+      hooks: {
+        shouldTriggerFailFast,
+      },
+    });
+
+    tasks[SHOULD_SKIP_TASK]();
+    tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
+    tasks[RESET_SKIP_TASK]();
+    tasks[SHOULD_SKIP_TASK]();
+
+    expect(shouldTriggerFailFast).toHaveBeenNthCalledWith(1, {
+      strategy: "run",
+      test: undefined,
+    });
+    expect(shouldTriggerFailFast).toHaveBeenNthCalledWith(2, {
+      strategy: "run",
+      test: undefined,
+    });
   });
 
   it("increments and resets failed tests counter", () => {
