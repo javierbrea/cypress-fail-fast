@@ -2,7 +2,7 @@ name: test-e2e
 on:
   push:
     branches:
-      - master
+      - main
       - release
   pull_request:
 concurrency:  
