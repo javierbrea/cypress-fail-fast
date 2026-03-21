@@ -8,6 +8,9 @@ module.exports = {
   e2e: {
     baseUrl: "http://localhost:3000",
     setupNodeEvents(on, config) {
+      /**
+       * @returns {void | Promise<void>}
+       */
       const onFailFastTriggeredHook = ({ strategy, test }) => {
         const execute = () => {
           // eslint-disable-next-line no-console
@@ -23,12 +26,15 @@ module.exports = {
             }, 2000);
           });
         }
-        execute();
+        return execute();
       };
 
       let executedBeforeEach = 0;
       let consolePrinted = false;
 
+      /**
+       * @returns {boolean | Promise<boolean>}
+       */
       const shouldTriggerFailFastHook = () => {
         const execute = () => {
           executedBeforeEach++;
