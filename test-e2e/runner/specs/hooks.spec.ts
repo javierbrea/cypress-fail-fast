@@ -74,3 +74,80 @@ runSpecsTests("When shouldTriggerFailFast is enabled", {
     enableSkipModeAfterTests: 6,
   },
 });
+
+runSpecsTests("When onFailFastTriggered is async", {
+  cypressVariant: "cypress-latest",
+  specsFolder: "grandparent-describe-enabled",
+  config: {
+    failFastStrategy: "spec",
+    failFastIgnorePerTestConfig: true,
+    failFastBail: 2,
+  },
+  specsResults: [
+    {
+      executed: 4,
+      passed: 3,
+      failed: 1,
+      pending: 0,
+    },
+    {
+      executed: 4,
+      passed: 1,
+      failed: 2,
+      pending: 1,
+    },
+    {
+      executed: 3,
+      passed: 2,
+      failed: 1,
+      pending: 0,
+    },
+  ],
+  hooks: {
+    enableOnFailFastTriggered: true,
+    asyncHooks: true,
+    expectFailFastTriggeredLog: {
+      strategy: "spec",
+      test: {
+        name: "should display second item",
+        fullTitle:
+          "List items fail-fast enabled Another describe Another describe should display second item",
+      },
+    },
+  },
+});
+
+runSpecsTests("When shouldTriggerFailFast is async", {
+  cypressVariant: "cypress-latest",
+  specsFolder: "grandparent-describe-enabled",
+  config: {
+    failFastStrategy: "spec",
+    failFastIgnorePerTestConfig: true,
+    failFastBail: 4,
+  },
+  specsResults: [
+    {
+      executed: 4,
+      passed: 3,
+      failed: 1,
+      pending: 0,
+    },
+    {
+      executed: 4,
+      passed: 1,
+      failed: 1,
+      pending: 2,
+    },
+    {
+      executed: 3,
+      passed: 0,
+      failed: 0,
+      pending: 3,
+    },
+  ],
+  hooks: {
+    enableShouldTriggerFailFast: true,
+    enableSkipModeAfterTests: 6,
+    asyncHooks: true,
+  },
+});

@@ -33,6 +33,8 @@ type HooksConfig = {
   enableShouldTriggerFailFast?: boolean;
   /** Number of failed tests required to trigger fail-fast mode when `shouldTriggerFailFast` is enabled. */
   enableSkipModeAfterTests?: number;
+  /** When `true`, hooks will be async and return a Promise with a timeout. */
+  asyncHooks?: boolean;
 };
 
 /** Expected test counts for a single Cypress spec file. */
@@ -304,9 +306,12 @@ const runVariantTests = (
           ENABLE_SKIP_MODE_AFTER_TESTS: options.hooks?.enableSkipModeAfterTests
             ? String(options.hooks.enableSkipModeAfterTests)
             : undefined,
+          ASYNC_HOOKS: options.hooks?.asyncHooks
+            ? String(options.hooks.asyncHooks)
+            : undefined,
         }),
       );
-    }, 120000);
+    }, 240000);
 
     tests(getLogs);
   });

@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - feat: Support configuration via `Cypress.expose()` and new `failFast*` options.
 - feat: Add `failFastIgnorePerTestConfig` option to control whether per-test configuration is honored.
+- feat: Support async hooks in `onFailFastTriggered` and `shouldTriggerFailFast` by allowing them to return a `Promise`. Added error handling with warnings for hooks.
 - refactor: Migrate plugin and tests to TypeScript.
 - test(e2e): Simplify and speed up E2E tests.
 
