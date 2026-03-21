@@ -114,7 +114,9 @@ describe("registerFailFastTasks", () => {
     };
 
     expect(
-      await tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest)),
+      await tasks[TRIGGER_FAIL_FAST_TASK](
+        createEnableSkipTaskPayload(failedTest),
+      ),
     ).toBe(true);
     expect(await tasks[SHOULD_SKIP_TASK]()).toBe(true);
   });
@@ -168,7 +170,9 @@ describe("registerFailFastTasks", () => {
 
   it("logs error and returns false when shouldTriggerFailFast hook fails", async () => {
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-    const shouldTriggerFailFast = jest.fn<() => Promise<boolean>>().mockRejectedValue(new Error("Hook failed"));
+    const shouldTriggerFailFast = jest
+      .fn<() => Promise<boolean>>()
+      .mockRejectedValue(new Error("Hook failed"));
     const tasks = createRegisteredTasks({
       hooks: {
         shouldTriggerFailFast,
@@ -177,26 +181,36 @@ describe("registerFailFastTasks", () => {
 
     expect(await tasks[SHOULD_SKIP_TASK]()).toBe(false);
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Ignored error in shouldTriggerFailFast hook: Error: Hook failed")
+      expect.stringContaining(
+        "Ignored error in shouldTriggerFailFast hook: Error: Hook failed",
+      ),
     );
     warnSpy.mockRestore();
   });
 
   it("logs error and continues when onFailFastTriggered hook fails", async () => {
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-    const onFailFastTriggered = jest.fn<() => Promise<void>>().mockRejectedValue(new Error("Hook failed"));
+    const onFailFastTriggered = jest
+      .fn<() => Promise<void>>()
+      .mockRejectedValue(new Error("Hook failed"));
     const tasks = createRegisteredTasks({
       hooks: {
         onFailFastTriggered,
       },
     });
 
-    expect(await tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload({
-      name: "a test",
-      fullTitle: "suite a test",
-    }))).toBe(true);
+    expect(
+      await tasks[TRIGGER_FAIL_FAST_TASK](
+        createEnableSkipTaskPayload({
+          name: "a test",
+          fullTitle: "suite a test",
+        }),
+      ),
+    ).toBe(true);
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Ignored error in onFailFastTriggered hook: Error: Hook failed")
+      expect.stringContaining(
+        "Ignored error in onFailFastTriggered hook: Error: Hook failed",
+      ),
     );
     warnSpy.mockRestore();
   });
@@ -220,7 +234,9 @@ describe("registerFailFastTasks", () => {
       },
     });
 
-    await tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
+    await tasks[TRIGGER_FAIL_FAST_TASK](
+      createEnableSkipTaskPayload(failedTest),
+    );
 
     expect(onFailFastTriggered).toHaveBeenCalledTimes(1);
     expect(onFailFastTriggered).toHaveBeenCalledWith({
@@ -253,7 +269,9 @@ describe("registerFailFastTasks", () => {
       },
     );
 
-    await tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
+    await tasks[TRIGGER_FAIL_FAST_TASK](
+      createEnableSkipTaskPayload(failedTest),
+    );
 
     expect(onFailFastTriggered).toHaveBeenCalledWith({
       strategy: SPEC_STRATEGY,
@@ -278,7 +296,9 @@ describe("registerFailFastTasks", () => {
     });
 
     await tasks[SHOULD_SKIP_TASK]();
-    await tasks[TRIGGER_FAIL_FAST_TASK](createEnableSkipTaskPayload(failedTest));
+    await tasks[TRIGGER_FAIL_FAST_TASK](
+      createEnableSkipTaskPayload(failedTest),
+    );
     tasks[RESET_SKIP_TASK]();
     await tasks[SHOULD_SKIP_TASK]();
 

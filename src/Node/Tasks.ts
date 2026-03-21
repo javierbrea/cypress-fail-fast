@@ -44,7 +44,6 @@ export function registerFailFastTasks(
       const result = await shouldTriggerFailFastCallback();
       return result || false;
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.warn(
         `${chalk.yellow(LOG_PREFIX)} Ignored error in shouldTriggerFailFast hook: ${error}`,
       );
@@ -77,7 +76,9 @@ export function registerFailFastTasks(
     [SHOULD_SKIP_TASK]: async function () {
       return await shouldSkip();
     },
-    [TRIGGER_FAIL_FAST_TASK]: async function (value: TriggerFailFastTaskPayload) {
+    [TRIGGER_FAIL_FAST_TASK]: async function (
+      value: TriggerFailFastTaskPayload,
+    ) {
       if (onFailFastTriggeredCallback) {
         try {
           await onFailFastTriggeredCallback({
@@ -85,7 +86,6 @@ export function registerFailFastTasks(
             test: value.test,
           });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn(
             `${chalk.yellow(LOG_PREFIX)} Ignored error in onFailFastTriggered hook: ${error}`,
           );

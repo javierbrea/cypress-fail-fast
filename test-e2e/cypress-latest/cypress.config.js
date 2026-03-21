@@ -33,7 +33,8 @@ module.exports = {
         const execute = () => {
           executedBeforeEach++;
           if (
-            executedBeforeEach > Number(process.env.ENABLE_SKIP_MODE_AFTER_TESTS)
+            executedBeforeEach >
+            Number(process.env.ENABLE_SKIP_MODE_AFTER_TESTS)
           ) {
             if (!consolePrinted) {
               consolePrinted = true;
