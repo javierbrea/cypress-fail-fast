@@ -213,6 +213,8 @@ Supported hooks:
     - `fullTitle`: The full title of the test that failed, including the titles of its parent suites.
 - `shouldTriggerFailFast`: Trigger fail-fast mode at any moment based on custom logic. For example, you can use this hook to trigger fail-fast mode when a certain threshold of failures is reached across parallel runs. The hook should return `true` to trigger fail-fast mode or `false` to continue without triggering it. This hook is called before each test execution, so be careful with the performance of the logic implemented here.
 
+Both `onFailFastTriggered` and `shouldTriggerFailFast` support returning a Promise, allowing you to execute asynchronous operations like API calls or database queries inside the hooks. If a Promise is returned, the plugin will wait for it to resolve before continuing. If a hook throws an error or returns a rejected Promise, the error will be caught, a warning will be logged, and execution will continue normally (in the case of `shouldTriggerFailFast`, it will assume `false`).
+
 Here you have an example of how to use these hooks to coordinate multiple parallel runs using a shared file as a flag:
 
 ```ts
