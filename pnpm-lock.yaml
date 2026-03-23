@@ -103,8 +103,8 @@ importers:
         specifier: 3.8.1
         version: 3.8.1
       sinon:
-        specifier: 21.0.2
-        version: 21.0.2
+        specifier: 21.0.3
+        version: 21.0.3
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -4128,8 +4128,8 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  sinon@21.0.2:
-    resolution: {integrity: sha512-VHV4UaoxIe5jrMd89Y9duI76T5g3Lp+ET+ctLhLDaZtSznDPah1KKpRElbdBV4RwqWSw2vadFiVs9Del7MbVeQ==}
+  sinon@21.0.3:
+    resolution: {integrity: sha512-0x8TQFr8EjADhSME01u1ZK31yv2+bd6Z5NrBCHVM+n4qL1wFqbxftmeyi3bwlr49FbbzRfrqSFOpyHCOh/YmYA==}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -9580,7 +9580,7 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  sinon@21.0.2:
+  sinon@21.0.3:
     dependencies:
       '@sinonjs/commons': 3.0.1
       '@sinonjs/fake-timers': 15.1.1
