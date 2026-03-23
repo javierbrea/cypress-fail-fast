@@ -4,33 +4,57 @@
   ],
   "packageRules": [
     {
-      "matchPaths": ["test-e2e/cypress-variants/cypress-9/package.json"],
-      "matchPackageNames": ["cypress"],
+      "matchFileNames": [
+        "test-e2e/cypress-variants/cypress-9/package.json"
+      ],
+      "matchPackageNames": [
+        "cypress"
+      ],
       "allowedVersions": "9.x"
     },
     {
-      "matchPaths": ["test-e2e/cypress-variants/cypress-10/package.json"],
-      "matchPackageNames": ["cypress"],
+      "matchFileNames": [
+        "test-e2e/cypress-variants/cypress-10/package.json"
+      ],
+      "matchPackageNames": [
+        "cypress"
+      ],
       "allowedVersions": "10.x"
     },
     {
-      "matchPaths": ["test-e2e/cypress-variants/cypress-11/package.json"],
-      "matchPackageNames": ["cypress"],
+      "matchFileNames": [
+        "test-e2e/cypress-variants/cypress-11/package.json"
+      ],
+      "matchPackageNames": [
+        "cypress"
+      ],
       "allowedVersions": "11.x"
     },
     {
-      "matchPaths": ["test-e2e/cypress-variants/cypress-12/package.json"],
-      "matchPackageNames": ["cypress"],
+      "matchFileNames": [
+        "test-e2e/cypress-variants/cypress-12/package.json"
+      ],
+      "matchPackageNames": [
+        "cypress"
+      ],
       "allowedVersions": "12.x"
     },
     {
-      "matchPaths": ["test-e2e/cypress-variants/cypress-13/package.json"],
-      "matchPackageNames": ["cypress"],
+      "matchFileNames": [
+        "test-e2e/cypress-variants/cypress-13/package.json"
+      ],
+      "matchPackageNames": [
+        "cypress"
+      ],
       "allowedVersions": "13.x"
     },
     {
-      "matchPaths": ["package.json"],
-      "matchPackageNames": ["chalk"],
+      "matchFileNames": [
+        "package.json"
+      ],
+      "matchPackageNames": [
+        "chalk"
+      ],
       "allowedVersions": "<5.0.0"
     }
   ]
