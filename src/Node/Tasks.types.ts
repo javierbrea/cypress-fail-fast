@@ -29,13 +29,15 @@ export type FailFastHooks = {
   /**
    * Runs when fail-fast mode is triggered from a failed test.
    */
-  onFailFastTriggered?(context: OnFailFastTriggeredHookContext): void;
+  onFailFastTriggered?(
+    context: OnFailFastTriggeredHookContext,
+  ): void | Promise<void>;
 
   /**
    * Runs before each test execution to decide if fail-fast should be triggered.
    * Returning true enables skip mode.
    */
-  shouldTriggerFailFast?(): boolean;
+  shouldTriggerFailFast?(): boolean | Promise<boolean>;
 };
 
 /**

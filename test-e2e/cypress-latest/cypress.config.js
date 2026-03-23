@@ -8,30 +8,59 @@ module.exports = {
   e2e: {
     baseUrl: "http://localhost:3000",
     setupNodeEvents(on, config) {
+      /**
+       * @returns {void | Promise<void>}
+       */
       const onFailFastTriggeredHook = ({ strategy, test }) => {
-        // eslint-disable-next-line no-console
-        console.log(
-          `Fail-fast triggered with strategy "${strategy}" by test "${test.fullTitle}"`,
-        );
+        const execute = () => {
+          // eslint-disable-next-line no-console
+          console.log(
+            `Fail-fast triggered with strategy "${strategy}" by test "${test.fullTitle}"`,
+          );
+        };
+        if (process.env.ASYNC_HOOKS === "true") {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              execute();
+              resolve();
+            }, 2000);
+          });
+        }
+        return execute();
       };
 
       let executedBeforeEach = 0;
       let consolePrinted = false;
 
+      /**
+       * @returns {boolean | Promise<boolean>}
+       */
       const shouldTriggerFailFastHook = () => {
-        executedBeforeEach++;
-        if (
-          executedBeforeEach > Number(process.env.ENABLE_SKIP_MODE_AFTER_TESTS)
-        ) {
-          if (!consolePrinted) {
-            consolePrinted = true;
-            // eslint-disable-next-line no-console
-            console.log(
-              `Custom shouldTriggerFailFast hook triggered fail-fast mode after ${executedBeforeEach - 1} tests executed`,
-            );
+        const execute = () => {
+          executedBeforeEach++;
+          if (
+            executedBeforeEach >
+            Number(process.env.ENABLE_SKIP_MODE_AFTER_TESTS)
+          ) {
+            if (!consolePrinted) {
+              consolePrinted = true;
+              // eslint-disable-next-line no-console
+              console.log(
+                `Custom shouldTriggerFailFast hook triggered fail-fast mode after ${executedBeforeEach - 1} tests executed`,
+              );
+            }
+            return true;
           }
-          return true;
+          return false;
+        };
+        if (process.env.ASYNC_HOOKS === "true") {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(execute());
+            }, 2000);
+          });
         }
+        return execute();
       };
 
       const hooks = {};

@@ -35,24 +35,32 @@ export function registerFailFastTasks(
     pluginConfig.hooks?.shouldTriggerFailFast;
   const onFailFastTriggeredCallback = pluginConfig.hooks?.onFailFastTriggered;
 
-  function shouldTriggerFailFastFromHook() {
+  async function shouldTriggerFailFastFromHook() {
     if (!shouldTriggerFailFastCallback) {
       return false;
     }
 
-    return shouldTriggerFailFastCallback() || false;
+    try {
+      const result = await shouldTriggerFailFastCallback();
+      return result || false;
+    } catch (error) {
+      console.warn(
+        `${chalk.yellow(LOG_PREFIX)} Ignored error in shouldTriggerFailFast hook: ${error}`,
+      );
+      return false;
+    }
   }
 
   /**
    * Computes whether remaining tests should be skipped.
    * @returns `true` when skip mode is active.
    */
-  const shouldSkip = () => {
+  const shouldSkip = async () => {
     if (shouldSkipFlag) {
       return shouldSkipFlag;
     }
 
-    if (shouldTriggerFailFastFromHook()) {
+    if (await shouldTriggerFailFastFromHook()) {
       shouldSkipFlag = true;
     }
 
@@ -65,20 +73,28 @@ export function registerFailFastTasks(
       shouldSkipFlag = false;
       return null;
     },
-    [SHOULD_SKIP_TASK]: function () {
-      return shouldSkip();
+    [SHOULD_SKIP_TASK]: async function () {
+      return await shouldSkip();
     },
-    [TRIGGER_FAIL_FAST_TASK]: function (value: TriggerFailFastTaskPayload) {
+    [TRIGGER_FAIL_FAST_TASK]: async function (
+      value: TriggerFailFastTaskPayload,
+    ) {
       if (onFailFastTriggeredCallback) {
-        onFailFastTriggeredCallback({
-          strategy,
-          test: value.test,
-        });
+        try {
+          await onFailFastTriggeredCallback({
+            strategy,
+            test: value.test,
+          });
+        } catch (error) {
+          console.warn(
+            `${chalk.yellow(LOG_PREFIX)} Ignored error in onFailFastTriggered hook: ${error}`,
+          );
+        }
       }
 
       shouldSkipFlag = true;
 
-      return shouldSkip();
+      return await shouldSkip();
     },
     [FAILED_TESTS_TASK]: function (value: boolean) {
       if (value === true) {
