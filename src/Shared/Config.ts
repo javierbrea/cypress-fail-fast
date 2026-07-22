@@ -12,6 +12,7 @@ import { FailFastGlobalConfig } from "./Config.types";
 
 export const SPEC_STRATEGY = "spec" as const;
 export const RUN_STRATEGY = "run" as const;
+export const DESCRIBE_STRATEGY = "describe" as const;
 
 const truthyValuesSet = new Set([true, "true", 1, "1"]);
 const falsyValuesSet = new Set([false, "false", 0, "0"]);
@@ -54,6 +55,15 @@ export function strategyIsSpec(value: string) {
 }
 
 /**
+ * Checks if the provided strategy value equals `describe`.
+ * @param value Strategy value from Cypress env.
+ * @returns `true` when strategy is `describe`.
+ */
+export function strategyIsDescribe(value: string) {
+  return value === DESCRIBE_STRATEGY;
+}
+
+/**
  * Normalizes a strategy value to one of the supported strategy constants.
  * @param value Strategy value to normalize.
  * @returns Normalized strategy value.
@@ -61,7 +71,13 @@ export function strategyIsSpec(value: string) {
 export function strategyValue(
   value: unknown,
 ): FailFastGlobalConfig["strategy"] {
-  return strategyIsSpec(value as string) ? SPEC_STRATEGY : RUN_STRATEGY;
+  if (strategyIsSpec(value as string)) {
+    return SPEC_STRATEGY;
+  }
+  if (strategyIsDescribe(value as string)) {
+    return DESCRIBE_STRATEGY;
+  }
+  return RUN_STRATEGY;
 }
 
 function isDefined(value: unknown) {
@@ -104,6 +120,7 @@ export function getFailFastEnvironmentConfig(
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
     strategyIsSpec: strategy === SPEC_STRATEGY,
+    strategyIsDescribe: strategy === DESCRIBE_STRATEGY,
     bail: numericVarValue(
       Cyp.expose(BAIL_GLOBAL_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
@@ -132,6 +149,7 @@ export function getFailFastPluginConfig(
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
     strategyIsSpec: strategy === SPEC_STRATEGY,
+    strategyIsDescribe: strategy === DESCRIBE_STRATEGY,
     bail: numericVarValue(
       config.expose?.[BAIL_GLOBAL_CONFIG],
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
@@ -146,6 +164,42 @@ export function getFailFastPluginConfig(
  */
 export function currentStrategyIsSpec(Cyp: Cypress.Cypress) {
   return getFailFastEnvironmentConfig(Cyp).strategyIsSpec;
+}
+
+/**
+ * Returns whether the current fail-fast strategy is `describe`.
+ * @param Cyp Cypress global object.
+ * @returns `true` when strategy is `describe`.
+ */
+export function currentStrategyIsDescribe(Cyp: Cypress.Cypress) {
+  return getFailFastEnvironmentConfig(Cyp).strategyIsDescribe;
+}
+
+/**
+ * Checks whether one title path is contained at the beginning of another.
+ *
+ * Used by the `describe` strategy to decide if a test belongs to the describe
+ * block (or any block nested inside it) where fail-fast was triggered: Mocha
+ * title paths are hierarchical, so a test is inside a suite when the suite's
+ * title path is a prefix of the test's title path.
+ *
+ * Note that title paths are the only suite identity available on both sides of
+ * the plugin (browser hooks and Node tasks), so two sibling describes with
+ * exactly the same title chain cannot be told apart. This limitation is
+ * documented in the README.
+ *
+ * @param titlePath Title path of the test being evaluated.
+ * @param scopeTitlePath Title path of the describe block acting as skip scope.
+ * @returns `true` when `scopeTitlePath` is a prefix of `titlePath`.
+ */
+export function titlePathStartsWith(
+  titlePath: string[],
+  scopeTitlePath: string[],
+): boolean {
+  if (scopeTitlePath.length > titlePath.length) {
+    return false;
+  }
+  return scopeTitlePath.every((title, index) => titlePath[index] === title);
 }
 
 /**

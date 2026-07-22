@@ -13,12 +13,22 @@ import {
 } from "../Shared/Constants";
 import type {
   FailFastFailedTestData,
+  ShouldSkipTaskPayload,
   TriggerFailFastTaskPayload,
 } from "../Node/Tasks.types";
 
-import { bailConfig, currentStrategyIsSpec } from "../Shared/Config";
+import {
+  bailConfig,
+  currentStrategyIsSpec,
+  currentStrategyIsDescribe,
+} from "../Shared/Config";
 
-import { failFastIsEnabled, testHasFailed, isHeaded } from "./CypressHelpers";
+import {
+  failFastIsEnabled,
+  testHasFailed,
+  isHeaded,
+  getSkipScopeTitlePath,
+} from "./CypressHelpers";
 
 /**
  * Registers Mocha hooks that implement fail-fast behavior in the browser process.
@@ -45,10 +55,19 @@ export function registerFailFast(
 
   /**
    * Reads the global skip flag from Node tasks.
+   *
+   * The title path of the test about to run is sent along so that the
+   * `describe` strategy can decide whether the test belongs to the describe
+   * block where fail-fast was triggered. Other strategies ignore it.
+   * @param currentTest Test about to run, when available.
    * @returns Cypress chainable resolving to skip state.
    */
-  function shouldSkip() {
-    return cy.task<boolean>(SHOULD_SKIP_TASK, undefined, { log: false });
+  function shouldSkip(currentTest?: Mocha.Test) {
+    return cy.task<boolean>(
+      SHOULD_SKIP_TASK,
+      { titlePath: currentTest?.titlePath() } as ShouldSkipTaskPayload,
+      { log: false },
+    );
   }
 
   /**
@@ -67,12 +86,23 @@ export function registerFailFast(
 
   /**
    * Enables skip mode for subsequent tests.
+   *
+   * With the `describe` strategy, the skip mode is scoped to the describe
+   * block of the test that triggered it, so only the remaining tests of that
+   * block are skipped. The scope has to be resolved here, in the browser,
+   * because the Mocha suite tree is not available in the Node process.
+   * @param failedTest Failed test data shared with Node-side hooks.
+   * @param skipScopeTitlePath Title path of the describe block to scope skip mode to.
    * @returns Cypress chainable resolving when skip mode is enabled.
    */
-  function enableSkipMode(failedTest: FailFastFailedTestData) {
+  function enableSkipMode(
+    failedTest: FailFastFailedTestData,
+    skipScopeTitlePath?: string[],
+  ) {
     log(SKIP_MESSAGE);
     return cy.task<void>(TRIGGER_FAIL_FAST_TASK, {
       test: failedTest,
+      skipScopeTitlePath,
     } as TriggerFailFastTaskPayload);
   }
 
@@ -108,9 +138,10 @@ export function registerFailFast(
   /**
    * Runs a callback only when skip mode is active.
    * @param callback Callback to execute in skip mode.
+   * @param currentTest Test about to run, used to evaluate scoped skip mode.
    */
-  function runIfSkipIsEnabled(callback: () => void) {
-    shouldSkip().then((value) => {
+  function runIfSkipIsEnabled(callback: () => void, currentTest?: Mocha.Test) {
+    shouldSkip(currentTest).then((value) => {
       if (value === true) {
         callback();
       }
@@ -124,13 +155,17 @@ export function registerFailFast(
   function skipSuiteIfEnabled(context: Mocha.Context) {
     runIfSkipIsEnabled(() => {
       context.skip();
-    });
+    }, context.currentTest);
   }
 
   before(function () {
-    if (isHeaded(Cyp) || currentStrategyIsSpec(Cyp)) {
+    if (
+      isHeaded(Cyp) ||
+      currentStrategyIsSpec(Cyp) ||
+      currentStrategyIsDescribe(Cyp)
+    ) {
       /*
-        Reset the shouldSkip flag at the start of a run, so that it doesn't carry over into subsequent runs. Do this only for headed runs because in headless runs, the `before` hook is executed for each spec file.
+        Reset the shouldSkip flag at the start of a run, so that it doesn't carry over into subsequent runs. Do this only for headed runs because in headless runs, the `before` hook is executed for each spec file. The `describe` strategy resets here for the same reason the `spec` strategy does: a describe block only exists within one spec file, so its skip scope must never leak into the next one.
       */
       resetSkipFlag();
       resetFailedTests();
@@ -153,7 +188,15 @@ export function registerFailFast(
     ) {
       log(`Test "${currentTest.fullTitle()}" has failed`);
       registerFailureAndRunIfBailLimitIsReached(() => {
-        enableSkipMode(mapFailedTest(currentTest));
+        /*
+          The skip scope is only resolved (and sent) for the `describe`
+          strategy: for `spec` and `run` an unscoped skip mode preserves the
+          previous behavior of skipping every remaining test.
+        */
+        const skipScopeTitlePath = currentStrategyIsDescribe(Cyp)
+          ? getSkipScopeTitlePath(currentTest, Cyp)
+          : undefined;
+        enableSkipMode(mapFailedTest(currentTest), skipScopeTitlePath);
       });
     }
   });

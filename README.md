@@ -10,7 +10,7 @@ Skip the rest of your Cypress tests after the first failure.
 
 With Cypress Fail Fast, you can:
 
-- Skip all remaining tests in the current spec file, or in the entire run, depending on the configured strategy.
+- Skip all remaining tests in the current describe block, in the current spec file, or in the entire run, depending on the configured strategy.
 - Control fail-fast behavior at a per-test or per-suite level, so you can choose which failures should trigger fail-fast mode and which should not.
 - Set hooks to:
   - Run when fail-fast mode is triggered, so you can perform custom actions.
@@ -79,15 +79,20 @@ All plugin configuration is provided through the Cypress configuration file usin
 
 The following properties are supported:
 
-- `failFastStrategy`: `"spec" | "run"` (default: `"run"`)
+- `failFastStrategy`: `"spec" | "run" | "describe"` (default: `"run"`)
   - `"spec"`: Skip remaining tests only in the current spec file.  
   - `"run"` (default): Skip remaining tests in all spec files for the current run.  
+  - `"describe"`: Skip remaining tests only in the describe block where the failure happened. The skipped scope is resolved as follows:
+    - When any ancestor describe block of the failed test carries an explicit `failFast` configuration, the nearest one is used as the scope, so a failure anywhere inside a configured block (including nested describes) skips the remaining tests of that whole block.
+    - Otherwise, the scope is the immediate parent describe block of the failed test (nested describes inside it are also skipped).
+    - Describe blocks outside the scope, and the rest of the spec files, run normally. Note that fail-fast mode may be triggered again by a failure in another describe block, moving the skipped scope to that block.
+    - Note: describe blocks are identified by their title paths, so two sibling describe blocks with exactly the same title cannot be told apart. Use unique describe titles within a spec file when using this strategy.
 
 - `failFastEnabled`: `boolean` (default: `true`)  
   Enable or disable the fail-fast behavior globally. When set to `false`, fail-fast can still be enabled for specific tests or suites using per-test configuration.
 
 - `failFastBail`: `number` (default: `1`)  
-  Number of failing test suites required before entering fail-fast mode. For example, `failFastBail: 2` will start skipping tests after failures in two different suites or spec files, depending on the strategy. When strategy is `"spec"`, failures are reset at the beginning of each spec file, so fail-fast mode will be triggered after the configured number of failures within the same spec. When strategy is `"run"`, failures are tracked across the entire run, so fail-fast mode will be triggered after the configured number of failures regardless of which spec files they occur in.
+  Number of failing test suites required before entering fail-fast mode. For example, `failFastBail: 2` will start skipping tests after failures in two different suites or spec files, depending on the strategy. When strategy is `"spec"` or `"describe"`, failures are reset at the beginning of each spec file, so fail-fast mode will be triggered after the configured number of failures within the same spec. When strategy is `"run"`, failures are tracked across the entire run, so fail-fast mode will be triggered after the configured number of failures regardless of which spec files they occur in.
 
 - `failFastIgnorePerTestConfig`: `boolean` (default: `false`)  
   When `true`, the plugin ignores any per-test or per-suite `failFast` configuration and only uses the global options exposed through `expose`. This is useful when you want to control fail-fast exclusively at a global level (for example, disabling it completely or enabling it for the entire run) and avoid any accidental overrides in tests or suites.
@@ -207,11 +212,11 @@ Hooks allow you to run custom logic when fail-fast mode is triggered or to trigg
 Supported hooks:
 
 - `onFailFastTriggered`: Run custom logic when fail-fast mode is triggered. For example, you can use this hook to log additional information or to notify an external system. The hook receives an object with the following properties:
-  - `strategy`: The fail-fast strategy that is being applied (`"spec"` or `"run"`).
+  - `strategy`: The fail-fast strategy that is being applied (`"spec"`, `"run"` or `"describe"`).
   - `test`: The failed test that triggered fail-fast mode, with the following properties:
     - `name`: The title of the test that failed.
     - `fullTitle`: The full title of the test that failed, including the titles of its parent suites.
-- `shouldTriggerFailFast`: Trigger fail-fast mode at any moment based on custom logic. For example, you can use this hook to trigger fail-fast mode when a certain threshold of failures is reached across parallel runs. The hook should return `true` to trigger fail-fast mode or `false` to continue without triggering it. This hook is called before each test execution, so be careful with the performance of the logic implemented here.
+- `shouldTriggerFailFast`: Trigger fail-fast mode at any moment based on custom logic. For example, you can use this hook to trigger fail-fast mode when a certain threshold of failures is reached across parallel runs. The hook should return `true` to trigger fail-fast mode or `false` to continue without triggering it. This hook is called before each test execution, so be careful with the performance of the logic implemented here. Note that fail-fast mode triggered from this hook has no failed test attached, so, when the `"describe"` strategy is used, there is no describe block to scope the skipped tests to: every remaining test is skipped, as with the `"spec"` strategy.
 
 Both `onFailFastTriggered` and `shouldTriggerFailFast` support returning a Promise, allowing you to execute asynchronous operations like API calls or database queries inside the hooks. If a Promise is returned, the plugin will wait for it to resolve before continuing. If a hook throws an error or returns a rejected Promise, the error will be caught, a warning will be logged, and execution will continue normally (in the case of `shouldTriggerFailFast`, it will assume `false`).
 
