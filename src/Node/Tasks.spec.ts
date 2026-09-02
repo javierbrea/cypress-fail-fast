@@ -324,4 +324,130 @@ describe("registerFailFastTasks", () => {
       `${chalk.yellow(LOG_PREFIX)} my message`,
     );
   });
+
+  describe("when skip mode is scoped to a describe block", () => {
+    const failedTest: FailFastFailedTestData = {
+      name: "failed test",
+      fullTitle: "First block failed test",
+    };
+
+    function createScopedTasks() {
+      const tasks = createRegisteredTasks(undefined, {
+        failFastStrategy: "describe",
+      });
+      return tasks;
+    }
+
+    it("skips tests inside the scoped describe block", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "another test"],
+        }),
+      ).toBe(true);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "nested block", "another test"],
+        }),
+      ).toBe(true);
+    });
+
+    it("does not skip tests outside the scoped describe block", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "another test"],
+        }),
+      ).toBe(false);
+    });
+
+    it("skips tests conservatively when their title path is unknown", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+
+      expect(await tasks[SHOULD_SKIP_TASK]()).toBe(true);
+      expect(await tasks[SHOULD_SKIP_TASK]({})).toBe(true);
+    });
+
+    it("clears the scope when skip state is reset", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+      tasks[RESET_SKIP_TASK]();
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "another test"],
+        }),
+      ).toBe(false);
+    });
+
+    it("replaces the scope when fail-fast is triggered again from another describe block", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["Second block"],
+      });
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "another test"],
+        }),
+      ).toBe(true);
+    });
+
+    it("skips every remaining test when skip mode is triggered without scope", async () => {
+      // Skip mode without a scope happens when it is triggered from the
+      // shouldTriggerFailFast hook, which has no failed test to derive a
+      // scope from.
+      const shouldTriggerFailFast = jest
+        .fn<() => boolean>()
+        .mockReturnValue(true);
+      const tasks = createRegisteredTasks(
+        {
+          hooks: {
+            shouldTriggerFailFast,
+          },
+        },
+        {
+          failFastStrategy: "describe",
+        },
+      );
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "a test"],
+        }),
+      ).toBe(true);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "a test"],
+        }),
+      ).toBe(true);
+    });
+  });
 });

@@ -14,24 +14,39 @@ import {
   FAILED_TEST_MESSAGE,
 } from "../Shared/Constants";
 
-import { bailConfig, currentStrategyIsSpec } from "../Shared/Config";
-import { failFastIsEnabled, testHasFailed, isHeaded } from "./CypressHelpers";
+import {
+  bailConfig,
+  currentStrategyIsSpec,
+  currentStrategyIsDescribe,
+} from "../Shared/Config";
+import {
+  failFastIsEnabled,
+  testHasFailed,
+  isHeaded,
+  getSkipScopeTitlePath,
+} from "./CypressHelpers";
 import { registerFailFast } from "./FailFast";
 
 jest.mock("../Shared/Config", () => ({
   bailConfig: jest.fn(),
   currentStrategyIsSpec: jest.fn(),
+  currentStrategyIsDescribe: jest.fn(),
 }));
 
 jest.mock("./CypressHelpers", () => ({
   failFastIsEnabled: jest.fn(),
   testHasFailed: jest.fn(),
   isHeaded: jest.fn(),
+  getSkipScopeTitlePath: jest.fn(),
 }));
 
 const mockedBailConfig = bailConfig as jest.MockedFunction<typeof bailConfig>;
 const mockedCurrentStrategyIsSpec =
   currentStrategyIsSpec as jest.MockedFunction<typeof currentStrategyIsSpec>;
+const mockedCurrentStrategyIsDescribe =
+  currentStrategyIsDescribe as jest.MockedFunction<
+    typeof currentStrategyIsDescribe
+  >;
 const mockedFailFastIsEnabled = failFastIsEnabled as jest.MockedFunction<
   typeof failFastIsEnabled
 >;
@@ -39,6 +54,8 @@ const mockedTestHasFailed = testHasFailed as jest.MockedFunction<
   typeof testHasFailed
 >;
 const mockedIsHeaded = isHeaded as jest.MockedFunction<typeof isHeaded>;
+const mockedGetSkipScopeTitlePath =
+  getSkipScopeTitlePath as jest.MockedFunction<typeof getSkipScopeTitlePath>;
 
 type HookCallback = (this: Mocha.Context) => void;
 
@@ -105,10 +122,15 @@ function createCyLike(initialShouldSkip = false, initialFailedTests = 0) {
   } as unknown as Cypress.cy;
 }
 
-function createCurrentTest(fullTitle = "a suite a test", title = "a test") {
+function createCurrentTest(
+  fullTitle = "a suite a test",
+  title = "a test",
+  titlePath = ["a suite", "a test"],
+) {
   return {
     title,
     fullTitle: () => fullTitle,
+    titlePath: () => titlePath,
   } as unknown as Mocha.Test;
 }
 
@@ -118,15 +140,19 @@ describe("registerFailFast", () => {
   beforeEach(() => {
     mockedBailConfig.mockReset();
     mockedCurrentStrategyIsSpec.mockReset();
+    mockedCurrentStrategyIsDescribe.mockReset();
     mockedFailFastIsEnabled.mockReset();
     mockedTestHasFailed.mockReset();
     mockedIsHeaded.mockReset();
+    mockedGetSkipScopeTitlePath.mockReset();
 
     mockedBailConfig.mockReturnValue(2);
     mockedCurrentStrategyIsSpec.mockReturnValue(false);
+    mockedCurrentStrategyIsDescribe.mockReturnValue(false);
     mockedFailFastIsEnabled.mockReturnValue(true);
     mockedTestHasFailed.mockReturnValue(false);
     mockedIsHeaded.mockReturnValue(false);
+    mockedGetSkipScopeTitlePath.mockReturnValue([]);
   });
 
   it("resets shared state in before hook when run is headed", () => {
@@ -202,9 +228,13 @@ describe("registerFailFast", () => {
 
     beforeHook.getCallback()?.call(context);
 
-    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, undefined, {
-      log: false,
-    });
+    expect(cyLike.task).toHaveBeenCalledWith(
+      SHOULD_SKIP_TASK,
+      { titlePath: undefined },
+      {
+        log: false,
+      },
+    );
     expect(context.skip).toHaveBeenCalledTimes(1);
   });
 
@@ -245,9 +275,13 @@ describe("registerFailFast", () => {
 
     beforeEachHook.getCallback()?.call(context);
 
-    expect(cyLike.task).toHaveBeenCalledWith(SHOULD_SKIP_TASK, undefined, {
-      log: false,
-    });
+    expect(cyLike.task).toHaveBeenCalledWith(
+      SHOULD_SKIP_TASK,
+      { titlePath: undefined },
+      {
+        log: false,
+      },
+    );
     expect(context.skip).toHaveBeenCalledTimes(1);
   });
 
@@ -412,6 +446,135 @@ describe("registerFailFast", () => {
         name: "a test",
         fullTitle: "suite should stop",
       },
+      skipScopeTitlePath: undefined,
     });
+  });
+
+  it("resets shared state in before hook when strategy is describe", () => {
+    const cyLike = createCyLike();
+    const beforeHook = createHookRegisterer();
+    const beforeEachHook = createHookRegisterer();
+    const afterEachHook = createHookRegisterer();
+    const context = { skip: jest.fn() } as unknown as Mocha.Context;
+
+    mockedCurrentStrategyIsDescribe.mockReturnValue(true);
+
+    registerFailFast(
+      cypressLike,
+      cyLike,
+      beforeHook.register,
+      beforeEachHook.register,
+      afterEachHook.register,
+    );
+
+    beforeHook.getCallback()?.call(context);
+
+    expect(cyLike.task).toHaveBeenCalledWith(RESET_SKIP_TASK, null, {
+      log: false,
+    });
+    expect(cyLike.task).toHaveBeenCalledWith(RESET_FAILED_TESTS_TASK, null, {
+      log: false,
+    });
+    expect(context.skip).not.toHaveBeenCalled();
+  });
+
+  it("sends current test title path to should-skip task in beforeEach hook", () => {
+    const cyLike = createCyLike(true);
+    const beforeHook = createHookRegisterer();
+    const beforeEachHook = createHookRegisterer();
+    const afterEachHook = createHookRegisterer();
+    const currentTest = createCurrentTest("a suite a test", "a test", [
+      "a suite",
+      "a test",
+    ]);
+    const context = {
+      skip: jest.fn(),
+      currentTest,
+    } as unknown as Mocha.Context;
+
+    registerFailFast(
+      cypressLike,
+      cyLike,
+      beforeHook.register,
+      beforeEachHook.register,
+      afterEachHook.register,
+    );
+
+    beforeEachHook.getCallback()?.call(context);
+
+    expect(cyLike.task).toHaveBeenCalledWith(
+      SHOULD_SKIP_TASK,
+      { titlePath: ["a suite", "a test"] },
+      {
+        log: false,
+      },
+    );
+    expect(context.skip).toHaveBeenCalledTimes(1);
+  });
+
+  it("enables skip mode with skip scope when strategy is describe and bail limit is reached", () => {
+    const cyLike = createCyLike(false, 0);
+    const beforeHook = createHookRegisterer();
+    const beforeEachHook = createHookRegisterer();
+    const afterEachHook = createHookRegisterer();
+    const currentTest = createCurrentTest("a suite should stop");
+    const context = {
+      currentTest,
+    } as unknown as Mocha.Context;
+
+    mockedTestHasFailed.mockReturnValue(true);
+    mockedFailFastIsEnabled.mockReturnValue(true);
+    mockedBailConfig.mockReturnValue(1);
+    mockedCurrentStrategyIsDescribe.mockReturnValue(true);
+    mockedGetSkipScopeTitlePath.mockReturnValue(["a suite"]);
+
+    registerFailFast(
+      cypressLike,
+      cyLike,
+      beforeHook.register,
+      beforeEachHook.register,
+      afterEachHook.register,
+    );
+
+    afterEachHook.getCallback()?.call(context);
+
+    expect(mockedGetSkipScopeTitlePath).toHaveBeenCalledTimes(1);
+    expect(mockedGetSkipScopeTitlePath.mock.calls[0]?.[0]).toBe(currentTest);
+    expect(mockedGetSkipScopeTitlePath.mock.calls[0]?.[1]).toBe(cypressLike);
+    expect(cyLike.task).toHaveBeenCalledWith(TRIGGER_FAIL_FAST_TASK, {
+      test: {
+        name: "a test",
+        fullTitle: "a suite should stop",
+      },
+      skipScopeTitlePath: ["a suite"],
+    });
+  });
+
+  it("does not resolve skip scope when strategy is not describe", () => {
+    const cyLike = createCyLike(false, 0);
+    const beforeHook = createHookRegisterer();
+    const beforeEachHook = createHookRegisterer();
+    const afterEachHook = createHookRegisterer();
+    const currentTest = createCurrentTest("a suite should stop");
+    const context = {
+      currentTest,
+    } as unknown as Mocha.Context;
+
+    mockedTestHasFailed.mockReturnValue(true);
+    mockedFailFastIsEnabled.mockReturnValue(true);
+    mockedBailConfig.mockReturnValue(1);
+    mockedCurrentStrategyIsDescribe.mockReturnValue(false);
+
+    registerFailFast(
+      cypressLike,
+      cyLike,
+      beforeHook.register,
+      beforeEachHook.register,
+      afterEachHook.register,
+    );
+
+    afterEachHook.getCallback()?.call(context);
+
+    expect(mockedGetSkipScopeTitlePath).not.toHaveBeenCalled();
   });
 });

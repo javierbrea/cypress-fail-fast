@@ -69,6 +69,77 @@ export function failFastIsEnabled(
 }
 
 /**
+ * Reads a fail-fast override configured directly on a suite, if any.
+ *
+ * Suite-level configuration reaches tests through Cypress's merged
+ * `testConfigList` (see {@link getTestConfig}), but that merged list does not
+ * tell WHICH suite contributed the override. To attribute configuration to a
+ * concrete suite, this reads the raw config object that Cypress stores on the
+ * suite itself. The property is private and its shape has changed between
+ * Cypress versions, so both known shapes are checked defensively: when none
+ * matches, the caller falls back to a sane default (the immediate parent
+ * describe).
+ * @param suite Mocha suite instance.
+ * @returns The fail-fast override configured on that exact suite, if any.
+ */
+function getSuiteOwnConfig(
+  suite: Mocha.Suite,
+): Cypress.FailFastTestConfigOptions | undefined {
+  // @ts-expect-error - Accessing private property _testConfig is necessary to retrieve the failFast configuration defined at the suite level
+  const suiteConfig = suite._testConfig;
+  return suiteConfig?.failFast ?? suiteConfig?.unverifiedTestConfig?.failFast;
+}
+
+/**
+ * Resolves the describe block acting as skip scope for the `describe` strategy.
+ *
+ * The scope is the nearest ancestor suite carrying an explicit `failFast`
+ * configuration: when a user marks a describe block with fail-fast options, a
+ * failure anywhere inside it (including nested describes) should skip the
+ * remaining tests of that whole block. When no ancestor carries explicit
+ * configuration (fail-fast enabled globally), the scope falls back to the
+ * failed test's immediate parent describe, which is the most intuitive
+ * boundary: "skip the rest of this describe".
+ *
+ * Per-suite attribution is skipped when `failFastIgnorePerTestConfig` is set,
+ * because in that mode suite-level configuration must have no effect at all.
+ *
+ * @param currentTest Test that triggered fail-fast.
+ * @param Cyp Cypress global object.
+ * @returns Title path of the skip scope. An empty array means the test has no
+ * parent describe (it is defined at the spec root), in which case every
+ * remaining test in the spec is skipped, matching the `spec` strategy.
+ */
+export function getSkipScopeTitlePath(
+  currentTest: Mocha.Test,
+  Cyp: Cypress.Cypress,
+): string[] {
+  const parentSuite = currentTest.parent;
+  let scope: Mocha.Suite | undefined;
+
+  if (!shouldIgnorePerTestConfig(Cyp)) {
+    let suite: Mocha.Suite | undefined = parentSuite;
+    while (suite && !suite.root) {
+      if (getSuiteOwnConfig(suite)) {
+        scope = suite;
+        break;
+      }
+      suite = suite.parent;
+    }
+  }
+
+  if (!scope) {
+    scope = parentSuite;
+  }
+
+  if (!scope || scope.root) {
+    return [];
+  }
+
+  return scope.titlePath();
+}
+
+/**
  * Determines whether a test has definitively failed after exhausting retries.
  * @param currentTest Current Mocha test.
  * @returns `true` when the test is failed and has no remaining retries.
