@@ -9,7 +9,7 @@
   "devDependencies": {
     "cypress-fail-fast": "workspace:*",
     "cross-env": "7.0.3",
-    "cypress": "15.10.0",
-    "webpack": "5.93.0"
+    "cypress": "15.21.1",
+    "webpack": "5.110.3"
   }
 }

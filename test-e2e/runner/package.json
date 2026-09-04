@@ -13,7 +13,7 @@
   "devDependencies": {
     "cypress-fail-fast": "workspace:*",
     "cross-env": "7.0.3",
-    "start-server-and-test": "2.0.13",
+    "start-server-and-test": "2.1.5",
     "strip-ansi": "6.0.0"
   }
 }
