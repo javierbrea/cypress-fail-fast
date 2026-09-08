@@ -540,7 +540,7 @@ describe("registerFailFast", () => {
 
     expect(mockedGetSkipScopeTitlePath).toHaveBeenCalledTimes(1);
     expect(mockedGetSkipScopeTitlePath.mock.calls[0]?.[0]).toBe(currentTest);
-    expect(mockedGetSkipScopeTitlePath.mock.calls[0]?.[1]).toBe(cypressLike);
+    expect(mockedGetSkipScopeTitlePath).toHaveBeenCalledWith(currentTest);
     expect(cyLike.task).toHaveBeenCalledWith(TRIGGER_FAIL_FAST_TASK, {
       test: {
         name: "a test",

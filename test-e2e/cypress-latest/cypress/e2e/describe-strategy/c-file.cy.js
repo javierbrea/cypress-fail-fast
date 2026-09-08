@@ -1,8 +1,6 @@
-// 4 tests. The failing test lives in a describe block nested inside a block
-// carrying an explicit failFast configuration, so the skip scope must be that
-// configured block: the sibling nested describe must also be skipped, while
-// the block outside the configured one must run normally:
-// 4 tests should be executed, 2 should pass, 1 should fail and 1 should be pending.
+// A configured ancestor does not expand the scope: only the failing inner
+// describe is skipped, while its sibling and the outside block keep running.
+// 5 tests: 3 passing, 1 failing, 1 pending.
 
 describe("Configured block", { failFast: { enabled: true } }, () => {
   beforeEach(() => {
@@ -16,6 +14,10 @@ describe("Configured block", { failFast: { enabled: true } }, () => {
 
     it("should display first item", () => {
       cy.get("ul li:eq(0)").should("have.text", "Wrong text");
+    });
+
+    it("should skip the remaining inner test", () => {
+      cy.get("h1").should("have.text", "Items list");
     });
   });
 

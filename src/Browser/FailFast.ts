@@ -63,11 +63,10 @@ export function registerFailFast(
    * @returns Cypress chainable resolving to skip state.
    */
   function shouldSkip(currentTest?: Mocha.Test) {
-    return cy.task<boolean>(
-      SHOULD_SKIP_TASK,
-      { titlePath: currentTest?.titlePath() } as ShouldSkipTaskPayload,
-      { log: false },
-    );
+    const payload: ShouldSkipTaskPayload = {
+      titlePath: currentTest?.titlePath(),
+    };
+    return cy.task<boolean>(SHOULD_SKIP_TASK, payload, { log: false });
   }
 
   /**
@@ -100,10 +99,11 @@ export function registerFailFast(
     skipScopeTitlePath?: string[],
   ) {
     log(SKIP_MESSAGE);
-    return cy.task<void>(TRIGGER_FAIL_FAST_TASK, {
+    const payload: TriggerFailFastTaskPayload = {
       test: failedTest,
       skipScopeTitlePath,
-    } as TriggerFailFastTaskPayload);
+    };
+    return cy.task<void>(TRIGGER_FAIL_FAST_TASK, payload);
   }
 
   function mapFailedTest(currentTest: Mocha.Test): FailFastFailedTestData {
@@ -194,7 +194,7 @@ export function registerFailFast(
           previous behavior of skipping every remaining test.
         */
         const skipScopeTitlePath = currentStrategyIsDescribe(Cyp)
-          ? getSkipScopeTitlePath(currentTest, Cyp)
+          ? getSkipScopeTitlePath(currentTest)
           : undefined;
         enableSkipMode(mapFailedTest(currentTest), skipScopeTitlePath);
       });

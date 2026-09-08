@@ -338,6 +338,52 @@ describe("registerFailFastTasks", () => {
       return tasks;
     }
 
+    it("consults the hook outside an active scope and clears the scope when it triggers", async () => {
+      const shouldTriggerFailFast = jest
+        .fn<() => boolean>()
+        .mockReturnValue(false);
+      const tasks = createRegisteredTasks(
+        { hooks: { shouldTriggerFailFast } },
+        { failFastStrategy: "describe" },
+      );
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["First block", "test"] }),
+      ).toBe(true);
+      expect(shouldTriggerFailFast).not.toHaveBeenCalled();
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["Second block", "test"] }),
+      ).toBe(false);
+      expect(shouldTriggerFailFast).toHaveBeenCalledTimes(1);
+      shouldTriggerFailFast.mockReturnValue(true);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "next test"],
+        }),
+      ).toBe(true);
+      expect(shouldTriggerFailFast).toHaveBeenCalledTimes(2);
+      shouldTriggerFailFast.mockReturnValue(false);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["Third block", "test"] }),
+      ).toBe(true);
+      expect(shouldTriggerFailFast).toHaveBeenCalledTimes(2);
+    });
+
+    it("treats an empty scope as unscoped skip mode", async () => {
+      const tasks = createScopedTasks();
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: [],
+      });
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["Another block", "test"] }),
+      ).toBe(true);
+      expect(await tasks[SHOULD_SKIP_TASK]()).toBe(true);
+    });
+
     it("skips tests inside the scoped describe block", async () => {
       const tasks = createScopedTasks();
 

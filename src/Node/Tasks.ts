@@ -67,7 +67,17 @@ export function registerFailFastTasks(
    * @returns `true` when skip mode is active for that test.
    */
   const shouldSkip = async (testTitlePath?: string[]) => {
-    if (!shouldSkipFlag && (await shouldTriggerFailFastFromHook())) {
+    const skipApplies =
+      shouldSkipFlag &&
+      (!skipScopeTitlePath ||
+        !testTitlePath ||
+        titlePathStartsWith(testTitlePath, skipScopeTitlePath));
+
+    if (skipApplies) {
+      return true;
+    }
+
+    if (await shouldTriggerFailFastFromHook()) {
       /*
         Skip mode triggered from the hook has no failed test attached, so there
         is no describe block to scope it to. Clear any previous scope to keep
@@ -77,23 +87,9 @@ export function registerFailFastTasks(
       */
       shouldSkipFlag = true;
       skipScopeTitlePath = null;
+      return true;
     }
-
-    if (!shouldSkipFlag) {
-      return false;
-    }
-
-    /*
-      When skip mode is scoped to a describe block, only tests inside that
-      block are skipped: a test is inside the block when the block's title path
-      is a prefix of the test's title path. Tests with an unknown title path
-      are skipped conservatively, preserving the behavior of unscoped skip mode.
-    */
-    if (skipScopeTitlePath && testTitlePath) {
-      return titlePathStartsWith(testTitlePath, skipScopeTitlePath);
-    }
-
-    return shouldSkipFlag;
+    return false;
   };
 
   // Expose fail fast tasks
@@ -123,7 +119,9 @@ export function registerFailFastTasks(
       }
 
       shouldSkipFlag = true;
-      skipScopeTitlePath = value.skipScopeTitlePath || null;
+      skipScopeTitlePath = value.skipScopeTitlePath?.length
+        ? value.skipScopeTitlePath
+        : null;
 
       return shouldSkipFlag;
     },

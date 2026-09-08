@@ -24,13 +24,11 @@ runSpecsTests("When describe strategy is set", {
       failed: 0,
       pending: 0,
     },
-    // Third spec: the failure happens in a describe nested inside a block
-    // carrying explicit failFast configuration, so the whole configured block
-    // is skipped (including a sibling nested describe), while the describe
-    // outside it runs normally.
+    // Third spec: the configured ancestor does not expand the scope.
+    // The sibling nested describe and outside describe both run normally.
     {
-      executed: 4,
-      passed: 2,
+      executed: 5,
+      passed: 3,
       failed: 1,
       pending: 1,
     },

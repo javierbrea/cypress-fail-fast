@@ -15,6 +15,7 @@ import {
   failFastIsEnabled,
   testHasFailed,
   getSkipScopeTitlePath,
+  getSuiteOwnConfig,
 } from "./CypressHelpers";
 
 jest.mock("../Shared/Config", () => ({
@@ -212,126 +213,60 @@ describe("testHasFailed", () => {
   });
 });
 
+describe("getSuiteOwnConfig", () => {
+  it.each([
+    [undefined, undefined],
+    [{}, undefined],
+    [{ unverifiedTestConfig: {} }, undefined],
+    [{ failFast: { enabled: false } }, { enabled: false }],
+    [
+      { unverifiedTestConfig: { failFast: { enabled: true } } },
+      { enabled: true },
+    ],
+    [
+      {
+        failFast: { enabled: false },
+        unverifiedTestConfig: { failFast: { enabled: true } },
+      },
+      { enabled: false },
+    ],
+  ])("reads only the suite's own config from %j", (config, expected) => {
+    const suite = { _testConfig: config } as unknown as Mocha.Suite;
+    expect(getSuiteOwnConfig(suite)).toEqual(expected);
+  });
+
+  it("does not inherit configuration from a parent suite", () => {
+    const suite = {
+      parent: { _testConfig: { failFast: { enabled: true } } },
+    } as unknown as Mocha.Suite;
+    expect(getSuiteOwnConfig(suite)).toBeUndefined();
+  });
+});
+
 describe("getSkipScopeTitlePath", () => {
-  const cypressLike = {} as Cypress.Cypress;
+  it.each([true, false])(
+    "uses the immediate parent even when an ancestor has enabled: %s",
+    (enabled) => {
+      const currentTest = {
+        parent: {
+          root: false,
+          titlePath: () => ["configured suite", "inner suite"],
+          parent: { _testConfig: { failFast: { enabled } } },
+        },
+      } as unknown as Mocha.Test;
+      expect(getSkipScopeTitlePath(currentTest)).toEqual([
+        "configured suite",
+        "inner suite",
+      ]);
+    },
+  );
 
-  beforeEach(() => {
-    mockedShouldIgnorePerTestConfig.mockReset();
-    mockedShouldIgnorePerTestConfig.mockReturnValue(false);
+  it("returns an empty scope for a test at the spec root", () => {
+    const currentTest = { parent: { root: true } } as unknown as Mocha.Test;
+    expect(getSkipScopeTitlePath(currentTest)).toEqual([]);
   });
 
-  function createSuite({
-    title,
-    titlePath,
-    parent,
-    root = false,
-    failFast,
-  }: {
-    title: string;
-    titlePath?: string[];
-    parent?: Mocha.Suite;
-    root?: boolean;
-    failFast?: { enabled: boolean };
-  }): Mocha.Suite {
-    const suiteLike = {
-      title,
-      root,
-      parent,
-      titlePath: () => titlePath || [title],
-      _testConfig: failFast ? { failFast } : undefined,
-    };
-    return suiteLike as unknown as Mocha.Suite;
-  }
-
-  function createTestInSuite(parent: Mocha.Suite): Mocha.Test {
-    return { parent } as unknown as Mocha.Test;
-  }
-
-  it("returns the immediate parent describe when no suite has own fail-fast config", () => {
-    const rootSuite = createSuite({ title: "", root: true });
-    const parentSuite = createSuite({
-      title: "child suite",
-      titlePath: ["parent suite", "child suite"],
-      parent: rootSuite,
-    });
-    const currentTest = createTestInSuite(parentSuite);
-
-    expect(getSkipScopeTitlePath(currentTest, cypressLike)).toEqual([
-      "parent suite",
-      "child suite",
-    ]);
-  });
-
-  it("returns the nearest ancestor suite carrying own fail-fast config", () => {
-    const rootSuite = createSuite({ title: "", root: true });
-    const configuredSuite = createSuite({
-      title: "configured suite",
-      titlePath: ["configured suite"],
-      parent: rootSuite,
-      failFast: { enabled: true },
-    });
-    const innerSuite = createSuite({
-      title: "inner suite",
-      titlePath: ["configured suite", "inner suite"],
-      parent: configuredSuite,
-    });
-    const currentTest = createTestInSuite(innerSuite);
-
-    expect(getSkipScopeTitlePath(currentTest, cypressLike)).toEqual([
-      "configured suite",
-    ]);
-  });
-
-  it("reads suite config from unverifiedTestConfig shape", () => {
-    const rootSuite = createSuite({ title: "", root: true });
-    const configuredSuite = createSuite({
-      title: "configured suite",
-      titlePath: ["configured suite"],
-      parent: rootSuite,
-    });
-    // @ts-expect-error Mocked partially - reproducing the alternative private shape used by some Cypress versions
-    configuredSuite._testConfig = {
-      unverifiedTestConfig: { failFast: { enabled: true } },
-    };
-    const innerSuite = createSuite({
-      title: "inner suite",
-      titlePath: ["configured suite", "inner suite"],
-      parent: configuredSuite,
-    });
-    const currentTest = createTestInSuite(innerSuite);
-
-    expect(getSkipScopeTitlePath(currentTest, cypressLike)).toEqual([
-      "configured suite",
-    ]);
-  });
-
-  it("ignores suite own config when per-test config is ignored", () => {
-    mockedShouldIgnorePerTestConfig.mockReturnValue(true);
-
-    const rootSuite = createSuite({ title: "", root: true });
-    const configuredSuite = createSuite({
-      title: "configured suite",
-      titlePath: ["configured suite"],
-      parent: rootSuite,
-      failFast: { enabled: true },
-    });
-    const innerSuite = createSuite({
-      title: "inner suite",
-      titlePath: ["configured suite", "inner suite"],
-      parent: configuredSuite,
-    });
-    const currentTest = createTestInSuite(innerSuite);
-
-    expect(getSkipScopeTitlePath(currentTest, cypressLike)).toEqual([
-      "configured suite",
-      "inner suite",
-    ]);
-  });
-
-  it("returns an empty title path for tests defined at the spec root", () => {
-    const rootSuite = createSuite({ title: "", root: true });
-    const currentTest = createTestInSuite(rootSuite);
-
-    expect(getSkipScopeTitlePath(currentTest, cypressLike)).toEqual([]);
+  it("returns an empty scope for a test without a parent", () => {
+    expect(getSkipScopeTitlePath({} as Mocha.Test)).toEqual([]);
   });
 });
