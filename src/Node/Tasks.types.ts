@@ -45,6 +45,24 @@ export type FailFastHooks = {
  */
 export type TriggerFailFastTaskPayload = {
   test: FailFastFailedTestData;
+  /**
+   * Title path of the describe block where remaining tests must be skipped.
+   * Only provided when the `describe` strategy is active. When present, the
+   * skip mode only affects tests whose title path starts with this one.
+   */
+  skipScopeTitlePath?: string[];
+};
+
+/**
+ * Payload accepted by the should-skip task.
+ */
+export type ShouldSkipTaskPayload = {
+  /**
+   * Title path of the test about to run. Used by the `describe` strategy to
+   * decide whether the test belongs to the describe block where fail-fast was
+   * triggered. Other strategies ignore it.
+   */
+  titlePath?: string[];
 };
 
 /**

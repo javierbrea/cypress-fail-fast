@@ -14,6 +14,8 @@ import {
   getTestConfig,
   failFastIsEnabled,
   testHasFailed,
+  getSkipScopeTitlePath,
+  getSuiteOwnConfig,
 } from "./CypressHelpers";
 
 jest.mock("../Shared/Config", () => ({
@@ -127,6 +129,7 @@ describe("failFastIsEnabled", () => {
       ignorePerTestConfig: false,
       enabled: true,
       strategyIsSpec: false,
+      strategyIsDescribe: false,
       bail: 1,
     });
   });
@@ -207,5 +210,63 @@ describe("testHasFailed", () => {
     } as unknown as Mocha.Test;
 
     expect(testHasFailed(testLike)).toBe(false);
+  });
+});
+
+describe("getSuiteOwnConfig", () => {
+  it.each([
+    [undefined, undefined],
+    [{}, undefined],
+    [{ unverifiedTestConfig: {} }, undefined],
+    [{ failFast: { enabled: false } }, { enabled: false }],
+    [
+      { unverifiedTestConfig: { failFast: { enabled: true } } },
+      { enabled: true },
+    ],
+    [
+      {
+        failFast: { enabled: false },
+        unverifiedTestConfig: { failFast: { enabled: true } },
+      },
+      { enabled: false },
+    ],
+  ])("reads only the suite's own config from %j", (config, expected) => {
+    const suite = { _testConfig: config } as unknown as Mocha.Suite;
+    expect(getSuiteOwnConfig(suite)).toEqual(expected);
+  });
+
+  it("does not inherit configuration from a parent suite", () => {
+    const suite = {
+      parent: { _testConfig: { failFast: { enabled: true } } },
+    } as unknown as Mocha.Suite;
+    expect(getSuiteOwnConfig(suite)).toBeUndefined();
+  });
+});
+
+describe("getSkipScopeTitlePath", () => {
+  it.each([true, false])(
+    "uses the immediate parent even when an ancestor has enabled: %s",
+    (enabled) => {
+      const currentTest = {
+        parent: {
+          root: false,
+          titlePath: () => ["configured suite", "inner suite"],
+          parent: { _testConfig: { failFast: { enabled } } },
+        },
+      } as unknown as Mocha.Test;
+      expect(getSkipScopeTitlePath(currentTest)).toEqual([
+        "configured suite",
+        "inner suite",
+      ]);
+    },
+  );
+
+  it("returns an empty scope for a test at the spec root", () => {
+    const currentTest = { parent: { root: true } } as unknown as Mocha.Test;
+    expect(getSkipScopeTitlePath(currentTest)).toEqual([]);
+  });
+
+  it("returns an empty scope for a test without a parent", () => {
+    expect(getSkipScopeTitlePath({} as Mocha.Test)).toEqual([]);
   });
 });

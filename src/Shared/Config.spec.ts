@@ -16,11 +16,15 @@ import {
   isUndefined,
   RUN_STRATEGY,
   SPEC_STRATEGY,
+  DESCRIBE_STRATEGY,
   strategyIsSpec,
+  strategyIsDescribe,
   strategyValue,
+  titlePathStartsWith,
   getFailFastEnvironmentConfig,
   getFailFastPluginConfig,
   currentStrategyIsSpec,
+  currentStrategyIsDescribe,
   shouldIgnorePerTestConfig,
   bailConfig,
 } from "./Config";
@@ -85,11 +89,62 @@ describe("strategyIsSpec", () => {
   });
 });
 
+describe("strategyIsDescribe", () => {
+  it("returns true only when strategy is describe", () => {
+    expect(strategyIsDescribe(DESCRIBE_STRATEGY)).toBe(true);
+    expect(strategyIsDescribe(SPEC_STRATEGY)).toBe(false);
+    expect(strategyIsDescribe(RUN_STRATEGY)).toBe(false);
+  });
+});
+
 describe("strategyValue", () => {
-  it("returns spec for spec and run otherwise", () => {
+  it("returns spec or describe when provided and run otherwise", () => {
     expect(strategyValue(SPEC_STRATEGY)).toBe(SPEC_STRATEGY);
+    expect(strategyValue(DESCRIBE_STRATEGY)).toBe(DESCRIBE_STRATEGY);
     expect(strategyValue(RUN_STRATEGY)).toBe(RUN_STRATEGY);
     expect(strategyValue(undefined)).toBe(RUN_STRATEGY);
+  });
+});
+
+describe("titlePathStartsWith", () => {
+  it("returns true when scope is a prefix of the title path", () => {
+    expect(
+      titlePathStartsWith(["parent", "child", "test title"], ["parent"]),
+    ).toBe(true);
+    expect(
+      titlePathStartsWith(
+        ["parent", "child", "test title"],
+        ["parent", "child"],
+      ),
+    ).toBe(true);
+  });
+
+  it("returns true when scope equals the title path", () => {
+    expect(titlePathStartsWith(["parent", "child"], ["parent", "child"])).toBe(
+      true,
+    );
+  });
+
+  it("returns true when scope is empty", () => {
+    expect(titlePathStartsWith(["parent", "test title"], [])).toBe(true);
+  });
+
+  it("returns false when scope diverges from the title path", () => {
+    expect(
+      titlePathStartsWith(["parent", "child", "test title"], ["other parent"]),
+    ).toBe(false);
+    expect(
+      titlePathStartsWith(
+        ["parent", "child", "test title"],
+        ["parent", "other child"],
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when scope is longer than the title path", () => {
+    expect(
+      titlePathStartsWith(["parent"], ["parent", "child", "grandchild"]),
+    ).toBe(false);
   });
 });
 
@@ -107,6 +162,7 @@ describe("getFailFastEnvironmentConfig", () => {
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
       strategyIsSpec: false,
+      strategyIsDescribe: false,
       bail: GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
     });
   });
@@ -124,6 +180,7 @@ describe("getFailFastEnvironmentConfig", () => {
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
       strategyIsSpec: false,
+      strategyIsDescribe: false,
       bail: 3,
     });
   });
@@ -141,6 +198,7 @@ describe("getFailFastEnvironmentConfig", () => {
       ignorePerTestConfig: true,
       enabled: false,
       strategyIsSpec: true,
+      strategyIsDescribe: false,
       bail: 2,
     });
   });
@@ -195,6 +253,18 @@ describe("helper config accessors", () => {
     });
 
     expect(currentStrategyIsSpec(cypressLike)).toBe(true);
+  });
+
+  it("returns strategyIsDescribe from currentStrategyIsDescribe", () => {
+    const cypressLike = createCypressLike({
+      [IGNORE_PER_TEST_CONFIG]: false,
+      [ENABLED_GLOBAL_CONFIG]: true,
+      [STRATEGY_GLOBAL_CONFIG]: "describe",
+      [BAIL_GLOBAL_CONFIG]: 1,
+    });
+
+    expect(currentStrategyIsDescribe(cypressLike)).toBe(true);
+    expect(currentStrategyIsSpec(cypressLike)).toBe(false);
   });
 
   it("returns ignorePerTestConfig from shouldIgnorePerTestConfig", () => {

@@ -69,6 +69,45 @@ export function failFastIsEnabled(
 }
 
 /**
+ * Reads a fail-fast override configured directly on a suite, if any.
+ *
+ * Suite-level configuration reaches tests through Cypress's merged
+ * `testConfigList` (see {@link getTestConfig}), but that merged list does not
+ * tell WHICH suite contributed the override. To attribute configuration to a
+ * concrete suite, this reads the raw config object that Cypress stores on the
+ * suite itself. The property is private and its shape has changed between
+ * Cypress versions, so both known shapes are checked defensively: when none
+ * matches, no override is returned.
+ * @param suite Mocha suite instance.
+ * @returns The fail-fast override configured on that exact suite, if any.
+ */
+export function getSuiteOwnConfig(
+  suite: Mocha.Suite,
+): Cypress.FailFastTestConfigOptions | undefined {
+  // @ts-expect-error - Accessing private property _testConfig is necessary to retrieve the failFast configuration defined at the suite level
+  const suiteConfig = suite._testConfig;
+  return suiteConfig?.failFast ?? suiteConfig?.unverifiedTestConfig?.failFast;
+}
+
+/**
+ * Resolves the describe block acting as skip scope for the `describe` strategy.
+ *
+ * The scope is always the failed test's immediate parent describe.
+ *
+ * @param currentTest Test that triggered fail-fast.
+ * @returns Title path of the skip scope. An empty array means the test has no
+ * parent describe (it is defined at the spec root), in which case every
+ * remaining test in the spec is skipped, matching the `spec` strategy.
+ */
+export function getSkipScopeTitlePath(currentTest: Mocha.Test): string[] {
+  const parentSuite = currentTest.parent;
+  if (!parentSuite || parentSuite.root) {
+    return [];
+  }
+  return parentSuite.titlePath();
+}
+
+/**
  * Determines whether a test has definitively failed after exhausting retries.
  * @param currentTest Current Mocha test.
  * @returns `true` when the test is failed and has no remaining retries.
