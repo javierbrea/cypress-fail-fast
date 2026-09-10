@@ -119,8 +119,6 @@ export function getFailFastEnvironmentConfig(
       Cyp.expose(ENABLED_GLOBAL_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
-    strategyIsSpec: strategy === SPEC_STRATEGY,
-    strategyIsDescribe: strategy === DESCRIBE_STRATEGY,
     bail: numericVarValue(
       Cyp.expose(BAIL_GLOBAL_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
@@ -148,8 +146,6 @@ export function getFailFastPluginConfig(
       config.expose?.[ENABLED_GLOBAL_CONFIG],
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
-    strategyIsSpec: strategy === SPEC_STRATEGY,
-    strategyIsDescribe: strategy === DESCRIBE_STRATEGY,
     bail: numericVarValue(
       config.expose?.[BAIL_GLOBAL_CONFIG],
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
@@ -163,7 +159,7 @@ export function getFailFastPluginConfig(
  * @returns `true` when strategy is `spec`.
  */
 export function currentStrategyIsSpec(Cyp: Cypress.Cypress) {
-  return getFailFastEnvironmentConfig(Cyp).strategyIsSpec;
+  return strategyIsSpec(getFailFastEnvironmentConfig(Cyp).strategy);
 }
 
 /**
@@ -172,7 +168,7 @@ export function currentStrategyIsSpec(Cyp: Cypress.Cypress) {
  * @returns `true` when strategy is `describe`.
  */
 export function currentStrategyIsDescribe(Cyp: Cypress.Cypress) {
-  return getFailFastEnvironmentConfig(Cyp).strategyIsDescribe;
+  return strategyIsDescribe(getFailFastEnvironmentConfig(Cyp).strategy);
 }
 
 /**
