@@ -9,7 +9,8 @@ import {
   LOG_TASK,
   LOG_PREFIX,
 } from "../Shared/Constants";
-import { getFailFastPluginConfig, titlePathStartsWith } from "../Shared/Config";
+import { getFailFastPluginConfig } from "../Shared/Config";
+import { titlePathStartsWith } from "../Shared/TitlePath";
 import type {
   FailFastPluginConfigOptions,
   ShouldSkipTaskPayload,

@@ -20,7 +20,6 @@ import {
   strategyIsSpec,
   strategyIsDescribe,
   strategyValue,
-  titlePathStartsWith,
   getFailFastEnvironmentConfig,
   getFailFastPluginConfig,
   currentStrategyIsSpec,
@@ -103,48 +102,6 @@ describe("strategyValue", () => {
     expect(strategyValue(DESCRIBE_STRATEGY)).toBe(DESCRIBE_STRATEGY);
     expect(strategyValue(RUN_STRATEGY)).toBe(RUN_STRATEGY);
     expect(strategyValue(undefined)).toBe(RUN_STRATEGY);
-  });
-});
-
-describe("titlePathStartsWith", () => {
-  it("returns true when scope is a prefix of the title path", () => {
-    expect(
-      titlePathStartsWith(["parent", "child", "test title"], ["parent"]),
-    ).toBe(true);
-    expect(
-      titlePathStartsWith(
-        ["parent", "child", "test title"],
-        ["parent", "child"],
-      ),
-    ).toBe(true);
-  });
-
-  it("returns true when scope equals the title path", () => {
-    expect(titlePathStartsWith(["parent", "child"], ["parent", "child"])).toBe(
-      true,
-    );
-  });
-
-  it("returns true when scope is empty", () => {
-    expect(titlePathStartsWith(["parent", "test title"], [])).toBe(true);
-  });
-
-  it("returns false when scope diverges from the title path", () => {
-    expect(
-      titlePathStartsWith(["parent", "child", "test title"], ["other parent"]),
-    ).toBe(false);
-    expect(
-      titlePathStartsWith(
-        ["parent", "child", "test title"],
-        ["parent", "other child"],
-      ),
-    ).toBe(false);
-  });
-
-  it("returns false when scope is longer than the title path", () => {
-    expect(
-      titlePathStartsWith(["parent"], ["parent", "child", "grandchild"]),
-    ).toBe(false);
   });
 });
 
