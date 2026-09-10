@@ -6,11 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- feat: Add `describe` strategy, which skips only the remaining tests in the describe block where the failure happened. The skipped scope is always the failed test's immediate parent describe, independent of per-suite configuration.
 ### Changed
 ### Fixed
 ### Removed
 ### Breaking Changes
+
+## [8.2.0] - 2026-09-10
+
+### Added
+
+- feat: Add `describe` strategy, which skips only the remaining tests in the describe block where the failure happened. The skipped scope is always the failed test's immediate parent describe, independent of per-suite configuration.
 
 ## [8.1.0] - 2026-03-23
 
