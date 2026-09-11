@@ -16,11 +16,14 @@ import {
   isUndefined,
   RUN_STRATEGY,
   SPEC_STRATEGY,
+  DESCRIBE_STRATEGY,
   strategyIsSpec,
+  strategyIsDescribe,
   strategyValue,
   getFailFastEnvironmentConfig,
   getFailFastPluginConfig,
   currentStrategyIsSpec,
+  currentStrategyIsDescribe,
   shouldIgnorePerTestConfig,
   bailConfig,
 } from "./Config";
@@ -85,9 +88,18 @@ describe("strategyIsSpec", () => {
   });
 });
 
+describe("strategyIsDescribe", () => {
+  it("returns true only when strategy is describe", () => {
+    expect(strategyIsDescribe(DESCRIBE_STRATEGY)).toBe(true);
+    expect(strategyIsDescribe(SPEC_STRATEGY)).toBe(false);
+    expect(strategyIsDescribe(RUN_STRATEGY)).toBe(false);
+  });
+});
+
 describe("strategyValue", () => {
-  it("returns spec for spec and run otherwise", () => {
+  it("returns spec or describe when provided and run otherwise", () => {
     expect(strategyValue(SPEC_STRATEGY)).toBe(SPEC_STRATEGY);
+    expect(strategyValue(DESCRIBE_STRATEGY)).toBe(DESCRIBE_STRATEGY);
     expect(strategyValue(RUN_STRATEGY)).toBe(RUN_STRATEGY);
     expect(strategyValue(undefined)).toBe(RUN_STRATEGY);
   });
@@ -106,7 +118,6 @@ describe("getFailFastEnvironmentConfig", () => {
       strategy: RUN_STRATEGY,
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
-      strategyIsSpec: false,
       bail: GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
     });
   });
@@ -123,7 +134,6 @@ describe("getFailFastEnvironmentConfig", () => {
       strategy: RUN_STRATEGY,
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
-      strategyIsSpec: false,
       bail: 3,
     });
   });
@@ -140,7 +150,6 @@ describe("getFailFastEnvironmentConfig", () => {
       strategy: SPEC_STRATEGY,
       ignorePerTestConfig: true,
       enabled: false,
-      strategyIsSpec: true,
       bail: 2,
     });
   });
@@ -167,7 +176,6 @@ describe("getFailFastPluginConfig", () => {
       } as unknown as Pick<Cypress.PluginConfigOptions, "expose">),
     ).toMatchObject({
       strategy: RUN_STRATEGY,
-      strategyIsSpec: false,
     });
   });
 
@@ -180,22 +188,34 @@ describe("getFailFastPluginConfig", () => {
       } as unknown as Pick<Cypress.PluginConfigOptions, "expose">),
     ).toMatchObject({
       strategy: SPEC_STRATEGY,
-      strategyIsSpec: true,
     });
   });
 });
 
 describe("helper config accessors", () => {
-  it("returns strategyIsSpec from currentStrategyIsSpec", () => {
-    const cypressLike = createCypressLike({
-      [IGNORE_PER_TEST_CONFIG]: false,
-      [ENABLED_GLOBAL_CONFIG]: true,
-      [STRATEGY_GLOBAL_CONFIG]: "spec",
-      [BAIL_GLOBAL_CONFIG]: 1,
-    });
+  // Raw strategy strings are used on purpose instead of the exported constants:
+  // asserting against the constants would make input and expectation mutate
+  // together, letting mutations of the constants themselves survive.
+  const strategyAccessorsCases: [string, boolean, boolean][] = [
+    ["spec", true, false],
+    ["run", false, false],
+    ["describe", false, true],
+  ];
 
-    expect(currentStrategyIsSpec(cypressLike)).toBe(true);
-  });
+  it.each(strategyAccessorsCases)(
+    "returns the strategy accessors values for the %s strategy",
+    (strategy, expectedIsSpec, expectedIsDescribe) => {
+      const cypressLike = createCypressLike({
+        [IGNORE_PER_TEST_CONFIG]: false,
+        [ENABLED_GLOBAL_CONFIG]: true,
+        [STRATEGY_GLOBAL_CONFIG]: strategy,
+        [BAIL_GLOBAL_CONFIG]: 1,
+      });
+
+      expect(currentStrategyIsSpec(cypressLike)).toBe(expectedIsSpec);
+      expect(currentStrategyIsDescribe(cypressLike)).toBe(expectedIsDescribe);
+    },
+  );
 
   it("returns ignorePerTestConfig from shouldIgnorePerTestConfig", () => {
     const cypressLike = createCypressLike({

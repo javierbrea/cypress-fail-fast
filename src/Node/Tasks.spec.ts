@@ -22,7 +22,11 @@ import {
   LOG_PREFIX,
 } from "../Shared/Constants";
 import type { FailFastConfig } from "../Shared/Config.types";
-import { RUN_STRATEGY, SPEC_STRATEGY } from "../Shared/Config";
+import {
+  DESCRIBE_STRATEGY,
+  RUN_STRATEGY,
+  SPEC_STRATEGY,
+} from "../Shared/Config";
 import type {
   FailFastFailedTestData,
   FailFastPluginConfigOptions,
@@ -279,6 +283,40 @@ describe("registerFailFastTasks", () => {
     });
   });
 
+  it("passes describe strategy to hooks when configured", async () => {
+    const onFailFastTriggered =
+      jest.fn<
+        (context: {
+          strategy: "run" | "spec" | "describe";
+          test: FailFastFailedTestData;
+        }) => void
+      >();
+    const failedTest = {
+      name: "a test",
+      fullTitle: "suite a test",
+    };
+
+    const tasks = createRegisteredTasks(
+      {
+        hooks: {
+          onFailFastTriggered,
+        },
+      },
+      {
+        failFastStrategy: "describe",
+      },
+    );
+
+    await tasks[TRIGGER_FAIL_FAST_TASK](
+      createEnableSkipTaskPayload(failedTest),
+    );
+
+    expect(onFailFastTriggered).toHaveBeenCalledWith({
+      strategy: DESCRIBE_STRATEGY,
+      test: failedTest,
+    });
+  });
+
   it("calls shouldTriggerFailFast without arguments", async () => {
     const shouldTriggerFailFast = jest
       .fn<() => boolean>()
@@ -309,11 +347,37 @@ describe("registerFailFastTasks", () => {
   it("increments and resets failed tests counter", () => {
     const tasks = createRegisteredTasks();
 
-    expect(tasks[FAILED_TESTS_TASK](null)).toBe(0);
-    expect(tasks[FAILED_TESTS_TASK](true)).toBe(1);
-    expect(tasks[FAILED_TESTS_TASK](true)).toBe(2);
+    // An absent payload and an empty one are both unscoped failures.
+    expect(tasks[FAILED_TESTS_TASK]()).toBe(1);
+    expect(tasks[FAILED_TESTS_TASK]({})).toBe(2);
     expect(tasks[RESET_FAILED_TESTS_TASK]()).toBeNull();
-    expect(tasks[FAILED_TESTS_TASK](null)).toBe(0);
+    expect(tasks[FAILED_TESTS_TASK]()).toBe(1);
+  });
+
+  it("counts failed tests of each describe block independently", () => {
+    const tasks = createRegisteredTasks();
+    const firstBlock = { skipScopeTitlePath: ["First block"] };
+    const secondBlock = { skipScopeTitlePath: ["First", "block"] };
+
+    expect(tasks[FAILED_TESTS_TASK](firstBlock)).toBe(1);
+    // A different title path never shares the counter, even when its titles
+    // would produce the same string once joined.
+    expect(tasks[FAILED_TESTS_TASK](secondBlock)).toBe(1);
+    expect(tasks[FAILED_TESTS_TASK](firstBlock)).toBe(2);
+    // Unscoped failures are counted apart from any describe block.
+    expect(tasks[FAILED_TESTS_TASK]()).toBe(1);
+
+    expect(tasks[RESET_FAILED_TESTS_TASK]()).toBeNull();
+
+    expect(tasks[FAILED_TESTS_TASK](firstBlock)).toBe(1);
+    expect(tasks[FAILED_TESTS_TASK](secondBlock)).toBe(1);
+  });
+
+  it("treats an empty scope as unscoped when counting failed tests", () => {
+    const tasks = createRegisteredTasks();
+
+    expect(tasks[FAILED_TESTS_TASK]({ skipScopeTitlePath: [] })).toBe(1);
+    expect(tasks[FAILED_TESTS_TASK]()).toBe(2);
   });
 
   it("logs message with fail-fast prefix", () => {
@@ -323,5 +387,177 @@ describe("registerFailFastTasks", () => {
     expect(consoleLogSpy).toHaveBeenCalledWith(
       `${chalk.yellow(LOG_PREFIX)} my message`,
     );
+  });
+
+  describe("when skip mode is scoped to a describe block", () => {
+    const failedTest: FailFastFailedTestData = {
+      name: "failed test",
+      fullTitle: "First block failed test",
+    };
+
+    function createScopedTasks() {
+      const tasks = createRegisteredTasks(undefined, {
+        failFastStrategy: "describe",
+      });
+      return tasks;
+    }
+
+    it("consults the hook outside an active scope and clears the scope when it triggers", async () => {
+      const shouldTriggerFailFast = jest
+        .fn<() => boolean>()
+        .mockReturnValue(false);
+      const tasks = createRegisteredTasks(
+        { hooks: { shouldTriggerFailFast } },
+        { failFastStrategy: "describe" },
+      );
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["First block", "test"] }),
+      ).toBe(true);
+      expect(shouldTriggerFailFast).not.toHaveBeenCalled();
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["Second block", "test"] }),
+      ).toBe(false);
+      expect(shouldTriggerFailFast).toHaveBeenCalledTimes(1);
+      shouldTriggerFailFast.mockReturnValue(true);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "next test"],
+        }),
+      ).toBe(true);
+      expect(shouldTriggerFailFast).toHaveBeenCalledTimes(2);
+      shouldTriggerFailFast.mockReturnValue(false);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["Third block", "test"] }),
+      ).toBe(true);
+      expect(shouldTriggerFailFast).toHaveBeenCalledTimes(2);
+    });
+
+    it("treats an empty scope as unscoped skip mode", async () => {
+      const tasks = createScopedTasks();
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: [],
+      });
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({ titlePath: ["Another block", "test"] }),
+      ).toBe(true);
+      expect(await tasks[SHOULD_SKIP_TASK]()).toBe(true);
+    });
+
+    it("skips tests inside the scoped describe block", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "another test"],
+        }),
+      ).toBe(true);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "nested block", "another test"],
+        }),
+      ).toBe(true);
+    });
+
+    it("does not skip tests outside the scoped describe block", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "another test"],
+        }),
+      ).toBe(false);
+    });
+
+    it("skips tests conservatively when their title path is unknown", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+
+      expect(await tasks[SHOULD_SKIP_TASK]()).toBe(true);
+      expect(await tasks[SHOULD_SKIP_TASK]({})).toBe(true);
+    });
+
+    it("clears the scope when skip state is reset", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+      tasks[RESET_SKIP_TASK]();
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "another test"],
+        }),
+      ).toBe(false);
+    });
+
+    it("replaces the scope when fail-fast is triggered again from another describe block", async () => {
+      const tasks = createScopedTasks();
+
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["First block"],
+      });
+      await tasks[TRIGGER_FAIL_FAST_TASK]({
+        test: failedTest,
+        skipScopeTitlePath: ["Second block"],
+      });
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "another test"],
+        }),
+      ).toBe(true);
+    });
+
+    it("skips every remaining test when skip mode is triggered without scope", async () => {
+      // Skip mode without a scope happens when it is triggered from the
+      // shouldTriggerFailFast hook, which has no failed test to derive a
+      // scope from.
+      const shouldTriggerFailFast = jest
+        .fn<() => boolean>()
+        .mockReturnValue(true);
+      const tasks = createRegisteredTasks(
+        {
+          hooks: {
+            shouldTriggerFailFast,
+          },
+        },
+        {
+          failFastStrategy: "describe",
+        },
+      );
+
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["First block", "a test"],
+        }),
+      ).toBe(true);
+      expect(
+        await tasks[SHOULD_SKIP_TASK]({
+          titlePath: ["Second block", "a test"],
+        }),
+      ).toBe(true);
+    });
   });
 });

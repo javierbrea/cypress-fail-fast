@@ -12,6 +12,7 @@ import { FailFastGlobalConfig } from "./Config.types";
 
 export const SPEC_STRATEGY = "spec" as const;
 export const RUN_STRATEGY = "run" as const;
+export const DESCRIBE_STRATEGY = "describe" as const;
 
 const truthyValuesSet = new Set([true, "true", 1, "1"]);
 const falsyValuesSet = new Set([false, "false", 0, "0"]);
@@ -54,6 +55,15 @@ export function strategyIsSpec(value: string) {
 }
 
 /**
+ * Checks if the provided strategy value equals `describe`.
+ * @param value Strategy value from Cypress env.
+ * @returns `true` when strategy is `describe`.
+ */
+export function strategyIsDescribe(value: string) {
+  return value === DESCRIBE_STRATEGY;
+}
+
+/**
  * Normalizes a strategy value to one of the supported strategy constants.
  * @param value Strategy value to normalize.
  * @returns Normalized strategy value.
@@ -61,7 +71,13 @@ export function strategyIsSpec(value: string) {
 export function strategyValue(
   value: unknown,
 ): FailFastGlobalConfig["strategy"] {
-  return strategyIsSpec(value as string) ? SPEC_STRATEGY : RUN_STRATEGY;
+  if (strategyIsSpec(value as string)) {
+    return SPEC_STRATEGY;
+  }
+  if (strategyIsDescribe(value as string)) {
+    return DESCRIBE_STRATEGY;
+  }
+  return RUN_STRATEGY;
 }
 
 function isDefined(value: unknown) {
@@ -103,7 +119,6 @@ export function getFailFastEnvironmentConfig(
       Cyp.expose(ENABLED_GLOBAL_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
-    strategyIsSpec: strategy === SPEC_STRATEGY,
     bail: numericVarValue(
       Cyp.expose(BAIL_GLOBAL_CONFIG),
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
@@ -131,7 +146,6 @@ export function getFailFastPluginConfig(
       config.expose?.[ENABLED_GLOBAL_CONFIG],
       GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
     ),
-    strategyIsSpec: strategy === SPEC_STRATEGY,
     bail: numericVarValue(
       config.expose?.[BAIL_GLOBAL_CONFIG],
       GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
@@ -145,7 +159,16 @@ export function getFailFastPluginConfig(
  * @returns `true` when strategy is `spec`.
  */
 export function currentStrategyIsSpec(Cyp: Cypress.Cypress) {
-  return getFailFastEnvironmentConfig(Cyp).strategyIsSpec;
+  return strategyIsSpec(getFailFastEnvironmentConfig(Cyp).strategy);
+}
+
+/**
+ * Returns whether the current fail-fast strategy is `describe`.
+ * @param Cyp Cypress global object.
+ * @returns `true` when strategy is `describe`.
+ */
+export function currentStrategyIsDescribe(Cyp: Cypress.Cypress) {
+  return strategyIsDescribe(getFailFastEnvironmentConfig(Cyp).strategy);
 }
 
 /**
