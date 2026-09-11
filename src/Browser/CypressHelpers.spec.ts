@@ -128,8 +128,6 @@ describe("failFastIsEnabled", () => {
       strategy: RUN_STRATEGY,
       ignorePerTestConfig: false,
       enabled: true,
-      strategyIsSpec: false,
-      strategyIsDescribe: false,
       bail: 1,
     });
   });

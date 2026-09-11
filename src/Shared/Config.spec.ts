@@ -20,7 +20,6 @@ import {
   strategyIsSpec,
   strategyIsDescribe,
   strategyValue,
-  titlePathStartsWith,
   getFailFastEnvironmentConfig,
   getFailFastPluginConfig,
   currentStrategyIsSpec,
@@ -106,48 +105,6 @@ describe("strategyValue", () => {
   });
 });
 
-describe("titlePathStartsWith", () => {
-  it("returns true when scope is a prefix of the title path", () => {
-    expect(
-      titlePathStartsWith(["parent", "child", "test title"], ["parent"]),
-    ).toBe(true);
-    expect(
-      titlePathStartsWith(
-        ["parent", "child", "test title"],
-        ["parent", "child"],
-      ),
-    ).toBe(true);
-  });
-
-  it("returns true when scope equals the title path", () => {
-    expect(titlePathStartsWith(["parent", "child"], ["parent", "child"])).toBe(
-      true,
-    );
-  });
-
-  it("returns true when scope is empty", () => {
-    expect(titlePathStartsWith(["parent", "test title"], [])).toBe(true);
-  });
-
-  it("returns false when scope diverges from the title path", () => {
-    expect(
-      titlePathStartsWith(["parent", "child", "test title"], ["other parent"]),
-    ).toBe(false);
-    expect(
-      titlePathStartsWith(
-        ["parent", "child", "test title"],
-        ["parent", "other child"],
-      ),
-    ).toBe(false);
-  });
-
-  it("returns false when scope is longer than the title path", () => {
-    expect(
-      titlePathStartsWith(["parent"], ["parent", "child", "grandchild"]),
-    ).toBe(false);
-  });
-});
-
 describe("getFailFastEnvironmentConfig", () => {
   it("uses default values when env values are undefined", () => {
     const cypressLike = createCypressLike({
@@ -161,8 +118,6 @@ describe("getFailFastEnvironmentConfig", () => {
       strategy: RUN_STRATEGY,
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
-      strategyIsSpec: false,
-      strategyIsDescribe: false,
       bail: GLOBAL_CONFIG_DEFAULT_VALUES[BAIL_GLOBAL_CONFIG],
     });
   });
@@ -179,8 +134,6 @@ describe("getFailFastEnvironmentConfig", () => {
       strategy: RUN_STRATEGY,
       ignorePerTestConfig: GLOBAL_CONFIG_DEFAULT_VALUES[IGNORE_PER_TEST_CONFIG],
       enabled: GLOBAL_CONFIG_DEFAULT_VALUES[ENABLED_GLOBAL_CONFIG],
-      strategyIsSpec: false,
-      strategyIsDescribe: false,
       bail: 3,
     });
   });
@@ -197,8 +150,6 @@ describe("getFailFastEnvironmentConfig", () => {
       strategy: SPEC_STRATEGY,
       ignorePerTestConfig: true,
       enabled: false,
-      strategyIsSpec: true,
-      strategyIsDescribe: false,
       bail: 2,
     });
   });
@@ -225,7 +176,6 @@ describe("getFailFastPluginConfig", () => {
       } as unknown as Pick<Cypress.PluginConfigOptions, "expose">),
     ).toMatchObject({
       strategy: RUN_STRATEGY,
-      strategyIsSpec: false,
     });
   });
 
@@ -238,34 +188,34 @@ describe("getFailFastPluginConfig", () => {
       } as unknown as Pick<Cypress.PluginConfigOptions, "expose">),
     ).toMatchObject({
       strategy: SPEC_STRATEGY,
-      strategyIsSpec: true,
     });
   });
 });
 
 describe("helper config accessors", () => {
-  it("returns strategyIsSpec from currentStrategyIsSpec", () => {
-    const cypressLike = createCypressLike({
-      [IGNORE_PER_TEST_CONFIG]: false,
-      [ENABLED_GLOBAL_CONFIG]: true,
-      [STRATEGY_GLOBAL_CONFIG]: "spec",
-      [BAIL_GLOBAL_CONFIG]: 1,
-    });
+  // Raw strategy strings are used on purpose instead of the exported constants:
+  // asserting against the constants would make input and expectation mutate
+  // together, letting mutations of the constants themselves survive.
+  const strategyAccessorsCases: [string, boolean, boolean][] = [
+    ["spec", true, false],
+    ["run", false, false],
+    ["describe", false, true],
+  ];
 
-    expect(currentStrategyIsSpec(cypressLike)).toBe(true);
-  });
+  it.each(strategyAccessorsCases)(
+    "returns the strategy accessors values for the %s strategy",
+    (strategy, expectedIsSpec, expectedIsDescribe) => {
+      const cypressLike = createCypressLike({
+        [IGNORE_PER_TEST_CONFIG]: false,
+        [ENABLED_GLOBAL_CONFIG]: true,
+        [STRATEGY_GLOBAL_CONFIG]: strategy,
+        [BAIL_GLOBAL_CONFIG]: 1,
+      });
 
-  it("returns strategyIsDescribe from currentStrategyIsDescribe", () => {
-    const cypressLike = createCypressLike({
-      [IGNORE_PER_TEST_CONFIG]: false,
-      [ENABLED_GLOBAL_CONFIG]: true,
-      [STRATEGY_GLOBAL_CONFIG]: "describe",
-      [BAIL_GLOBAL_CONFIG]: 1,
-    });
-
-    expect(currentStrategyIsDescribe(cypressLike)).toBe(true);
-    expect(currentStrategyIsSpec(cypressLike)).toBe(false);
-  });
+      expect(currentStrategyIsSpec(cypressLike)).toBe(expectedIsSpec);
+      expect(currentStrategyIsDescribe(cypressLike)).toBe(expectedIsDescribe);
+    },
+  );
 
   it("returns ignorePerTestConfig from shouldIgnorePerTestConfig", () => {
     const cypressLike = createCypressLike({

@@ -9,12 +9,28 @@ import {
   LOG_TASK,
   LOG_PREFIX,
 } from "../Shared/Constants";
-import { getFailFastPluginConfig, titlePathStartsWith } from "../Shared/Config";
+import { getFailFastPluginConfig } from "../Shared/Config";
+import { titlePathStartsWith } from "../Shared/TitlePath";
 import type {
+  FailedTestsTaskPayload,
   FailFastPluginConfigOptions,
   ShouldSkipTaskPayload,
   TriggerFailFastTaskPayload,
 } from "./Tasks.types";
+
+/**
+ * Builds the key used to count failures for a skip scope.
+ *
+ * Scopes are only present under the `describe` strategy; every other strategy
+ * counts failures under the empty key, preserving a single global counter. The
+ * title path is serialized instead of joined so that paths with different
+ * shapes can never produce the same key.
+ * @param skipScopeTitlePath Title path of the describe block the failure belongs to.
+ * @returns Key identifying the failure counter to use.
+ */
+function failedTestsScopeKey(skipScopeTitlePath?: string[]): string {
+  return skipScopeTitlePath?.length ? JSON.stringify(skipScopeTitlePath) : "";
+}
 
 /**
  * Registers Node-side Cypress tasks used to coordinate fail-fast state.
@@ -29,7 +45,15 @@ export function registerFailFastTasks(
 ) {
   // store skip flag
   let shouldSkipFlag = false;
-  let failedTests = 0;
+  /*
+    Failed tests count, keyed by skip scope. The `describe` strategy counts
+    failures per describe block, so that the bail limit applies to each block
+    independently: skipping a block is decided by the failures inside it, not by
+    failures happening anywhere else in the spec file. Every other strategy
+    sends no scope and therefore shares the empty key, behaving as a single
+    global counter.
+  */
+  const failedTestsByScope = new Map<string, number>();
   /*
     Title path of the describe block where fail-fast was triggered. Only set by
     the `describe` strategy: when present, skip mode affects only the tests
@@ -125,14 +149,14 @@ export function registerFailFastTasks(
 
       return shouldSkipFlag;
     },
-    [FAILED_TESTS_TASK]: function (value: boolean) {
-      if (value === true) {
-        failedTests++;
-      }
+    [FAILED_TESTS_TASK]: function (value?: FailedTestsTaskPayload) {
+      const scopeKey = failedTestsScopeKey(value?.skipScopeTitlePath);
+      const failedTests = (failedTestsByScope.get(scopeKey) ?? 0) + 1;
+      failedTestsByScope.set(scopeKey, failedTests);
       return failedTests;
     },
     [RESET_FAILED_TESTS_TASK]: function () {
-      failedTests = 0;
+      failedTestsByScope.clear();
       return null;
     },
     [LOG_TASK]: function (message: string) {

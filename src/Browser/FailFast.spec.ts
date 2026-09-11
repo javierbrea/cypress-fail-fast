@@ -72,9 +72,14 @@ function createHookRegisterer() {
   };
 }
 
-function createCyLike(initialShouldSkip = false, initialFailedTests = 0) {
+function createCyLike(initialShouldSkip = false) {
   let shouldSkip = initialShouldSkip;
-  let failedTests = initialFailedTests;
+  /*
+    The failed-tests task is a Node-side collaborator: this stub only feeds a
+    count back to the bail check. Splitting that count per describe block is
+    the task's own behavior, covered in `src/Node/Tasks.spec.ts`.
+  */
+  let failedTests = 0;
 
   const task = jest.fn((taskName: string, value: unknown): unknown => {
     if (taskName === SHOULD_SKIP_TASK) {
@@ -100,7 +105,7 @@ function createCyLike(initialShouldSkip = false, initialFailedTests = 0) {
       return null;
     }
 
-    if (taskName === FAILED_TESTS_TASK && value === true) {
+    if (taskName === FAILED_TESTS_TASK) {
       failedTests++;
       return {
         then: (callback: (currentValue: number) => void) => {
@@ -306,9 +311,11 @@ describe("registerFailFast", () => {
 
     expect(mockedTestHasFailed).not.toHaveBeenCalled();
     expect(mockedFailFastIsEnabled).not.toHaveBeenCalled();
-    expect(cyLike.task).not.toHaveBeenCalledWith(FAILED_TESTS_TASK, true, {
-      log: false,
-    });
+    expect(cyLike.task).not.toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      expect.anything(),
+      { log: false },
+    );
   });
 
   it("does not register failure when test has not failed", () => {
@@ -365,13 +372,15 @@ describe("registerFailFast", () => {
     expect(mockedFailFastIsEnabled).toHaveBeenCalledTimes(1);
     expect(mockedFailFastIsEnabled.mock.calls[0]?.[0]).toBe(currentTest);
     expect(mockedFailFastIsEnabled.mock.calls[0]?.[1]).toBe(cypressLike);
-    expect(cyLike.task).not.toHaveBeenCalledWith(FAILED_TESTS_TASK, true, {
-      log: false,
-    });
+    expect(cyLike.task).not.toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      expect.anything(),
+      { log: false },
+    );
   });
 
   it("logs failure count and does not enable skip mode when bail is not reached", () => {
-    const cyLike = createCyLike(false, 0);
+    const cyLike = createCyLike();
     const beforeHook = createHookRegisterer();
     const beforeEachHook = createHookRegisterer();
     const afterEachHook = createHookRegisterer();
@@ -398,9 +407,11 @@ describe("registerFailFast", () => {
       LOG_TASK,
       'Test "suite should continue" has failed',
     );
-    expect(cyLike.task).toHaveBeenCalledWith(FAILED_TESTS_TASK, true, {
-      log: false,
-    });
+    expect(cyLike.task).toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      { skipScopeTitlePath: undefined },
+      { log: false },
+    );
     expect(cyLike.task).toHaveBeenCalledWith(
       LOG_TASK,
       `${FAILED_TEST_MESSAGE}: 1/2`,
@@ -413,7 +424,7 @@ describe("registerFailFast", () => {
   });
 
   it("enables skip mode when bail limit is reached", () => {
-    const cyLike = createCyLike(false, 0);
+    const cyLike = createCyLike();
     const beforeHook = createHookRegisterer();
     const beforeEachHook = createHookRegisterer();
     const afterEachHook = createHookRegisterer();
@@ -513,7 +524,7 @@ describe("registerFailFast", () => {
   });
 
   it("enables skip mode with skip scope when strategy is describe and bail limit is reached", () => {
-    const cyLike = createCyLike(false, 0);
+    const cyLike = createCyLike();
     const beforeHook = createHookRegisterer();
     const beforeEachHook = createHookRegisterer();
     const afterEachHook = createHookRegisterer();
@@ -541,6 +552,11 @@ describe("registerFailFast", () => {
     expect(mockedGetSkipScopeTitlePath).toHaveBeenCalledTimes(1);
     expect(mockedGetSkipScopeTitlePath.mock.calls[0]?.[0]).toBe(currentTest);
     expect(mockedGetSkipScopeTitlePath).toHaveBeenCalledWith(currentTest);
+    expect(cyLike.task).toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      { skipScopeTitlePath: ["a suite"] },
+      { log: false },
+    );
     expect(cyLike.task).toHaveBeenCalledWith(TRIGGER_FAIL_FAST_TASK, {
       test: {
         name: "a test",
@@ -550,8 +566,62 @@ describe("registerFailFast", () => {
     });
   });
 
+  it("reports every failure under its own describe block", () => {
+    const cyLike = createCyLike();
+    const beforeHook = createHookRegisterer();
+    const beforeEachHook = createHookRegisterer();
+    const afterEachHook = createHookRegisterer();
+
+    mockedTestHasFailed.mockReturnValue(true);
+    mockedFailFastIsEnabled.mockReturnValue(true);
+    mockedBailConfig.mockReturnValue(2);
+    mockedCurrentStrategyIsDescribe.mockReturnValue(true);
+
+    registerFailFast(
+      cypressLike,
+      cyLike,
+      beforeHook.register,
+      beforeEachHook.register,
+      afterEachHook.register,
+    );
+
+    mockedGetSkipScopeTitlePath.mockReturnValue(["first block"]);
+    afterEachHook.getCallback()?.call({
+      currentTest: createCurrentTest("first block a test"),
+    } as unknown as Mocha.Context);
+
+    mockedGetSkipScopeTitlePath.mockReturnValue(["second block"]);
+    afterEachHook.getCallback()?.call({
+      currentTest: createCurrentTest("second block a test"),
+    } as unknown as Mocha.Context);
+
+    /*
+      The scope is resolved again for every failure instead of being reused, so
+      each one is counted under the block it happened in. Keeping those counters
+      apart is the failed-tests task's job, covered in `src/Node/Tasks.spec.ts`.
+    */
+    expect(cyLike.task).toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      { skipScopeTitlePath: ["first block"] },
+      { log: false },
+    );
+    expect(cyLike.task).toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      { skipScopeTitlePath: ["second block"] },
+      { log: false },
+    );
+    // Whichever failure reaches the bail limit scopes skip mode to its own block.
+    expect(cyLike.task).toHaveBeenCalledWith(TRIGGER_FAIL_FAST_TASK, {
+      test: {
+        name: "a test",
+        fullTitle: "second block a test",
+      },
+      skipScopeTitlePath: ["second block"],
+    });
+  });
+
   it("does not resolve skip scope when strategy is not describe", () => {
-    const cyLike = createCyLike(false, 0);
+    const cyLike = createCyLike();
     const beforeHook = createHookRegisterer();
     const beforeEachHook = createHookRegisterer();
     const afterEachHook = createHookRegisterer();
@@ -576,5 +646,10 @@ describe("registerFailFast", () => {
     afterEachHook.getCallback()?.call(context);
 
     expect(mockedGetSkipScopeTitlePath).not.toHaveBeenCalled();
+    expect(cyLike.task).toHaveBeenCalledWith(
+      FAILED_TESTS_TASK,
+      { skipScopeTitlePath: undefined },
+      { log: false },
+    );
   });
 });
