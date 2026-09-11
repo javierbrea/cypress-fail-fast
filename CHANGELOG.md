@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- feat: Add `describe` strategy, which skips only the remaining tests in the describe block where the failure happened. The skipped scope is always the failed test's immediate parent describe, independent of per-suite configuration.
+- feat: Add `describe` strategy, which skips only the remaining tests in the describe block where the failure happened. The skipped scope is always the failed test's immediate parent describe, independent of per-suite configuration. Note that this widens the `FailFastStrategy` type and the `strategy` property received by the `onFailFastTriggered` hook, so TypeScript consumers exhaustively switching over that value may need to handle the new member.
+- feat: Apply `failFastBail` per describe block when the `describe` strategy is used. Failures are counted separately for each block, so a block is skipped once it accumulates the configured number of failures on its own. The `spec` and `run` strategies keep counting failures globally.
 
 ## [8.1.0] - 2026-03-23
 

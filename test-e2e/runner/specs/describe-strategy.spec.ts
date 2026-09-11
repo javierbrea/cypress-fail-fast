@@ -35,6 +35,34 @@ runSpecsTests("When describe strategy is set", {
   ],
 });
 
+runSpecsTests("When describe strategy is set and bail is greater than one", {
+  cypressVariant: "cypress-latest",
+  specsFolder: "describe-strategy-bail",
+  config: {
+    failFastStrategy: "describe",
+    failFastBail: 2,
+  },
+  specsResults: [
+    // First spec: one failure in each describe block. Failures are counted per
+    // block, so neither reaches the bail limit and nothing is skipped. With a
+    // counter shared by the whole spec this would be 1 passed and 1 pending.
+    {
+      executed: 4,
+      passed: 2,
+      failed: 2,
+      pending: 0,
+    },
+    // Second spec: the first block accumulates both failures itself, reaching
+    // the bail limit, so only its remaining test is skipped.
+    {
+      executed: 4,
+      passed: 1,
+      failed: 2,
+      pending: 1,
+    },
+  ],
+});
+
 runSpecsTests(
   "When describe strategy is set and specs contain a single describe",
   {

@@ -151,3 +151,44 @@ runSpecsTests("When shouldTriggerFailFast is async", {
     asyncHooks: true,
   },
 });
+
+runSpecsTests(
+  "When shouldTriggerFailFast is enabled and strategy is describe",
+  {
+    cypressVariant: "cypress-latest",
+    specsFolder: "describe-strategy",
+    config: {
+      failFastStrategy: "describe",
+    },
+    specsResults: [
+      // First spec: the failure in the first describe block scopes skip mode to
+      // that block, so the hook keeps being consulted for the tests of the second
+      // block. When it triggers, skip mode is widened to the whole spec, because
+      // a failure-less trigger has no describe block to scope itself to.
+      {
+        executed: 6,
+        passed: 1,
+        failed: 1,
+        pending: 4,
+      },
+      // Second and third specs: skip mode is reset per spec file, but the hook
+      // keeps returning true, so it triggers again on their first test.
+      {
+        executed: 2,
+        passed: 0,
+        failed: 0,
+        pending: 2,
+      },
+      {
+        executed: 5,
+        passed: 0,
+        failed: 0,
+        pending: 5,
+      },
+    ],
+    hooks: {
+      enableShouldTriggerFailFast: true,
+      enableSkipModeAfterTests: 2,
+    },
+  },
+);

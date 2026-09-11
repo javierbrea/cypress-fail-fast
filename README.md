@@ -85,13 +85,17 @@ The following properties are supported:
   - `"describe"`: Skip remaining tests only in the describe block where the failure happened. The skipped scope is resolved as follows:
     - The scope is always the failed test's immediate parent describe block (nested describes inside it are also skipped), regardless of where per-test or per-suite configuration is declared.
     - Describe blocks outside the scope, and the rest of the spec files, run normally. Note that fail-fast mode may be triggered again by a failure in another describe block, moving the skipped scope to that block.
-    - Note: describe blocks are identified by their title paths, so two sibling describe blocks with exactly the same title cannot be told apart. Use unique describe titles within a spec file when using this strategy.
+    - Note: describe blocks are identified by their title paths, so two sibling describe blocks with exactly the same title cannot be told apart: they share both the skip scope and the failure counter used by `failFastBail`. Use unique describe titles within a spec file when using this strategy.
 
 - `failFastEnabled`: `boolean` (default: `true`)  
   Enable or disable the fail-fast behavior globally. When set to `false`, fail-fast can still be enabled for specific tests or suites using per-test configuration.
 
 - `failFastBail`: `number` (default: `1`)  
-  Number of failing test suites required before entering fail-fast mode. For example, `failFastBail: 2` will start skipping tests after failures in two different suites or spec files, depending on the strategy. When strategy is `"spec"` or `"describe"`, failures are reset at the beginning of each spec file, so fail-fast mode will be triggered after the configured number of failures within the same spec. When strategy is `"run"`, failures are tracked across the entire run, so fail-fast mode will be triggered after the configured number of failures regardless of which spec files they occur in. With `"describe"`, the counter is per spec, but only the block containing the failure that reaches the bail limit is skipped; if that block has no tests left, fail-fast can trigger without skipping any tests.
+  Number of failed tests required before entering fail-fast mode. For example, `failFastBail: 2` will start skipping tests once two failures have been counted. Where those failures are counted depends on the strategy:
+
+  - `"run"`: Failures are tracked across the entire run, so fail-fast mode will be triggered after the configured number of failures regardless of which spec files they occur in.
+  - `"spec"`: Failures are reset at the beginning of each spec file, so fail-fast mode will be triggered after the configured number of failures within the same spec.
+  - `"describe"`: Failures are also reset at the beginning of each spec file, but they are counted separately for each describe block, so the limit applies to every block independently. A block is skipped once it accumulates the configured number of failures on its own, and failures in other blocks never count towards it. The block a failure is counted for is the failed test's immediate parent describe, the same one used as skip scope, so a failure inside a nested describe counts for that nested block and not for its ancestors.
 
 - `failFastIgnorePerTestConfig`: `boolean` (default: `false`)  
   When `true`, the plugin ignores any per-test or per-suite `failFast` configuration and only uses the global options exposed through `expose`. This is useful when you want to control fail-fast exclusively at a global level (for example, disabling it completely or enabling it for the entire run) and avoid any accidental overrides in tests or suites.

@@ -12,6 +12,7 @@ import {
   FAILED_TEST_MESSAGE,
 } from "../Shared/Constants";
 import type {
+  FailedTestsTaskPayload,
   FailFastFailedTestData,
   ShouldSkipTaskPayload,
   TriggerFailFastTaskPayload,
@@ -114,19 +115,27 @@ export function registerFailFast(
   }
 
   /**
-   * Increments the failed-tests counter.
-   * @returns Cypress chainable resolving to total failed tests.
+   * Increments the failed-tests counter of the skip scope the failure belongs to.
+   * @param skipScopeTitlePath Title path of the describe block to count the failure for.
+   * @returns Cypress chainable resolving to total failed tests in that scope.
    */
-  function registerFailure() {
-    return cy.task<number>(FAILED_TESTS_TASK, true, { log: false });
+  function registerFailure(skipScopeTitlePath?: string[]) {
+    const payload: FailedTestsTaskPayload = {
+      skipScopeTitlePath,
+    };
+    return cy.task<number>(FAILED_TESTS_TASK, payload, { log: false });
   }
 
   /**
-   * Runs a callback once the configured bail threshold is reached.
+   * Runs a callback once the configured bail threshold is reached in a scope.
+   * @param skipScopeTitlePath Title path of the describe block to count the failure for.
    * @param callback Callback executed when failed tests reach bail limit.
    */
-  function registerFailureAndRunIfBailLimitIsReached(callback: () => void) {
-    registerFailure().then((value) => {
+  function registerFailureAndRunIfBailLimitIsReached(
+    skipScopeTitlePath: string[] | undefined,
+    callback: () => void,
+  ) {
+    registerFailure(skipScopeTitlePath).then((value) => {
       const bail = bailConfig(Cyp);
       log(`${FAILED_TEST_MESSAGE}: ${value}/${bail}`);
       if (value >= bail) {
@@ -187,15 +196,17 @@ export function registerFailFast(
       failFastIsEnabled(currentTest, Cyp)
     ) {
       log(`Test "${currentTest.fullTitle()}" has failed`);
-      registerFailureAndRunIfBailLimitIsReached(() => {
-        /*
-          The skip scope is only resolved (and sent) for the `describe`
-          strategy: for `spec` and `run` an unscoped skip mode preserves the
-          previous behavior of skipping every remaining test.
-        */
-        const skipScopeTitlePath = currentStrategyIsDescribe(Cyp)
-          ? getSkipScopeTitlePath(currentTest)
-          : undefined;
+      /*
+        The skip scope is only resolved (and sent) for the `describe` strategy:
+        for `spec` and `run` an unscoped skip mode preserves the previous
+        behavior of skipping every remaining test. It is also what the failure
+        is counted against, so that the bail limit applies to each describe
+        block independently.
+      */
+      const skipScopeTitlePath = currentStrategyIsDescribe(Cyp)
+        ? getSkipScopeTitlePath(currentTest)
+        : undefined;
+      registerFailureAndRunIfBailLimitIsReached(skipScopeTitlePath, () => {
         enableSkipMode(mapFailedTest(currentTest), skipScopeTitlePath);
       });
     }

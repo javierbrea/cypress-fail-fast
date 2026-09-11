@@ -19,7 +19,7 @@ type HooksConfig = {
   enableOnFailFastTriggered?: boolean;
   /** Expected log message when the `onFailFastTriggered` hook is enabled. */
   expectFailFastTriggeredLog?: {
-    /* Strategy used when triggering fail-fast mode. It can be either `"spec"` or `"run"`. */
+    /* Strategy used when triggering fail-fast mode. It can be either `"spec"`, `"run"` or `"describe"`. */
     strategy: FailFastConfig["failFastStrategy"];
     /* Failed test that triggers fail-fast mode. It has to have `name` and `fullTitle` properties. */
     test: {

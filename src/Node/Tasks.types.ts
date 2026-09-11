@@ -66,6 +66,19 @@ export type ShouldSkipTaskPayload = {
 };
 
 /**
+ * Payload accepted by the failed-tests task.
+ */
+export type FailedTestsTaskPayload = {
+  /**
+   * Title path of the describe block the failure belongs to. Only provided when
+   * the `describe` strategy is active, so that the bail limit applies to each
+   * describe block independently. Other strategies send no scope, and their
+   * failures are therefore counted globally.
+   */
+  skipScopeTitlePath?: string[];
+};
+
+/**
  * Node-side plugin options for cypress-fail-fast.
  */
 export type FailFastPluginConfigOptions = {
