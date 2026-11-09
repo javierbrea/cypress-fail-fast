@@ -53,7 +53,7 @@
     "chalk": "4.1.2"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
+    "@babel/core": "7.29.13",
     "@babel/preset-env": "7.29.7",
     "@babel/preset-typescript": "7.28.5",
     "@eslint/js": "9.32.0",
@@ -74,8 +74,8 @@
     "eslint-import-resolver-typescript": "4.4.5",
     "eslint-plugin-cypress": "6.2.3",
     "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jest": "29.15.4",
-    "eslint-plugin-prettier": "5.5.6",
+    "eslint-plugin-jest": "29.15.5",
+    "eslint-plugin-prettier": "5.5.7",
     "fs-extra": "11.3.6",
     "globals": "16.3.0",
     "husky": "9.1.7",
